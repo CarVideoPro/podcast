@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Player</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header">
+        <img src="logo.png" alt="Logo" class="main-logo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\'%3E%3Cpath fill=\'%236750a4\' d=\'M4 4H20V6H4V4M4 7H12V9H4V7M4 10H20V12H4V10M4 13H12V15H4V13M4 16H20V18H4V16Z\' /%3E%3C/svg%3E'; this.onerror=null;">
+        <div class="header-info-container">
+            <span class="logo-text">Car Video Pro Podcasts</span>
+            <a href="https://t.me/car_video_pro" target="_blank" rel="noopener noreferrer" class="telegram-link-header">Telegram: t.me/car_video_pro</a>
+        </div>
+    </header>
+
+    <div id="loading-indicator">Podcastler yükleniyor...</div>
+
+    <div class="container">
+        <!-- Main content area (left side) -->
+        <main class="main-content">
+            <!-- Home View -->
+            <div id="home-view">
+                <section id="favorites-section">
+                    <h2>Favorilerin</h2>
+                    <div class="podcast-grid scrollable" id="favorites-grid">
+                        <p class="placeholder">Hiç favorin yok. Favorilerine podcast eklemek için ♡ butonuna tıkla.</p>
+                    </div>
+                </section>
+                <section id="top-podcasts-section">
+                    <h2>En Çok Dinlenen 100 Podcast</h2>
+                    <div class="podcast-list" id="top-podcasts-list"></div>
+                </section>
+            </div>
+
+            <!-- Podcast Detail View -->
+            <div id="podcast-detail-view" class="hidden"></div>
+        </main>
+
+        <!-- Player (right side) -->
+        <aside class="player-container">
+            <div id="player-podcast-info" class="player-section card">
+                 <p class="placeholder">Seçili Podcast Yok</p>
+            </div>
+
+            <div id="player-episode-info" class="player-section card">
+                <div class="episode-logo-container">
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Episode Art" id="player-episode-logo" class="placeholder-bg">
+                </div>
+                <h3 id="player-episode-name">Oynatmak için bir bölüm seçin</h3>
+            </div>
+
+            <!-- ===== NEW: Progress Bar ===== -->
+            <div class="progress-container">
+                <span id="current-time">0:00</span>
+                <input type="range" id="progress-bar" value="0" step="1">
+                <span id="total-duration">0:00</span>
+            </div>
+            
+            <div class="player-controls">
+                <button id="prev-btn">⏮</button>
+                <button id="play-pause-btn">▶</button>
+                <button id="next-btn">⏭</button>
+            </div>
+            <audio id="audio-player" style="display: none;"></audio>
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
