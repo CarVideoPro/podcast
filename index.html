@@ -1,527 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Podcast Player</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Yakında Sizlerleyiz!</title>
     <style>
-        /* --- Material 3 Style Overhaul (Flat Version) --- */
-        :root {
-            --background-color: #101224;
-            --surface-color: #101224;
-            --surface-container-color: #282b4c;
-            --primary-color: #2873ce;
-            --on-primary-color: #ffffff;
-            --on-surface-color: #ffffff;
-            --on-surface-variant-color: #ffffff;
-            --outline-color: #49454f;
-            --accent-color: #e0245e;
-            --border-radius: 10px; /* ~40% smaller */
-            --border-radius-small: 7px; /* ~40% smaller */
-        }
+        /* CSS (Stil) Kodları 
+          Sayfanın profesyonel görünmesini sağlar.
+        */
 
-        /* Basic Reset & Font */
-        body {
-            font-family: 'Roboto', sans-serif;
+        /* Temel sayfa ayarları */
+        body, html {
+            height: 100%;
             margin: 0;
-            background-color: var(--background-color);
-            color: var(--on-surface-color);
-            font-size: 12.5px; /* Base font size reduction */
-            padding-bottom: 80px; /* ~40% smaller */
-        }
-
-        h2 {
-            color: var(--on-surface-variant-color); font-weight: 500;
-            padding-bottom: 6px; margin-top: 12px; border-bottom: 1px solid var(--outline-color);
-            font-size: 1.1em;
-        }
-        .card { background-color: var(--surface-container-color); border-radius: var(--border-radius); padding: 10px; }
-
-        /* Layout */
-        .container { max-width: 1400px; margin: auto; }
-        .main-content { min-width: 300px; padding: 15px; }
-        
-        /* Helper class */
-        .hidden { display: none !important; }
-
-        /* Loading Indicator */
-        #loading-indicator {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 255, 255, 1);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.5em; z-index: 2000;
-        }
-        
-        /* NEW: Brand Info Subheader */
-        .brand-info-subheader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 8px;
-            margin-bottom: 10px;
-            background-color: rgba(0,0,0,0.15);
-            border-radius: var(--border-radius-small);
-        }
-        .brand-info-subheader .logo-text { font-size: 1em; font-weight: 700; color: var(--on-primary-color); }
-        .brand-info-subheader .telegram-link-header { font-size: 0.9em; color: var(--primary-color); text-decoration: none; }
-        .brand-info-subheader .telegram-link-header:hover { text-decoration: underline; }
-
-        /* Home View Podcast List */
-        .podcast-list { display: flex; flex-direction: column; gap: 7px; }
-        .podcast-list-item {
-            display: flex; align-items: center; padding: 7px; cursor: pointer;
-            background-color: var(--surface-container-color); border-radius: var(--border-radius);
-        }
-        .podcast-list-item .rank {
-            font-size: 0.9em; font-weight: 500; color: var(--on-surface-variant-color);
-            margin-right: 10px; width: 20px; text-align: center;
-        }
-        .podcast-list-item img { width: 38px; height: 38px; object-fit: cover; border-radius: 5px; margin-right: 10px; }
-        .podcast-list-item .podcast-info { flex-grow: 1; }
-        .podcast-list-item .podcast-name { font-weight: 500; font-size: 0.9em; }
-
-        /* Favorite Button Styles */
-        .favorite-btn {
-            font-size: 1.1em; background-color: rgba(0,0,0,0.08); color: var(--on-surface-variant-color);
-            border: none; cursor: pointer; transition: background-color 0.2s, color 0.2s;
-            width: 28px; height: 28px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            flex-shrink: 0; margin-left: 7px;
-        }
-        .favorite-btn:hover { background-color: rgba(0,0,0,0.12); }
-        .favorite-btn.favorited { background-color: var(--primary-color); color: var(--on-primary-color); }
-
-        /* ================================================= */
-        /* NEW: Podcast Detail View - 50% SMALLER */
-        /* ================================================= */
-        .podcast-detail-header {
-            display: flex; flex-wrap: wrap; gap: 8px 12px;
-            align-items: center; margin-bottom: 12px; padding: 12px;
-        }
-        .podcast-detail-header img { width: 63px; height: 63px; border-radius: 12px; flex-shrink: 0; }
-        .podcast-detail-header .info { flex-grow: 1; min-width: 150px; }
-        .podcast-detail-header h1 { margin: 0 0 8px 0; font-size: 1.2em; }
-        .podcast-detail-header .description {
-            font-size: 0.8em; color: var(--on-surface-variant-color);
-            line-height: 1.5; margin-bottom: 8px;
-        }
-        .podcast-detail-header .favorite-btn { width: 26px; height: 26px; font-size: 1em; } /* Special scaling */
-
-        .back-button {
-            font-size: 1.2em; font-weight: bold; cursor: pointer; margin-bottom: 10px;
-            width: 26px; height: 26px; border-radius: 50%; background-color: var(--primary-color);
-            color: var(--on-surface-variant-color); display: inline-flex; justify-content: center;
-            align-items: center; padding-right: 1px; transition: background-color 0.2s;
-        }
-
-        .episode-list-item {
-            display: flex; align-items: center; padding: 7px; margin-bottom: 4px;
-            cursor: pointer; border-radius: var(--border-radius-small);
-            background-color: var(--surface-container-color);
-        }
-        .episode-list-item .ep-number { margin-right: 8px; color: var(--on-surface-variant-color); font-size: 0.8em; }
-        .episode-list-item .ep-name { flex-grow: 1; font-weight: 500; font-size: 0.8em; }
-        .played-indicator {
-            font-size: 0.9em; width: 18px; height: 18px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            background-color: rgba(0,0,0,0.1); color: transparent;
-        }
-        .played-indicator.played { background-color: var(--primary-color); color: var(--on-primary-color); font-weight: bold; }
-        
-        /* ================================================= */
-        /* Fixed Player Styles */
-        /* ================================================= */
-        .player-container {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background-color: #282b4c;
-            border-top: 1px solid var(--outline-color);
-            z-index: 1000; display: flex; align-items: center;
-            justify-content: space-between; padding: 7px 15px;
-            box-sizing: border-box; gap: 12px;
-        }
-        
-        .player-center-section {
-            flex: 0 0 auto; display: flex; flex-direction: column;
-            align-items: center; gap: 4px;
-        }
-        .progress-container {
-            display: flex; align-items: center; gap: 6px; width: 180px; /* Wider progress bar */
-            font-size: 0.7em; color: var(--on-surface-variant-color);
-        }
-
-        #player-podcast-info {
-            flex: 1 1 auto; display: flex; align-items: center; gap: 7px; min-width: 120px; overflow: hidden;
-        }
-        #player-favorites-section {
-            flex: 1 1 auto; display: flex; gap: 7px; min-width: 120px; overflow-x: auto;
-        }
-
-        #player-podcast-info img { width: 36px; height: 36px; border-radius: 5px; }
-        #player-podcast-info .track-details { display: flex; flex-direction: column; overflow: hidden;}
-        #player-episode-name, #player-podcast-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #player-episode-name { font-weight: 500; font-size: 0.8em; }
-        #player-podcast-name { font-size: 0.7em; color: var(--on-surface-variant-color); }
-        
-        /* ================================================= */
-        /* NEW: 3D-Like Player Control Button Styles */
-        /* ================================================= */
-        .player-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 18px; /* Wider gap */
-        }
-        .player-controls button {
-            border: none;
-            cursor: pointer;
-            display: flex;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex; /* İçeriği ortalamak için modern yöntem */
             align-items: center;
             justify-content: center;
-            color: var(--on-primary-color);
-            border-radius: 50%;
-            background: linear-gradient(145deg, #2b2f54, #242747);
-            box-shadow: 4px 4px 8px #20233b, -4px -4px 8px #30335d;
-            transition: all 0.1s ease-in-out;
+            background-color: #f0f2f5; /* Hafif gri bir arka plan */
         }
-        .player-controls button:active {
-            background: #282b4c;
-            box-shadow: inset 4px 4px 8px #20233b, inset -4px -4px 8px #30335d;
-            transform: scale(0.95);
-        }
-        #prev-btn, #next-btn {
-             width: 38px;
-             height: 38px;
-        }
-        #play-pause-btn {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(145deg, #2b84f3, #246fb8); /* Primary color gradient */
-            box-shadow: 4px 4px 8px #205a9c, -4px -4px 8px #308cff;
-        }
-         #play-pause-btn:active {
-            background: #2873ce;
-            box-shadow: inset 4px 4px 8px #205a9c, inset -4px -4px 8px #308cff;
-         }
 
-        .player-controls button svg { width: 16px; height: 16px; }
-        #play-pause-btn svg { width: 22px; height: 22px; }
+        /* İçerik kutusu */
+        .container {
+            text-align: center;
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 12px; /* Köşeleri yumuşatma */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* Profesyonel gölge efekti */
+            max-width: 500px;
+            width: 90%; /* Mobil cihazlar için */
+            box-sizing: border-box;
+        }
 
-        #progress-bar {
-            -webkit-appearance: none; appearance: none; width: 100%; flex-grow: 1; height: 3px; background: #101224; border-radius: 2px; outline: none; cursor: pointer;
+        /* İkon (Resim) Stili 
+          Bu bir SVG (Vektörel Grafik) ikonudur. Kalitesi hiç bozulmaz.
+        */
+        .icon {
+            width: 80px;
+            height: 80px;
+            color: #007bff; /* Ana tema rengi (profesyonel bir mavi) */
+            margin-bottom: 25px;
+            animation: spin 8s linear infinite; /* İkonun yavaşça dönmesi için */
         }
-        #progress-bar::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 10px; height: 10px; background: var(--primary-color); border-radius: 50%;
-        }
-        
-        /* Favorites section inside the player */
-        #player-favorites-section::-webkit-scrollbar { height: 2px; }
-        #player-favorites-section::-webkit-scrollbar-track { background: transparent; }
-        #player-favorites-section::-webkit-scrollbar-thumb { background: #101224; border-radius: 2px;}
 
-        .player-fav-card img {
-            width: 36px; height: 36px; border-radius: 5px; cursor: pointer;
+        /* Başlık */
+        h1 {
+            font-size: 2.2rem; /* Büyük ve okunaklı başlık */
+            color: #333;
+            margin: 0 0 15px 0;
         }
-        .placeholder { color: var(--on-surface-variant-color); font-size: 0.9em;}
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            #player-favorites-section { display: none; }
-            #player-podcast-info { min-width: 120px; }
-            .progress-container { width: 120px; }
+
+        /* Açıklama metni */
+        p {
+            font-size: 1.1rem;
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
         }
-         @media (max-width: 500px) {
-            #player-podcast-info { display: none; }
-            #player-favorites-section { display: none; }
-            .player-container { justify-content: center; } /* Center the controls */
-         }
+
+        /* İkonun dönme animasyonu */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="loading-indicator">Podcastler yükleniyor...</div>
 
     <div class="container">
-        <main class="main-content">
-            <div id="home-view">
-                <section id="top-podcasts-section">
-                    <h2>En Çok Dinlenen 100 Podcast</h2>
-                    <div class="brand-info-subheader">
-                        <span class="logo-text">Car Video Pro Podcasts</span>
-                        <a href="https://t.me/car_video_pro" target="_blank" rel="noopener noreferrer" class="telegram-link-header">Telegram: t.me/car_video_pro</a>
-                    </div>
-                    <div class="podcast-list" id="top-podcasts-list"></div>
-                </section>
-            </div>
-            <div id="podcast-detail-view" class="hidden"></div>
-        </main>
+        
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19.13 5.09C15.22 1.18 8.78 1.18 4.87 5.09m0 13.82C8.78 22.82 15.22 22.82 19.13 18.91M12 8v8m-4-4h8"/>
+            <path d="M12 2v2m0 16v2m-9-9H1m19 0h-2m-2.12-6.36l-1.42-1.42M6.34 17.66l-1.42 1.42m12.72-1.42l-1.42-1.42m-9.88 1.42l-1.42-1.42"/>
+        </svg>
+
+        <h1>Sayfamız Yapım Aşamasında</h1>
+        <p>
+            Sizlere harika bir deneyim sunmak için çalışıyoruz.
+            Çok yakında yepyeni yüzümüzle karşınızda olacağız!
+        </p>
+
     </div>
 
-    <aside class="player-container">
-        <div class="player-center-section">
-             <div class="player-controls">
-                <button id="prev-btn"></button>
-                <button id="play-pause-btn"></button>
-                <button id="next-btn"></button>
-            </div>
-            <div class="progress-container">
-                <span id="current-time">0:00</span>
-                <input type="range" id="progress-bar" value="0" step="1">
-                <span id="total-duration">0:00</span>
-            </div>
-        </div>
-
-        <div id="player-podcast-info">
-             <p class="placeholder">Bölüm seçin</p>
-        </div>
-
-        <div id="player-favorites-section">
-             <p class="placeholder" style="font-size: 0.8em;">Favori ekle ♡</p>
-        </div>
-        
-        <audio id="audio-player" style="display: none;"></audio>
-    </aside>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let allPodcasts = [];
-            let currentPodcast = null;
-            let currentEpisodeIndex = -1;
-            let favorites = JSON.parse(localStorage.getItem('podcastFavorites')) || [];
-            let playedEpisodes = JSON.parse(localStorage.getItem('podcastPlayed')) || {};
-
-            const loadingIndicator = document.getElementById('loading-indicator');
-            const homeView = document.getElementById('home-view');
-            const detailView = document.getElementById('podcast-detail-view');
-            const topPodcastsList = document.getElementById('top-podcasts-list');
-            const audioPlayer = document.getElementById('audio-player');
-            const playerPodcastInfo = document.getElementById('player-podcast-info');
-            const playPauseBtn = document.getElementById('play-pause-btn');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const progressBar = document.getElementById('progress-bar');
-            const currentTimeSpan = document.getElementById('current-time');
-            const totalDurationSpan = document.getElementById('total-duration');
-
-            const ICONS = {};
-            ICONS.play = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z" /></svg>`;
-            ICONS.pause = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" /></svg>`;
-            ICONS.prev = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M6,18V6H8V18H6M9.5,12L18,6V18L9.5,12Z" /></svg>`;
-            ICONS.next = `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M16,18H18V6H16M6,18L14.5,12L6,6V18Z" /></svg>`;
-            
-            const CORS_PROXY_API = 'https://podcast.appecta.workers.dev/?url=';
-
-            const getProxiedUrl = (url) => {
-                if (!url || url.trim() === '') return 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-                return `${CORS_PROXY_API}${encodeURIComponent(url)}`;
-            };
-            const getElementText = (parent, tagName) => {
-                const element = parent.getElementsByTagName(tagName)[0];
-                return element ? element.textContent.trim() : '';
-            };
-            const formatTime = (seconds) => {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = Math.floor(seconds % 60);
-                return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
-            };
-
-            function parsePodcastFromXML(xmlString, rank) {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
-                if (xmlDoc.querySelector('parsererror')) { console.error('Failed to parse XML for rank:', rank); return null; }
-                const channel = xmlDoc.getElementsByTagName('channel')[0];
-                if (!channel) return null;
-                const itunesNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
-                let mainImage = '';
-                const itunesImage = channel.getElementsByTagNameNS(itunesNamespace, 'image')[0];
-                if (itunesImage) { mainImage = itunesImage.getAttribute('href');
-                } else { const standardImage = channel.getElementsByTagName('image')[0]; if (standardImage) { mainImage = getElementText(standardImage, 'url'); } }
-                const items = Array.from(channel.getElementsByTagName('item')).map(item => {
-                    const enclosure = item.getElementsByTagName('enclosure')[0];
-                    let episodeThumbnail = '';
-                    const itemItunesImage = item.getElementsByTagNameNS(itunesNamespace, 'image')[0];
-                    if (itemItunesImage) { episodeThumbnail = itemItunesImage.getAttribute('href'); }
-                    return {
-                        title: getElementText(item, 'title'), description: getElementText(item, 'description'), guid: getElementText(item, 'guid'),
-                        enclosure: { link: enclosure ? enclosure.getAttribute('url') : '', type: enclosure ? enclosure.getAttribute('type') : '', length: enclosure ? enclosure.getAttribute('length') : 0, },
-                        thumbnail: episodeThumbnail || mainImage,
-                    };
-                });
-                return {
-                    status: 'ok',
-                    feed: { rank, title: getElementText(channel, 'title'), description: getElementText(channel, 'description'), image: mainImage },
-                    items,
-                };
-            }
-
-            async function fetchPodcasts() {
-                const rssFeedText = `https://anchor.fm/s/44a38a74/podcast/rss
-https://www.omnycontent.com/d/playlist/5af088d6-01f8-4b3d-b372-acb600f45df6/bfc2b445-eb3b-4241-b228-ad950098be04/fa5fa5d2-e117-4161-8c59-ad95009915be/podcast.rss
-https://anchor.fm/s/e55fb424/podcast/rss
-https://www.erkamradyo.com/feed/17305
-https://www.spreaker.com/show/6707425/episodes/feed
-https://anchor.fm/s/925b3c1c/podcast/rss
-https://www.spreaker.com/show/5933165/episodes/feed
-https://podcasts.files.bbci.co.uk/p02pc9tn.rss
-https://www.spreaker.com/show/5332571/episodes/feed
-https://feeds.megaphone.fm/derindensesler
-https://anchor.fm/s/136c3d5c/podcast/rss
-https://www.spreaker.com/show/5743993/episodes/feed
-https://rss.art19.com/haddini-asan-yasam-rehberi
-https://feeds.megaphone.fm/PM8839168327
-https://feeds.megaphone.fm/sinan-canan-insanin-fabrika-ayarlari
-https://feeds.megaphone.fm/PM8841261106
-https://feeds.megaphone.fm/PM8722895261
-https://feeds.megaphone.fm/PM1758799800
-https://media.rss.com/biailemeselesi/feed.xml
-https://feeds.megaphone.fm/PM8433413889
-https://anchor.fm/s/1047fb3f4/podcast/rss
-https://anchor.fm/s/97464dfc/podcast/rss
-https://anchor.fm/s/6eb7e6ac/podcast/rss
-https://www.spreaker.com/show/4894686/episodes/feed`;
-                try {
-                    const rssUrls = rssFeedText.split('\n').filter(url => url.trim() !== '');
-                    const podcastPromises = rssUrls.map((url, index) =>
-                        fetch(`${CORS_PROXY_API}${encodeURIComponent(url)}`)
-                            .then(res => res.ok ? res.text() : Promise.reject(`Proxy fetch failed: ${res.status}`))
-                            .then(xmlString => parsePodcastFromXML(xmlString, index + 1))
-                            .catch(error => { console.error(`Error processing feed ${url}:`, error); return null; })
-                    );
-                    allPodcasts = (await Promise.all(podcastPromises)).filter(p => p !== null);
-                    renderHomeView();
-                    loadingIndicator.classList.add('hidden');
-                } catch (error) {
-                    console.error("Critical error:", error);
-                    loadingIndicator.innerText = 'Podcast verileri yüklenemedi';
-                }
-            }
-
-            function renderHomeView() { renderTopPodcasts(); renderFavorites(); }
-            
-            function renderTopPodcasts() {
-                topPodcastsList.innerHTML = '';
-                if (allPodcasts.length === 0) { topPodcastsList.innerHTML = `<p class="placeholder">Podcastler yüklenemedi.</p>`; return; }
-                allPodcasts.sort((a, b) => a.feed.rank - b.feed.rank).forEach(podcast => {
-                    const isFavorited = favorites.includes(podcast.feed.rank);
-                    const item = document.createElement('div');
-                    item.className = 'podcast-list-item';
-                    item.innerHTML = `<span class="rank">${podcast.feed.rank}</span><img src="${getProxiedUrl(podcast.feed.image)}" alt="${podcast.feed.title} Logo"><div class="podcast-info"><div class="podcast-name">${podcast.feed.title}</div></div><button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-rank="${podcast.feed.rank}">♡</button>`;
-                    item.addEventListener('click', () => showDetailView(podcast.feed.rank));
-                    item.querySelector('.favorite-btn').addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(podcast.feed.rank); });
-                    topPodcastsList.appendChild(item);
-                });
-            }
-
-            function renderFavorites() {
-                const playerFavoritesContainer = document.getElementById('player-favorites-section');
-                playerFavoritesContainer.innerHTML = '';
-                const favoritePodcasts = allPodcasts.filter(p => favorites.includes(p.feed.rank));
-                if (favoritePodcasts.length === 0) {
-                    playerFavoritesContainer.innerHTML = '<p class="placeholder" style="font-size: 0.8em; white-space: nowrap;">Favori ekle ♡</p>';
-                    return;
-                }
-                favoritePodcasts.forEach(podcast => {
-                    const card = document.createElement('div');
-                    card.className = 'player-fav-card';
-                    card.innerHTML = `<img src="${getProxiedUrl(podcast.feed.image)}" alt="${podcast.feed.title}" title="${podcast.feed.title}">`;
-                    card.addEventListener('click', () => showDetailView(podcast.feed.rank));
-                    playerFavoritesContainer.appendChild(card);
-                });
-            }
-            
-            function showDetailView(rank) {
-                currentPodcast = allPodcasts.find(p => p.feed.rank === rank);
-                if (!currentPodcast) return;
-                const isFavorited = favorites.includes(currentPodcast.feed.rank);
-                detailView.innerHTML = `
-                    <div class="back-button" id="back-to-home">‹</div>
-                    <div class="podcast-detail-header card">
-                        <img src="${getProxiedUrl(currentPodcast.feed.image)}" alt="${currentPodcast.feed.title} Logo">
-                        <div class="info">
-                            <h1>${currentPodcast.feed.title}</h1>
-                            <p class="description">${currentPodcast.feed.description || 'Açıklama bulunamadı.'}</p>
-                            <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-rank="${currentPodcast.feed.rank}">♡</button>
-                        </div>
-                    </div>
-                    <h2>Tüm bölümler</h2>
-                    <div class="episode-list">${currentPodcast.items.map((episode, index) => `<div class="episode-list-item" data-episode-index="${index}"><span class="ep-number">${currentPodcast.items.length - index}</span><div class="ep-name">${episode.title}</div><div class="played-indicator ${playedEpisodes[episode.guid] ? 'played' : ''}">${playedEpisodes[episode.guid] ? '✓' : ''}</div></div>`).join('')}</div>`;
-                homeView.classList.add('hidden');
-                detailView.classList.remove('hidden');
-                window.scrollTo(0, 0);
-                document.getElementById('back-to-home').addEventListener('click', () => { detailView.classList.add('hidden'); homeView.classList.remove('hidden'); window.scrollTo(0, 0); });
-                detailView.querySelector('.favorite-btn').addEventListener('click', () => toggleFavorite(currentPodcast.feed.rank));
-                detailView.querySelectorAll('.episode-list-item').forEach(item => { item.addEventListener('click', (e) => { const index = parseInt(e.currentTarget.dataset.episodeIndex); playEpisode(index); }); });
-            }
-
-            function updatePlayerUI() {
-                if (!currentPodcast || currentEpisodeIndex === -1) return;
-                const episode = currentPodcast.items[currentEpisodeIndex];
-                const episodeImageUrl = episode.thumbnail || currentPodcast.feed.image;
-                playerPodcastInfo.innerHTML = `
-                    <img src="${getProxiedUrl(episodeImageUrl)}" alt="Episode Art">
-                    <div class="track-details">
-                        <span id="player-episode-name">${episode.title}</span>
-                        <span id="player-podcast-name">${currentPodcast.feed.title}</span>
-                    </div>`;
-            }
-
-            function playEpisode(index) {
-                if (!currentPodcast || index < 0 || index >= currentPodcast.items.length) return;
-                currentEpisodeIndex = index;
-                const episode = currentPodcast.items[index];
-                if (!playedEpisodes[episode.guid]) {
-                    playedEpisodes[episode.guid] = true;
-                    localStorage.setItem('podcastPlayed', JSON.stringify(playedEpisodes));
-                    const episodeNode = detailView.querySelector(`[data-episode-index="${index}"] .played-indicator`);
-                    if (episodeNode) { episodeNode.classList.add('played'); episodeNode.innerText = '✓'; }
-                }
-                audioPlayer.src = episode.enclosure.link;
-                audioPlayer.play();
-                updatePlayerUI();
-            }
-
-            function toggleFavorite(rank) {
-                const index = favorites.indexOf(rank);
-                if (index > -1) { favorites.splice(index, 1); } else { favorites.push(rank); }
-                localStorage.setItem('podcastFavorites', JSON.stringify(favorites));
-                renderHomeView();
-                if (!detailView.classList.contains('hidden') && currentPodcast && currentPodcast.feed.rank === rank) { const isFavorited = favorites.includes(rank); detailView.querySelector('.favorite-btn').classList.toggle('favorited', isFavorited); }
-            }
-
-            function handlePlayPause() { if (audioPlayer.paused) { if (audioPlayer.src) { audioPlayer.play(); } } else { audioPlayer.pause(); } }
-            function handleNext() { if (currentPodcast) { let nextIndex = currentEpisodeIndex + 1; if (nextIndex < currentPodcast.items.length) { playEpisode(nextIndex); } } }
-            function handlePrev() { if (currentPodcast) { let prevIndex = currentEpisodeIndex - 1; if (prevIndex >= 0) { playEpisode(prevIndex); } } }
-
-            function initializePlayer() {
-                playPauseBtn.innerHTML = ICONS.play;
-                prevBtn.innerHTML = ICONS.prev;
-                nextBtn.innerHTML = ICONS.next;
-                playPauseBtn.addEventListener('click', handlePlayPause);
-                nextBtn.addEventListener('click', handleNext); 
-                prevBtn.addEventListener('click', handlePrev);
-                audioPlayer.addEventListener('play', () => playPauseBtn.innerHTML = ICONS.pause);
-                audioPlayer.addEventListener('pause', () => playPauseBtn.innerHTML = ICONS.play);
-                audioPlayer.addEventListener('ended', handleNext);
-                audioPlayer.addEventListener('timeupdate', () => {
-                    if (audioPlayer.duration) {
-                        progressBar.value = audioPlayer.currentTime;
-                        currentTimeSpan.textContent = formatTime(audioPlayer.currentTime);
-                    }
-                });
-                audioPlayer.addEventListener('loadedmetadata', () => {
-                    progressBar.max = audioPlayer.duration;
-                    totalDurationSpan.textContent = formatTime(audioPlayer.duration);
-                });
-                progressBar.addEventListener('input', () => {
-                    audioPlayer.currentTime = progressBar.value;
-                });
-            }
-            
-            initializePlayer();
-            fetchPodcasts();
-        });
-    </script>
 </body>
 </html>
