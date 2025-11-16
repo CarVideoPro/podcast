@@ -5,52 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yakında Sizlerleyiz!</title>
     <style>
-        /* CSS (Stil) Kodları 
-          Sayfanın profesyonel görünmesini sağlar.
-        */
+        /* CSS (Stil) Kodları */
 
-        /* Temel sayfa ayarları */
         body, html {
             height: 100%;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex; /* İçeriği ortalamak için modern yöntem */
+            display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f0f2f5; /* Hafif gri bir arka plan */
+            background-color: #f0f2f5;
         }
 
-        /* İçerik kutusu */
         .container {
             text-align: center;
             background: #ffffff;
             padding: 50px;
-            border-radius: 12px; /* Köşeleri yumuşatma */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* Profesyonel gölge efekti */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             max-width: 500px;
-            width: 90%; /* Mobil cihazlar için */
+            width: 90%;
             box-sizing: border-box;
         }
 
-        /* İkon (Resim) Stili 
-          Bu bir SVG (Vektörel Grafik) ikonudur. Kalitesi hiç bozulmaz.
-        */
         .icon {
             width: 80px;
             height: 80px;
-            color: #007bff; /* Ana tema rengi (profesyonel bir mavi) */
+            color: #007bff;
             margin-bottom: 25px;
-            animation: spin 8s linear infinite; /* İkonun yavaşça dönmesi için */
+            animation: spin 8s linear infinite;
         }
 
-        /* Başlık */
         h1 {
-            font-size: 2.2rem; /* Büyük ve okunaklı başlık */
+            font-size: 2.2rem;
             color: #333;
             margin: 0 0 15px 0;
         }
-
-        /* Açıklama metni */
+        
         p {
             font-size: 1.1rem;
             color: #666;
@@ -58,7 +49,44 @@
             margin: 0;
         }
 
-        /* İkonun dönme animasyonu */
+        /* *** YENİ EKLENEN STİLLER ***
+          İletişim bölümü için stil kodları
+        */
+
+        /* İletişim bölümünü ayıran çizgi */
+        .divider {
+            border-top: 1px solid #eee; /* İnce bir ayırıcı çizgi */
+            margin: 30px 0; /* Üstten ve alttan boşluk */
+        }
+        
+        .contact {
+            font-size: 0.95rem; /* Biraz daha küçük font */
+            color: #555;
+            display: flex; /* İkon ve metni yanyana getirmek için */
+            align-items: center;
+            justify-content: center; /* Ortalamak için */
+            gap: 8px; /* İkon ve metin arası boşluk */
+        }
+
+        /* Tıklanabilir link stili */
+        .contact a {
+            color: #007bff; /* Mavi, tıklanabilir link rengi */
+            text-decoration: none; /* Alt çizgiyi kaldır */
+            font-weight: 500;
+        }
+
+        /* Linkin üzerine gelince alt çizgi ekle */
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        /* Telegram ikon stili */
+        .contact-icon {
+            width: 18px;
+            height: 18px;
+            fill: #007bff; /* İkonun rengini link ile aynı yap */
+        }
+
         @keyframes spin {
             from {
                 transform: rotate(0deg);
@@ -83,6 +111,20 @@
             Sizlere harika bir deneyim sunmak için çalışıyoruz.
             Çok yakında yepyeni yüzümüzle karşınızda olacağız!
         </p>
+
+        <div class="divider"></div>
+
+        <div class="contact">
+            <svg class="contact-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.78 18.65l.28-4.23l7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3L3.64 11.9c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.3 1.29.27 1.02 1.31L17.1 17.61c-.24.82-.79 1.04-1.51.63l-4.14-3.04l-1.97 1.9c-.23.23-.42.41-.83.41z"/>
+            </svg>
+            
+            <span>İletişim Telegram :</span>
+            
+            <a href="https://t.me/car_video_pro" target="_blank" rel="noopener noreferrer">
+                t.me/car_video_pro
+            </a>
+        </div>
 
     </div>
 
