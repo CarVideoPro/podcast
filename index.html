@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro - Responsive Fix</title>
+    <title>Car Video Pro - Mini Player</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -40,41 +40,36 @@
             border-bottom: 1px solid var(--border-color);
             box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             width: 100%;
-            max-width: 100vw; /* Taşmayı önler */
+            max-width: 100vw;
             gap: 15px;
         }
 
-        /* ANA SAYFA BUTONU */
         .home-btn {
             width: 50px; height: 50px; 
             background-color: #1a1a1a; border: 1px solid #333; border-radius: 50%; 
             color: white; cursor: pointer; font-size: 1.2em; 
             display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; flex-shrink: 0; /* Küçülmesini engelle */
+            transition: 0.2s; flex-shrink: 0;
         }
         .home-btn:hover { background-color: #333; color: var(--accent-red); }
 
-        /* Orta Alan (Esnek Yapı) */
         .center-action-area { 
             display: flex; align-items: center; 
-            gap: 10px; flex: 1; /* Kalan boşluğu doldur */
-            min-width: 0; /* İçerik taşmasını engellemek için kritik */
+            gap: 10px; flex: 1; min-width: 0;
         }
 
-        /* ARAMA KUTUSU (Esnek) */
         .search-box { 
-            display: flex; flex: 2; /* Info box'tan daha geniş olsun */
+            display: flex; flex: 2; 
             background-color: var(--search-bg); 
             border: 1px solid #333; border-radius: 50px; 
             overflow: hidden; height: 50px; 
             transition: all 0.3s ease;
-            min-width: 100px; /* Çok küçülmesin */
+            min-width: 100px;
         }
         .search-box:focus-within { border-color: #3ea6ff; box-shadow: 0 0 15px rgba(62, 166, 255, 0.3); }
         .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; color: white; font-size: 1.1em; outline: none; min-width: 0; }
         .search-btn { width: 60px; background-color: #222; border: none; color: #aaa; border-left: 1px solid #333; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
 
-        /* MİKROFON */
         .mic-btn-pro { 
             width: 50px; height: 50px; flex-shrink: 0; border-radius: 50%; border: none; 
             background: #1a1a1a; border: 1px solid #333; color: white; cursor: pointer; 
@@ -85,14 +80,12 @@
         .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: var(--accent-red); color: white; border-color: var(--accent-red); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
 
-        /* KAYAN YAZI (Daralabilir) */
         .info-box {
             display: flex; flex: 1; align-items: center;
             background-color: var(--search-bg);
             border: 1px solid #333; border-radius: 50px;
             height: 50px; overflow: hidden; position: relative;
-            min-width: 0; /* Daralmasına izin ver */
-            max-width: 400px; /* Çok da genişlemesin */
+            min-width: 0; max-width: 400px;
         }
         .marquee-content {
             position: absolute; white-space: nowrap; will-change: transform;
@@ -102,7 +95,6 @@
         }
         @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
-        /* ZOOM */
         .zoom-controls-header {
             display: flex; align-items: center;
             background: #1a1a1a; border-radius: 50px; 
@@ -115,7 +107,6 @@
         }
         .zoom-btn:hover { background: #333; color: white; }
 
-        /* AYARLAR BUTONU */
         .settings-btn {
             width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333;
             border-radius: 50%; color: #aaa; cursor: pointer; font-size: 1.2em;
@@ -127,14 +118,11 @@
         .container { display: block; margin-top: 80px; height: calc(100vh - 80px); width: 100%; }
         .content { width: 100%; height: 100%; padding: 0; overflow-y: auto; position: relative; }
         
-        /* Sticky Kategoriler (FIX: Genişlik Ayarı) */
         .sticky-header {
             position: sticky; top: 0; z-index: 50;
             background-color: rgba(15, 15, 15, 0.95); backdrop-filter: blur(5px);
             padding: 15px 20px; border-bottom: 1px solid #222; 
-            width: 100%; 
-            max-width: 100vw; /* Taşmayı engelle */
-            box-sizing: border-box;
+            width: 100%; max-width: 100vw; box-sizing: border-box;
         }
 
         .chips { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
@@ -165,21 +153,64 @@
         .title { font-size: 1.05em; font-weight: 600; line-height: 1.3; margin-bottom: 4px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .channel-name { color: var(--secondary-text); font-size: 0.9em; }
 
-        /* --- MODALS --- */
-        .modal-overlay { 
+        /* --- PLAYER MODAL (Mini Player Destekli) --- */
+        .player-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: black; z-index: 9999; flex-direction: column; 
+            transition: all 0.3s ease; /* Yumuşak geçiş */
         }
         
+        /* MINIMIZED STATE (Mini Player) */
+        .player-modal.minimized {
+            top: auto; left: auto;
+            bottom: 20px; right: 20px;
+            width: 320px; height: 180px;
+            background: black;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            border: 1px solid #333;
+        }
+
+        /* Mini Player'da üst kısmı gizle */
+        .player-modal.minimized .player-header {
+            display: none;
+        }
+        
+        /* Mini Player Kapatma Butonu (Normalde gizli) */
+        .mini-close-btn {
+            display: none;
+            position: absolute; top: -12px; right: -12px;
+            width: 30px; height: 30px;
+            background: red; color: white;
+            border-radius: 50%; border: 2px solid white;
+            align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10001;
+            font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        /* Sadece minimized olunca göster */
+        .player-modal.minimized .mini-close-btn {
+            display: flex;
+        }
+
+        /* Minimized olunca iframe üzerine tıklama katmanı */
+        .maximize-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            cursor: pointer; z-index: 10000;
+        }
+        .player-modal.minimized .maximize-overlay {
+            display: block;
+        }
+
         .player-header { height: 70px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #333; gap: 15px; }
         
+        /* Geri butonu */
         .back-btn { 
             color: white; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; gap: 8px; 
             padding: 8px 20px; background: #333; border-radius: 25px; border: 1px solid #444; flex-shrink: 0; font-weight: bold; 
         }
-        .back-btn:hover { background: #cc0000; border-color: #cc0000; }
+        .back-btn:hover { background: #3ea6ff; border-color: #3ea6ff; }
 
-        /* YENİ TAM EKRAN BUTONU (Yazılı) */
         .fs-btn {
             height: 45px; flex-shrink: 0; border-radius: 25px;
             background: #222; border: 1px solid #444; color: white;
@@ -193,7 +224,7 @@
             border: 1px solid #333; border-radius: 25px; overflow: hidden; 
             position: relative; display: flex; align-items: center; min-width: 0;
         }
-        .video-frame { flex: 1; width: 100%; height: 100%; }
+        .video-frame { flex: 1; width: 100%; height: 100%; position: relative; }
         iframe { width: 100%; height: 100%; border: none; }
 
         /* API KEY MODAL */
@@ -266,10 +297,16 @@
         </main>
     </div>
 
-    <div class="modal-overlay" id="playerModal">
+    <div class="player-modal" id="playerModal">
+        <div class="mini-close-btn" onclick="stopPlayer()">
+            <i class="fa-solid fa-times"></i>
+        </div>
+
+        <div class="maximize-overlay" onclick="maximizePlayer()"></div>
+
         <div class="player-header">
-            <div class="back-btn" onclick="closePlayer()">
-                <i class="fa-solid fa-arrow-left"></i> Geri
+            <div class="back-btn" onclick="minimizePlayer()">
+                <i class="fa-solid fa-arrow-down"></i> Listeye Dön
             </div>
             
             <button class="fs-btn" onclick="toggleFullscreen()" title="Tam Ekran Modu">
@@ -298,7 +335,7 @@
     </div>
 
     <script>
-        // 5 API ANAHTARI
+        // API HAVUZU
         const DEFAULT_KEYS = [
             'AIzaSyBS7n6xDGEPV6MP4XOsfyO5gbBEccowZC8',
             'AIzaSyCoDHyEH5SzyIjg0bfwSJBTKevF_6Jy5Qo',
@@ -459,17 +496,41 @@
             loading.style.display = 'none';
         }
 
+        // --- PLAYER FUNCTIONS ---
         function openPlayer(id) {
             const modal = document.getElementById('playerModal');
             const frame = document.getElementById('youtubeFrame');
+            // Yeni video açınca tam boyutta aç
+            modal.classList.remove('minimized');
             frame.src = `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
             modal.style.display = 'flex';
         }
 
-        function closePlayer() {
-            document.getElementById('playerModal').style.display = 'none';
-            document.getElementById('youtubeFrame').src = "";
+        // "Listeye Dön" tuşu -> Mini Player'a geçiş yapar
+        function minimizePlayer() {
+            const modal = document.getElementById('playerModal');
+            modal.classList.add('minimized');
+        }
+
+        // Mini Player üzerindeki overlay'e tıklayınca -> Tam boyuta geçer
+        function maximizePlayer() {
+            const modal = document.getElementById('playerModal');
+            modal.classList.remove('minimized');
+        }
+
+        // Kırmızı (X) tuşu -> Videoyu tamamen kapatır
+        function stopPlayer() {
+            const modal = document.getElementById('playerModal');
+            const frame = document.getElementById('youtubeFrame');
+            frame.src = "";
+            modal.style.display = 'none';
+            modal.classList.remove('minimized');
             if (document.fullscreenElement) { document.exitFullscreen(); }
+        }
+
+        // Eski kapatma fonksiyonunu stopPlayer'a yönlendiriyoruz
+        function closePlayer() {
+            minimizePlayer();
         }
 
         function toggleFullscreen() {
