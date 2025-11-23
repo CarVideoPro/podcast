@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YouTube Sade & Dinamik</title>
+    <title>YouTube Smart Grid</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -16,134 +16,138 @@
             --accent-red: #ff0000;
             --search-bg: #222222;
             --border-color: #303030;
-            --card-min-width: 260px;
+            
+            /* DİNAMİK DEĞİŞKENLER (Zoom ile bunlar değişecek) */
+            --card-min-width: 220px; 
+            --base-font-size: 16px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', Arial, sans-serif; }
         
-        body { 
+        html, body { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            overflow: hidden; 
-            height: 100vh; 
-            width: 100vw; 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; /* Dış kaydırmayı engelle */
+            font-size: var(--base-font-size); /* Yazı boyutu değişkene bağlandı */
         }
 
         /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            display: flex; align-items: center; justify-content: space-between; /* İki uca yasla */
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 1.5rem; background-color: var(--header-bg);
-            height: 70px; border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            height: 60px; border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            width: 100%;
         }
 
-        .logo-area { display: flex; align-items: center; gap: 5px; font-size: 1.4rem; font-weight: bold; letter-spacing: -1px; cursor: pointer; }
-        .logo-icon { color: var(--accent-red); font-size: 2rem; }
+        .logo-area { display: flex; align-items: center; gap: 5px; font-size: 1.3em; font-weight: bold; letter-spacing: -1px; cursor: pointer; }
+        .logo-icon { color: var(--accent-red); font-size: 1.5em; }
         
-        /* Arama Alanı (Ortala) */
         .center-action-area { 
             flex: 1; display: flex; align-items: center; justify-content: center; 
-            gap: 15px; max-width: 800px; margin: 0 auto; 
+            gap: 10px; max-width: 700px; margin: 0 auto; 
         }
 
         .search-box { 
             display: flex; flex: 1; background-color: var(--search-bg); border: 1px solid var(--border-color); 
-            border-radius: 50px; overflow: hidden; height: 45px; transition: 0.3s;
+            border-radius: 40px; overflow: hidden; height: 40px; transition: 0.3s;
         }
-        .search-box:focus-within { border-color: #3ea6ff; box-shadow: 0 0 8px rgba(62, 166, 255, 0.2); }
-        .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; color: white; font-size: 1.1rem; outline: none; }
-        .search-btn { width: 60px; background-color: var(--hover-color); border: none; color: white; border-left: 1px solid var(--border-color); cursor: pointer; font-size: 1.2rem; }
+        .search-box input { flex: 1; background: transparent; border: none; padding: 0 15px; color: white; font-size: 1em; outline: none; }
+        .search-btn { width: 50px; background-color: var(--hover-color); border: none; color: white; border-left: 1px solid var(--border-color); cursor: pointer; font-size: 1em; }
 
         .mic-btn-pro { 
-            width: 45px; height: 45px; flex-shrink: 0; border-radius: 50%; border: none; 
-            background: linear-gradient(135deg, #ff0000, #ff4b4b); color: white; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+            width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: none; 
+            background: linear-gradient(135deg, #cc0000, #ff0000); color: white; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
         }
         .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: white; color: red; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
 
-        /* --- SIDEBAR & ZOOM --- */
-        .container { display: flex; margin-top: 70px; height: calc(100vh - 70px); }
+        /* --- CONTAINER --- */
+        .container { 
+            display: flex; 
+            margin-top: 60px; 
+            height: calc(100vh - 60px); 
+            width: 100%;
+        }
         
+        /* Sidebar sabit genişlikte kalmalı, yoksa zoom ile bozulur */
         .sidebar { 
-            width: 80px; background: var(--sidebar-bg); 
+            width: 70px; background: var(--sidebar-bg); 
             display: flex; flex-direction: column; align-items: center; 
-            padding-top: 10px; padding-bottom: 20px; /* Alttan boşluk */
+            padding-top: 10px; padding-bottom: 20px;
             overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; 
         }
 
-        .nav-link { width: 100%; padding: 15px 0; display: flex; flex-direction: column; align-items: center; color: white; cursor: pointer; font-size: 0.7rem; gap: 5px; opacity: 0.7; }
+        .nav-link { width: 100%; padding: 12px 0; display: flex; flex-direction: column; align-items: center; color: white; cursor: pointer; font-size: 0.7em; gap: 4px; opacity: 0.7; }
         .nav-link:hover { background-color: var(--hover-color); opacity: 1; }
-        .nav-link i { font-size: 1.4rem; margin-bottom: 5px; }
+        .nav-link i { font-size: 1.4em; margin-bottom: 3px; }
 
-        /* Zoom Kontrolleri (Sidebar İçin Özelleştirilmiş) */
         .zoom-controls-vertical {
-            margin-top: auto; /* En alta it */
-            display: flex;
-            flex-direction: column; /* Alt alta diz */
-            align-items: center;
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 8px 0;
-            border: 1px solid #333;
-            width: 50px;
-            gap: 5px;
+            margin-top: auto; 
+            display: flex; flex-direction: column; align-items: center;
+            background: #151515; border-radius: 15px; padding: 5px 0;
+            border: 1px solid #333; width: 40px; gap: 5px;
         }
+        .zoom-btn { width: 30px; height: 30px; background: transparent; color: #fff; border: none; cursor: pointer; font-size: 1em; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .zoom-btn:hover { background: #333; color: white; }
 
-        .zoom-btn { 
-            width: 35px; height: 35px; 
-            background: transparent; color: #fff; border: none; 
-            cursor: pointer; font-size: 1rem; border-radius: 50%;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center;
+        /* --- CONTENT --- */
+        .content { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            width: 100%; /* Her zaman full genişlik */
         }
-        .zoom-btn:hover { background: #333; color: var(--accent-red); }
-        .zoom-icon-static { color: #555; font-size: 0.8rem; margin: 2px 0; }
-
-        /* --- İÇERİK --- */
-        .content { flex: 1; padding: 20px; overflow-y: auto; }
         
-        .chips { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chips { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chips::-webkit-scrollbar { display: none; }
-        .chip { background: var(--hover-color); padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
-        .chip:hover { background: #3f3f3f; border-color: #555; }
+        .chip { background: var(--hover-color); padding: 0.5em 1em; border-radius: 6px; font-size: 0.9em; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .chip:hover { background: #3f3f3f; border-color: #444; }
 
+        /* GRID: Bu kısım sihirli kısım */
         .video-grid { 
             display: grid; 
+            /* minmax içindeki değişken JS ile değişecek */
             grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width), 1fr)); 
-            gap: 20px; row-gap: 30px; width: 100%;
+            gap: 15px; 
+            row-gap: 25px; 
+            width: 100%; 
         }
         
-        .video-card { cursor: pointer; transition: 0.2s; background: #0f0f0f; }
-        .video-card:hover { transform: scale(1.02); z-index: 10; }
+        .video-card { cursor: pointer; transition: 0.2s; background: transparent; }
+        .video-card:hover { transform: scale(1.03); z-index: 10; }
         
-        .thumbnail-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; background: #222; }
+        .thumbnail-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #1a1a1a; }
         .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
         
-        .video-info { display: flex; gap: 10px; margin-top: 10px; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: #555; flex-shrink: 0; overflow: hidden; }
+        .video-info { display: flex; gap: 8px; margin-top: 8px; }
+        .avatar { width: 2.2em; height: 2.2em; border-radius: 50%; background-color: #333; flex-shrink: 0; overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         
         .details { display: flex; flex-direction: column; width: 100%; }
-        .title { font-size: 1rem; font-weight: 600; line-height: 1.3; margin-bottom: 4px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .channel-name { color: var(--secondary-text); font-size: 0.85rem; }
+        .title { font-size: 1em; font-weight: 600; line-height: 1.2; margin-bottom: 3px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .channel-name { color: var(--secondary-text); font-size: 0.85em; }
 
         /* --- PLAYER --- */
         .player-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: black; z-index: 9999; flex-direction: column; 
         }
-        .player-header { height: 60px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #333; }
+        .player-header { height: 50px; display: flex; align-items: center; padding: 0 15px; background: #111; border-bottom: 1px solid #333; }
         .back-btn { 
             color: white; font-size: 1rem; cursor: pointer; margin-right: 20px; 
-            display: flex; align-items: center; gap: 8px; padding: 8px 16px; 
-            background: #333; border-radius: 20px; border: 1px solid #444; 
+            display: flex; align-items: center; gap: 6px; padding: 6px 12px; 
+            background: #333; border-radius: 15px; border: 1px solid #444; 
         }
         .video-frame { flex: 1; width: 100%; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        #loading { grid-column: 1 / -1; text-align: center; color: #aaa; margin-top: 50px; font-size: 1.2rem; display: none;}
+        #loading { grid-column: 1 / -1; text-align: center; color: #aaa; margin-top: 50px; font-size: 1rem; display: none;}
 
     </style>
 </head>
@@ -176,9 +180,9 @@
             <div class="nav-link" onclick="searchQuery('Haber')"><i class="fa-solid fa-newspaper"></i><span>Haber</span></div>
 
             <div class="zoom-controls-vertical">
-                <button class="zoom-btn" onclick="applyZoom(0.1)" title="Büyüt"><i class="fa-solid fa-plus"></i></button>
-                <i class="fa-solid fa-magnifying-glass zoom-icon-static"></i>
-                <button class="zoom-btn" onclick="applyZoom(-0.1)" title="Küçült"><i class="fa-solid fa-minus"></i></button>
+                <button class="zoom-btn" onclick="smartZoom(1)" title="Büyüt"><i class="fa-solid fa-plus"></i></button>
+                <i class="fa-solid fa-magnifying-glass" style="font-size:0.7em; color:#555;"></i>
+                <button class="zoom-btn" onclick="smartZoom(-1)" title="Küçült"><i class="fa-solid fa-minus"></i></button>
             </div>
         </aside>
 
@@ -202,7 +206,7 @@
     <div class="player-modal" id="playerModal">
         <div class="player-header">
             <div class="back-btn" onclick="closePlayer()">
-                <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+                <i class="fa-solid fa-arrow-left"></i> Kapat
             </div>
         </div>
         <div class="video-frame">
@@ -221,23 +225,39 @@
         const searchInput = document.getElementById('searchInput');
         const loading = document.getElementById('loading');
         
-        let currentZoom = 1.0;
+        // BAŞLANGIÇ DEĞERLERİ
+        let currentCardSize = 220; // Kart genişliği
+        let currentFontSize = 16;  // Yazı boyutu
 
         window.onload = loadHome;
 
-        // Zoom İşlevi
-        function applyZoom(delta) {
-            currentZoom += delta;
-            // Sınırları belirle
-            if(currentZoom < 0.6) currentZoom = 0.6;
-            if(currentZoom > 1.8) currentZoom = 1.8;
-            document.body.style.zoom = currentZoom;
-        }
+        // --- AKILLI ZOOM SİSTEMİ ---
+        // Sayfanın kendisini küçültmek yerine, elementlerin boyutunu değiştiriyoruz.
+        // Böylece tarayıcı "ha yer açıldı" diyip yeni videoları sağa kaydırıyor.
+        function smartZoom(direction) {
+            // Değişim miktarları
+            const sizeStep = 30; // Kartlar 30px büyür/küçülür
+            const fontStep = 1;  // Yazı 1px büyür/küçülür
 
-        // Link Engelleme
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A') { e.preventDefault(); }
-        });
+            if (direction === 1) {
+                // Büyüt
+                if(currentCardSize < 400) {
+                    currentCardSize += sizeStep;
+                    currentFontSize += fontStep;
+                }
+            } else {
+                // Küçült
+                if(currentCardSize > 140) {
+                    currentCardSize -= sizeStep;
+                    currentFontSize -= fontStep;
+                }
+            }
+
+            // CSS Değişkenlerini Güncelle
+            const root = document.documentElement;
+            root.style.setProperty('--card-min-width', currentCardSize + "px");
+            root.style.setProperty('--base-font-size', currentFontSize + "px");
+        }
 
         // Veri Çekme
         async function loadHome() {
