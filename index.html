@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YouTube Smart Grid</title>
+    <title>Car Video Pro - Responsive Fix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #0f0f0f;
             --header-bg: #121212;
-            --sidebar-bg: #0f0f0f;
             --text-color: #f1f1f1;
             --secondary-text: #aaaaaa;
             --hover-color: #272727;
             --accent-red: #ff0000;
-            --search-bg: #222222;
+            --search-bg: #1a1a1a;
             --border-color: #303030;
             
-            /* DİNAMİK DEĞİŞKENLER (Zoom ile bunlar değişecek) */
+            /* Zoom Değişkenleri */
             --card-min-width: 220px; 
             --base-font-size: 16px;
         }
@@ -27,137 +26,194 @@
         html, body { 
             background-color: var(--bg-color); 
             color: var(--text-color); 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; /* Dış kaydırmayı engelle */
-            font-size: var(--base-font-size); /* Yazı boyutu değişkene bağlandı */
+            width: 100%; height: 100%; 
+            overflow: hidden; 
+            font-size: var(--base-font-size);
         }
 
         /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 1.5rem; background-color: var(--header-bg);
-            height: 60px; border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; 
+            padding: 0 15px; background-color: var(--header-bg);
+            height: 80px; 
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             width: 100%;
+            max-width: 100vw; /* Taşmayı önler */
+            gap: 15px;
         }
 
-        .logo-area { display: flex; align-items: center; gap: 5px; font-size: 1.3em; font-weight: bold; letter-spacing: -1px; cursor: pointer; }
-        .logo-icon { color: var(--accent-red); font-size: 1.5em; }
-        
+        /* ANA SAYFA BUTONU */
+        .home-btn {
+            width: 50px; height: 50px; 
+            background-color: #1a1a1a; border: 1px solid #333; border-radius: 50%; 
+            color: white; cursor: pointer; font-size: 1.2em; 
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; flex-shrink: 0; /* Küçülmesini engelle */
+        }
+        .home-btn:hover { background-color: #333; color: var(--accent-red); }
+
+        /* Orta Alan (Esnek Yapı) */
         .center-action-area { 
-            flex: 1; display: flex; align-items: center; justify-content: center; 
-            gap: 10px; max-width: 700px; margin: 0 auto; 
+            display: flex; align-items: center; 
+            gap: 10px; flex: 1; /* Kalan boşluğu doldur */
+            min-width: 0; /* İçerik taşmasını engellemek için kritik */
         }
 
+        /* ARAMA KUTUSU (Esnek) */
         .search-box { 
-            display: flex; flex: 1; background-color: var(--search-bg); border: 1px solid var(--border-color); 
-            border-radius: 40px; overflow: hidden; height: 40px; transition: 0.3s;
+            display: flex; flex: 2; /* Info box'tan daha geniş olsun */
+            background-color: var(--search-bg); 
+            border: 1px solid #333; border-radius: 50px; 
+            overflow: hidden; height: 50px; 
+            transition: all 0.3s ease;
+            min-width: 100px; /* Çok küçülmesin */
         }
-        .search-box input { flex: 1; background: transparent; border: none; padding: 0 15px; color: white; font-size: 1em; outline: none; }
-        .search-btn { width: 50px; background-color: var(--hover-color); border: none; color: white; border-left: 1px solid var(--border-color); cursor: pointer; font-size: 1em; }
+        .search-box:focus-within { border-color: #3ea6ff; box-shadow: 0 0 15px rgba(62, 166, 255, 0.3); }
+        .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; color: white; font-size: 1.1em; outline: none; min-width: 0; }
+        .search-btn { width: 60px; background-color: #222; border: none; color: #aaa; border-left: 1px solid #333; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
 
+        /* MİKROFON */
         .mic-btn-pro { 
-            width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: none; 
-            background: linear-gradient(135deg, #cc0000, #ff0000); color: white; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; font-size: 1.2em;
-            box-shadow: 0 0 8px rgba(255, 0, 0, 0.3);
+            width: 50px; height: 50px; flex-shrink: 0; border-radius: 50%; border: none; 
+            background: #1a1a1a; border: 1px solid #333; color: white; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.3em;
+            transition: 0.3s;
         }
-        .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: white; color: red; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
+        .mic-btn-pro:hover { background: #333; color: var(--accent-red); }
+        .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: var(--accent-red); color: white; border-color: var(--accent-red); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
 
-        /* --- CONTAINER --- */
-        .container { 
-            display: flex; 
-            margin-top: 60px; 
-            height: calc(100vh - 60px); 
-            width: 100%;
+        /* KAYAN YAZI (Daralabilir) */
+        .info-box {
+            display: flex; flex: 1; align-items: center;
+            background-color: var(--search-bg);
+            border: 1px solid #333; border-radius: 50px;
+            height: 50px; overflow: hidden; position: relative;
+            min-width: 0; /* Daralmasına izin ver */
+            max-width: 400px; /* Çok da genişlemesin */
         }
-        
-        /* Sidebar sabit genişlikte kalmalı, yoksa zoom ile bozulur */
-        .sidebar { 
-            width: 70px; background: var(--sidebar-bg); 
-            display: flex; flex-direction: column; align-items: center; 
-            padding-top: 10px; padding-bottom: 20px;
-            overflow-y: auto; flex-shrink: 0; border-right: 1px solid #222; 
+        .marquee-content {
+            position: absolute; white-space: nowrap; will-change: transform;
+            animation: scrollText 12s linear infinite;
+            font-size: 1.1em; color: #4caf50; font-weight: bold;
+            display: flex; align-items: center; gap: 10px; width: 100%;
         }
+        @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
-        .nav-link { width: 100%; padding: 12px 0; display: flex; flex-direction: column; align-items: center; color: white; cursor: pointer; font-size: 0.7em; gap: 4px; opacity: 0.7; }
-        .nav-link:hover { background-color: var(--hover-color); opacity: 1; }
-        .nav-link i { font-size: 1.4em; margin-bottom: 3px; }
-
-        .zoom-controls-vertical {
-            margin-top: auto; 
-            display: flex; flex-direction: column; align-items: center;
-            background: #151515; border-radius: 15px; padding: 5px 0;
-            border: 1px solid #333; width: 40px; gap: 5px;
+        /* ZOOM */
+        .zoom-controls-header {
+            display: flex; align-items: center;
+            background: #1a1a1a; border-radius: 50px; 
+            border: 1px solid #333; height: 50px; padding: 0 10px; gap: 5px; flex-shrink: 0;
         }
-        .zoom-btn { width: 30px; height: 30px; background: transparent; color: #fff; border: none; cursor: pointer; font-size: 1em; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .zoom-btn { 
+            width: 35px; height: 35px; background: transparent; color: #fff; border: none; 
+            cursor: pointer; font-size: 1.1em; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; transition: 0.2s; 
+        }
         .zoom-btn:hover { background: #333; color: white; }
 
-        /* --- CONTENT --- */
-        .content { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-            width: 100%; /* Her zaman full genişlik */
+        /* AYARLAR BUTONU */
+        .settings-btn {
+            width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333;
+            border-radius: 50%; color: #aaa; cursor: pointer; font-size: 1.2em;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        
-        .chips { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
-        .chips::-webkit-scrollbar { display: none; }
-        .chip { background: var(--hover-color); padding: 0.5em 1em; border-radius: 6px; font-size: 0.9em; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
-        .chip:hover { background: #3f3f3f; border-color: #444; }
+        .settings-btn:hover { color: white; background: #333; }
 
-        /* GRID: Bu kısım sihirli kısım */
+        /* --- CONTAINER --- */
+        .container { display: block; margin-top: 80px; height: calc(100vh - 80px); width: 100%; }
+        .content { width: 100%; height: 100%; padding: 0; overflow-y: auto; position: relative; }
+        
+        /* Sticky Kategoriler (FIX: Genişlik Ayarı) */
+        .sticky-header {
+            position: sticky; top: 0; z-index: 50;
+            background-color: rgba(15, 15, 15, 0.95); backdrop-filter: blur(5px);
+            padding: 15px 20px; border-bottom: 1px solid #222; 
+            width: 100%; 
+            max-width: 100vw; /* Taşmayı engelle */
+            box-sizing: border-box;
+        }
+
+        .chips { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chip { 
+            background: #222; padding: 0.6em 1.2em; border-radius: 8px; 
+            font-size: 0.95em; white-space: nowrap; cursor: pointer; 
+            border: 1px solid #333; transition: 0.2s; color: #eee; flex-shrink: 0;
+        }
+        .chip.active { background: white; color: black; font-weight: bold; border-color: white; }
+
+        .video-grid-container { padding: 20px; width: 100%; box-sizing: border-box; }
         .video-grid { 
             display: grid; 
-            /* minmax içindeki değişken JS ile değişecek */
             grid-template-columns: repeat(auto-fill, minmax(var(--card-min-width), 1fr)); 
-            gap: 15px; 
-            row-gap: 25px; 
-            width: 100%; 
+            gap: 20px; row-gap: 30px; width: 100%; 
         }
         
         .video-card { cursor: pointer; transition: 0.2s; background: transparent; }
         .video-card:hover { transform: scale(1.03); z-index: 10; }
         
-        .thumbnail-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #1a1a1a; }
+        .thumbnail-container { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; background: #1a1a1a; }
         .thumbnail-container img { width: 100%; height: 100%; object-fit: cover; }
         
-        .video-info { display: flex; gap: 8px; margin-top: 8px; }
-        .avatar { width: 2.2em; height: 2.2em; border-radius: 50%; background-color: #333; flex-shrink: 0; overflow: hidden; }
+        .video-info { display: flex; gap: 12px; margin-top: 10px; }
+        .avatar { width: 2.5em; height: 2.5em; border-radius: 50%; background-color: #333; flex-shrink: 0; overflow: hidden; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        
         .details { display: flex; flex-direction: column; width: 100%; }
-        .title { font-size: 1em; font-weight: 600; line-height: 1.2; margin-bottom: 3px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .channel-name { color: var(--secondary-text); font-size: 0.85em; }
+        .title { font-size: 1.05em; font-weight: 600; line-height: 1.3; margin-bottom: 4px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .channel-name { color: var(--secondary-text); font-size: 0.9em; }
 
-        /* --- PLAYER --- */
-        .player-modal { 
+        /* --- MODALS --- */
+        .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: black; z-index: 9999; flex-direction: column; 
         }
-        .player-header { height: 50px; display: flex; align-items: center; padding: 0 15px; background: #111; border-bottom: 1px solid #333; }
+        
+        .player-header { height: 70px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #333; gap: 15px; }
+        
         .back-btn { 
-            color: white; font-size: 1rem; cursor: pointer; margin-right: 20px; 
-            display: flex; align-items: center; gap: 6px; padding: 6px 12px; 
-            background: #333; border-radius: 15px; border: 1px solid #444; 
+            color: white; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; gap: 8px; 
+            padding: 8px 20px; background: #333; border-radius: 25px; border: 1px solid #444; flex-shrink: 0; font-weight: bold; 
+        }
+        .back-btn:hover { background: #cc0000; border-color: #cc0000; }
+
+        /* YENİ TAM EKRAN BUTONU (Yazılı) */
+        .fs-btn {
+            height: 45px; flex-shrink: 0; border-radius: 25px;
+            background: #222; border: 1px solid #444; color: white;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer; font-size: 1.1em; transition: 0.2s; padding: 0 20px;
+        }
+        .fs-btn:hover { background: #444; color: #3ea6ff; border-color: #3ea6ff; }
+
+        .player-marquee-container { 
+            flex: 1; height: 50px; background-color: #1a1a1a; 
+            border: 1px solid #333; border-radius: 25px; overflow: hidden; 
+            position: relative; display: flex; align-items: center; min-width: 0;
         }
         .video-frame { flex: 1; width: 100%; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        #loading { grid-column: 1 / -1; text-align: center; color: #aaa; margin-top: 50px; font-size: 1rem; display: none;}
+        /* API KEY MODAL */
+        #settingsModal { background: rgba(0,0,0,0.85); align-items: center; justify-content: center; }
+        .settings-box { background: #222; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; text-align: center; border: 1px solid #444; }
+        .settings-box h2 { color: white; margin-bottom: 15px; }
+        .settings-box input { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: white; border-radius: 5px; margin-bottom: 15px; font-size: 1em; }
+        .save-btn { background: var(--accent-red); color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
+
+        #loading { text-align: center; color: #aaa; margin-top: 50px; font-size: 1.2em; display: none; width: 100%;}
+        #error-msg { text-align: center; color: #ff4b4b; margin-top: 20px; display: none; width: 100%; padding: 20px; border: 1px solid #ff4b4b; border-radius: 10px; background: rgba(255, 75, 75, 0.1); margin: 20px; }
 
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-area" onclick="window.location.reload()">
-            <i class="fa-brands fa-youtube logo-icon"></i>
-            <span>YouTube</span>
-        </div>
+        <button class="home-btn" onclick="loadHome()" title="Ana Sayfa">
+            <i class="fa-solid fa-house"></i>
+        </button>
 
         <div class="center-action-area">
             <div class="search-box">
@@ -166,115 +222,176 @@
             </div>
             
             <button class="mic-btn-pro" id="micBtn" onclick="toggleVoice()"><i class="fa fa-microphone"></i></button>
+
+            <div class="info-box">
+                <div class="marquee-content">
+                    <i class="fa-solid fa-car-side"></i> Car Video Pro <i class="fa-solid fa-music"></i>
+                </div>
+            </div>
+
+            <div class="zoom-controls-header">
+                <button class="zoom-btn" onclick="smartZoom(-1)" title="Küçült"><i class="fa-solid fa-minus"></i></button>
+                <i class="fa-solid fa-magnifying-glass" style="font-size:0.9em; color:#666;"></i>
+                <button class="zoom-btn" onclick="smartZoom(1)" title="Büyüt"><i class="fa-solid fa-plus"></i></button>
+            </div>
         </div>
-        
-        <div style="width: 20px;"></div> 
+
+        <button class="settings-btn" onclick="openSettings()" title="API Ayarları">
+            <i class="fa-solid fa-gear"></i>
+        </button>
     </header>
 
     <div class="container">
-        <aside class="sidebar">
-            <div class="nav-link" onclick="loadHome()"><i class="fa-solid fa-house"></i><span>Ana Sayfa</span></div>
-            <div class="nav-link" onclick="searchQuery('Shorts')"><i class="fa-solid fa-bolt"></i><span>Shorts</span></div>
-            <div class="nav-link" onclick="searchQuery('Müzik')"><i class="fa-solid fa-music"></i><span>Müzik</span></div>
-            <div class="nav-link" onclick="searchQuery('Oyun')"><i class="fa-solid fa-gamepad"></i><span>Oyun</span></div>
-            <div class="nav-link" onclick="searchQuery('Haber')"><i class="fa-solid fa-newspaper"></i><span>Haber</span></div>
-
-            <div class="zoom-controls-vertical">
-                <button class="zoom-btn" onclick="smartZoom(1)" title="Büyüt"><i class="fa-solid fa-plus"></i></button>
-                <i class="fa-solid fa-magnifying-glass" style="font-size:0.7em; color:#555;"></i>
-                <button class="zoom-btn" onclick="smartZoom(-1)" title="Küçült"><i class="fa-solid fa-minus"></i></button>
-            </div>
-        </aside>
-
         <main class="content">
-            <div class="chips">
-                <div class="chip active" onclick="loadHome()">Tümü</div>
-                <div class="chip" onclick="searchQuery('4K Belgesel')">Belgesel</div>
-                <div class="chip" onclick="searchQuery('Canlı Yayın')">Canlı</div>
-                <div class="chip" onclick="searchQuery('Yemek Tarifleri')">Yemek</div>
-                <div class="chip" onclick="searchQuery('Futbol Özetleri')">Spor</div>
-                <div class="chip" onclick="searchQuery('Bilim ve Teknoloji')">Bilim</div>
-                <div class="chip" onclick="searchQuery('Çizgi Film')">Çocuk</div>
+            <div class="sticky-header">
+                <div class="chips">
+                    <div class="chip active" onclick="loadHome()">Tümü</div>
+                    <div class="chip" onclick="searchQuery('Otomobil Videoları')">Otomobil</div>
+                    <div class="chip" onclick="searchQuery('Popüler Müzik')">Popüler Müzik</div>
+                    <div class="chip" onclick="searchQuery('Haberler Canlı')">Haberler</div>
+                    <div class="chip" onclick="searchQuery('Gezi ve Seyahat')">Gezi/Seyahat</div>
+                    <div class="chip" onclick="searchQuery('Komik Videolar')">Komik</div>
+                    <div class="chip" onclick="searchQuery('4K Belgesel')">Belgesel</div>
+                    <div class="chip" onclick="searchQuery('Canlı Yayın')">Canlı</div>
+                    <div class="chip" onclick="searchQuery('Yemek Tarifleri')">Yemek</div>
+                    <div class="chip" onclick="searchQuery('Futbol Özetleri')">Spor</div>
+                </div>
             </div>
 
-            <div class="video-grid" id="videoGrid">
-                </div>
-            <div id="loading">Yükleniyor...</div>
+            <div class="video-grid-container">
+                <div class="video-grid" id="videoGrid"></div>
+                <div id="loading">Yükleniyor...</div>
+                <div id="error-msg"></div>
+            </div>
         </main>
     </div>
 
-    <div class="player-modal" id="playerModal">
+    <div class="modal-overlay" id="playerModal">
         <div class="player-header">
             <div class="back-btn" onclick="closePlayer()">
-                <i class="fa-solid fa-arrow-left"></i> Kapat
+                <i class="fa-solid fa-arrow-left"></i> Geri
+            </div>
+            
+            <button class="fs-btn" onclick="toggleFullscreen()" title="Tam Ekran Modu">
+                <i class="fa-solid fa-expand"></i> <span>Tam Ekran</span>
+            </button>
+
+            <div class="player-marquee-container">
+                <div class="marquee-content">
+                    <i class="fa-solid fa-car-side"></i> Car Video Pro - Eğlencenin Adresi - İyi Seyirler Dileriz... <i class="fa-solid fa-music"></i>
+                </div>
             </div>
         </div>
         <div class="video-frame">
-            <iframe id="youtubeFrame" 
-                    sandbox="allow-scripts allow-same-origin allow-presentation allow-popups-to-escape-sandbox"
-                    src="" 
-                    allow="autoplay; encrypted-media; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+            <iframe id="youtubeFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal" style="z-index: 10000;">
+        <div class="settings-box">
+            <h2>API Anahtarı</h2>
+            <p>5 Anahtarlı havuz devrede. Sorun yoksa boş bırakın.</p>
+            <input type="text" id="apiKeyInput" placeholder="Özel Anahtarınız (Opsiyonel)">
+            <button class="save-btn" onclick="saveApiKey()">KAYDET</button>
+            <button onclick="closeSettings()" style="background:transparent; color:#aaa; border:none; margin-top:10px; cursor:pointer;">Kapat</button>
         </div>
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyBI1zlV43Yzrexl2Red_LC4nin2Xmhozvc'; 
+        // 5 API ANAHTARI
+        const DEFAULT_KEYS = [
+            'AIzaSyBS7n6xDGEPV6MP4XOsfyO5gbBEccowZC8',
+            'AIzaSyCoDHyEH5SzyIjg0bfwSJBTKevF_6Jy5Qo',
+            'AIzaSyDIeZ6q00aFDKtb8WFsEbJKlrHKV7dNGNY',
+            'AIzaSyD3lOf5M9FmvCCfmIFHUWgKwZdUax34b5E',
+            'AIzaSyA8psifPg6EF8u1xMqHVPlcS3FGPUrFLmY'
+        ];
+
+        let userApiKey = ''; 
+        
         const videoGrid = document.getElementById('videoGrid');
         const searchInput = document.getElementById('searchInput');
         const loading = document.getElementById('loading');
+        const errorMsg = document.getElementById('error-msg');
         
-        // BAŞLANGIÇ DEĞERLERİ
-        let currentCardSize = 220; // Kart genişliği
-        let currentFontSize = 16;  // Yazı boyutu
+        let currentCardSize = 220; 
+        let currentFontSize = 16;  
 
-        window.onload = loadHome;
+        window.onload = function() {
+            loadSettings();
+            searchQuery('müzik dinle');
+        };
 
-        // --- AKILLI ZOOM SİSTEMİ ---
-        // Sayfanın kendisini küçültmek yerine, elementlerin boyutunu değiştiriyoruz.
-        // Böylece tarayıcı "ha yer açıldı" diyip yeni videoları sağa kaydırıyor.
+        function loadSettings() {
+            const savedSize = localStorage.getItem('cvp_card_size');
+            const savedFont = localStorage.getItem('cvp_font_size');
+            const savedKey = localStorage.getItem('cvp_api_key');
+
+            if (savedSize) currentCardSize = parseInt(savedSize);
+            if (savedFont) currentFontSize = parseInt(savedFont);
+            if (savedKey) userApiKey = savedKey;
+
+            applyStyles();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('cvp_card_size', currentCardSize);
+            localStorage.setItem('cvp_font_size', currentFontSize);
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+            document.getElementById('apiKeyInput').value = userApiKey;
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveApiKey() {
+            const newKey = document.getElementById('apiKeyInput').value.trim();
+            userApiKey = newKey; 
+            localStorage.setItem('cvp_api_key', newKey);
+            closeSettings();
+            searchQuery('müzik dinle'); 
+        }
+
+        function getActiveKey() {
+            if (userApiKey && userApiKey.length > 10) return userApiKey;
+            const randomIndex = Math.floor(Math.random() * DEFAULT_KEYS.length);
+            return DEFAULT_KEYS[randomIndex];
+        }
+
         function smartZoom(direction) {
-            // Değişim miktarları
-            const sizeStep = 30; // Kartlar 30px büyür/küçülür
-            const fontStep = 1;  // Yazı 1px büyür/küçülür
-
+            const sizeStep = 30; const fontStep = 1;  
             if (direction === 1) {
-                // Büyüt
-                if(currentCardSize < 400) {
-                    currentCardSize += sizeStep;
-                    currentFontSize += fontStep;
-                }
+                if(currentCardSize < 500) { currentCardSize += sizeStep; currentFontSize += fontStep; }
             } else {
-                // Küçült
-                if(currentCardSize > 140) {
-                    currentCardSize -= sizeStep;
-                    currentFontSize -= fontStep;
-                }
+                if(currentCardSize > 140) { currentCardSize -= sizeStep; currentFontSize -= fontStep; }
             }
+            applyStyles();
+            saveSettings();
+        }
 
-            // CSS Değişkenlerini Güncelle
+        function applyStyles() {
             const root = document.documentElement;
             root.style.setProperty('--card-min-width', currentCardSize + "px");
             root.style.setProperty('--base-font-size', currentFontSize + "px");
         }
 
-        // Veri Çekme
-        async function loadHome() {
-            showLoading(true);
-            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&regionCode=TR&maxResults=50&key=${API_KEY}`;
-            await fetchAndRender(url);
-        }
+        async function loadHome() { searchQuery('müzik dinle'); }
+        function executeSearch() { searchQuery(searchInput.value); }
 
         async function searchQuery(q) {
             if(!q) return;
             showLoading(true);
             searchInput.value = q;
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(q)}&maxResults=50&key=${API_KEY}`;
+            errorMsg.style.display = 'none';
+
+            const currentKey = getActiveKey();
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(q)}&maxResults=50&key=${currentKey}`;
             await fetchAndRender(url, true);
         }
-
-        function executeSearch() { searchQuery(searchInput.value); }
 
         async function fetchAndRender(url, isSearch = false) {
             try {
@@ -282,12 +399,12 @@
                 const data = await response.json();
                 
                 if(data.error) {
-                    alert("API Hatası: " + data.error.message);
+                    showError(`<b>HATA:</b> ${data.error.message}<br>Tekrar deneyin.`);
                     return;
                 }
                 renderVideos(data.items, isSearch);
             } catch (e) {
-                alert("Bağlantı hatası.");
+                showError("İnternet bağlantısı kurulamadı.");
             } finally {
                 showLoading(false);
             }
@@ -301,7 +418,9 @@
             }
 
             items.forEach(item => {
-                let videoId = isSearch ? item.id.videoId : item.id;
+                let videoId = isSearch ? item.id?.videoId : (typeof item.id === 'string' ? item.id : item.id?.videoId);
+                if(!videoId) return;
+
                 let snippet = item.snippet;
                 if(!snippet) return;
 
@@ -334,7 +453,12 @@
             if(show) videoGrid.innerHTML = "";
         }
 
-        // Player
+        function showError(msg) {
+            errorMsg.innerHTML = msg;
+            errorMsg.style.display = 'block';
+            loading.style.display = 'none';
+        }
+
         function openPlayer(id) {
             const modal = document.getElementById('playerModal');
             const frame = document.getElementById('youtubeFrame');
@@ -345,9 +469,19 @@
         function closePlayer() {
             document.getElementById('playerModal').style.display = 'none';
             document.getElementById('youtubeFrame').src = "";
+            if (document.fullscreenElement) { document.exitFullscreen(); }
         }
 
-        // Sesli Komut
+        function toggleFullscreen() {
+            const iframe = document.getElementById('youtubeFrame');
+            if (!document.fullscreenElement) {
+                if(iframe.requestFullscreen) { iframe.requestFullscreen(); }
+                else if(iframe.webkitRequestFullscreen) { iframe.webkitRequestFullscreen(); }
+            } else {
+                if(document.exitFullscreen) { document.exitFullscreen(); }
+            }
+        }
+
         const micBtn = document.getElementById('micBtn');
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -356,7 +490,7 @@
             recognition.continuous = false;
             
             recognition.onstart = () => { micBtn.classList.add('listening'); searchInput.placeholder = "Dinliyorum..."; }
-            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Ara..."; }
+            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Müzik, Video Ara..."; }
             recognition.onresult = (e) => searchQuery(e.results[0][0].transcript);
             window.toggleVoice = () => recognition.start();
         } else {
