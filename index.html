@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro - Mini Player</title>
+    <title>Car Video Pro - Stable MultiKey</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -44,32 +44,39 @@
             gap: 15px;
         }
 
+        /* ANA SAYFA BUTONU */
         .home-btn {
             width: 50px; height: 50px; 
-            background-color: #1a1a1a; border: 1px solid #333; border-radius: 50%; 
+            background-color: #1a1a1a; 
+            border: 1px solid #333; 
+            border-radius: 50%; 
             color: white; cursor: pointer; font-size: 1.2em; 
             display: flex; align-items: center; justify-content: center;
             transition: 0.2s; flex-shrink: 0;
         }
         .home-btn:hover { background-color: #333; color: var(--accent-red); }
 
+        /* Orta Alan (Esnek) */
         .center-action-area { 
             display: flex; align-items: center; 
-            gap: 10px; flex: 1; min-width: 0;
+            gap: 10px; flex: 1; min-width: 0; 
         }
 
+        /* ARAMA KUTUSU */
         .search-box { 
             display: flex; flex: 2; 
             background-color: var(--search-bg); 
-            border: 1px solid #333; border-radius: 50px; 
+            border: 1px solid #333; 
+            border-radius: 50px; 
             overflow: hidden; height: 50px; 
             transition: all 0.3s ease;
-            min-width: 100px;
+            min-width: 100px; 
         }
         .search-box:focus-within { border-color: #3ea6ff; box-shadow: 0 0 15px rgba(62, 166, 255, 0.3); }
         .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; color: white; font-size: 1.1em; outline: none; min-width: 0; }
         .search-btn { width: 60px; background-color: #222; border: none; color: #aaa; border-left: 1px solid #333; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
 
+        /* MİKROFON */
         .mic-btn-pro { 
             width: 50px; height: 50px; flex-shrink: 0; border-radius: 50%; border: none; 
             background: #1a1a1a; border: 1px solid #333; color: white; cursor: pointer; 
@@ -80,6 +87,7 @@
         .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: var(--accent-red); color: white; border-color: var(--accent-red); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
 
+        /* KAYAN YAZI */
         .info-box {
             display: flex; flex: 1; align-items: center;
             background-color: var(--search-bg);
@@ -95,6 +103,7 @@
         }
         @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
+        /* ZOOM */
         .zoom-controls-header {
             display: flex; align-items: center;
             background: #1a1a1a; border-radius: 50px; 
@@ -107,6 +116,7 @@
         }
         .zoom-btn:hover { background: #333; color: white; }
 
+        /* AYARLAR BUTONU */
         .settings-btn {
             width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333;
             border-radius: 50%; color: #aaa; cursor: pointer; font-size: 1.2em;
@@ -153,58 +163,29 @@
         .title { font-size: 1.05em; font-weight: 600; line-height: 1.3; margin-bottom: 4px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .channel-name { color: var(--secondary-text); font-size: 0.9em; }
 
-        /* --- PLAYER MODAL (Mini Player Destekli) --- */
+        /* --- PLAYER MODAL --- */
         .player-modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: black; z-index: 9999; flex-direction: column; 
-            transition: all 0.3s ease; /* Yumuşak geçiş */
+            transition: all 0.3s ease;
         }
         
-        /* MINIMIZED STATE (Mini Player) */
+        /* Mini Player */
         .player-modal.minimized {
-            top: auto; left: auto;
-            bottom: 20px; right: 20px;
-            width: 320px; height: 180px;
-            background: black;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-            border: 1px solid #333;
+            top: auto; left: auto; bottom: 20px; right: 20px; width: 320px; height: 180px;
+            background: black; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); border: 1px solid #333;
         }
-
-        /* Mini Player'da üst kısmı gizle */
-        .player-modal.minimized .player-header {
-            display: none;
-        }
-        
-        /* Mini Player Kapatma Butonu (Normalde gizli) */
+        .player-modal.minimized .player-header { display: none; }
         .mini-close-btn {
-            display: none;
-            position: absolute; top: -12px; right: -12px;
-            width: 30px; height: 30px;
-            background: red; color: white;
-            border-radius: 50%; border: 2px solid white;
-            align-items: center; justify-content: center;
-            cursor: pointer; z-index: 10001;
-            font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            display: none; position: absolute; top: -12px; right: -12px; width: 30px; height: 30px;
+            background: red; color: white; border-radius: 50%; border: 2px solid white;
+            align-items: center; justify-content: center; cursor: pointer; z-index: 10001; font-weight: bold;
         }
-        
-        /* Sadece minimized olunca göster */
-        .player-modal.minimized .mini-close-btn {
-            display: flex;
-        }
-
-        /* Minimized olunca iframe üzerine tıklama katmanı */
-        .maximize-overlay {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            cursor: pointer; z-index: 10000;
-        }
-        .player-modal.minimized .maximize-overlay {
-            display: block;
-        }
+        .player-modal.minimized .mini-close-btn { display: flex; }
+        .maximize-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 10000; }
+        .player-modal.minimized .maximize-overlay { display: block; }
 
         .player-header { height: 70px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #333; gap: 15px; }
-        
-        /* Geri butonu */
         .back-btn { 
             color: white; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; gap: 8px; 
             padding: 8px 20px; background: #333; border-radius: 25px; border: 1px solid #444; flex-shrink: 0; font-weight: bold; 
@@ -298,15 +279,12 @@
     </div>
 
     <div class="player-modal" id="playerModal">
-        <div class="mini-close-btn" onclick="stopPlayer()">
-            <i class="fa-solid fa-times"></i>
-        </div>
-
+        <div class="mini-close-btn" onclick="stopPlayer()"><i class="fa-solid fa-times"></i></div>
         <div class="maximize-overlay" onclick="maximizePlayer()"></div>
 
         <div class="player-header">
             <div class="back-btn" onclick="minimizePlayer()">
-                <i class="fa-solid fa-arrow-down"></i> Listeye Dön
+                <i class="fa-solid fa-arrow-down"></i> Geri
             </div>
             
             <button class="fs-btn" onclick="toggleFullscreen()" title="Tam Ekran Modu">
@@ -326,17 +304,17 @@
 
     <div class="modal-overlay" id="settingsModal" style="z-index: 10000;">
         <div class="settings-box">
-            <h2>API Anahtarı</h2>
-            <p>5 Anahtarlı havuz devrede. Sorun yoksa boş bırakın.</p>
-            <input type="text" id="apiKeyInput" placeholder="Özel Anahtarınız (Opsiyonel)">
+            <h2>API Anahtarları</h2>
+            <p>5 Anahtarlı havuz devrede. Ekstra anahtar girmek isterseniz aşağıya yazın.</p>
+            <input type="text" id="apiKeyInput" placeholder="AIza...">
             <button class="save-btn" onclick="saveApiKey()">KAYDET</button>
             <button onclick="closeSettings()" style="background:transparent; color:#aaa; border:none; margin-top:10px; cursor:pointer;">Kapat</button>
         </div>
     </div>
 
     <script>
-        // API HAVUZU
-        const DEFAULT_KEYS = [
+        // GÜVENİLİR 5'Lİ API HAVUZU
+        const KEY_POOL = [
             'AIzaSyBS7n6xDGEPV6MP4XOsfyO5gbBEccowZC8',
             'AIzaSyCoDHyEH5SzyIjg0bfwSJBTKevF_6Jy5Qo',
             'AIzaSyDIeZ6q00aFDKtb8WFsEbJKlrHKV7dNGNY',
@@ -344,8 +322,9 @@
             'AIzaSyA8psifPg6EF8u1xMqHVPlcS3FGPUrFLmY'
         ];
 
-        let userApiKey = ''; 
-        
+        let userKey = '';
+        let currentKeyIndex = 0;
+
         const videoGrid = document.getElementById('videoGrid');
         const searchInput = document.getElementById('searchInput');
         const loading = document.getElementById('loading');
@@ -359,6 +338,7 @@
             searchQuery('müzik dinle');
         };
 
+        // --- AYARLAR ---
         function loadSettings() {
             const savedSize = localStorage.getItem('cvp_card_size');
             const savedFont = localStorage.getItem('cvp_font_size');
@@ -366,7 +346,7 @@
 
             if (savedSize) currentCardSize = parseInt(savedSize);
             if (savedFont) currentFontSize = parseInt(savedFont);
-            if (savedKey) userApiKey = savedKey;
+            if (savedKey) userKey = savedKey;
 
             applyStyles();
         }
@@ -378,44 +358,18 @@
 
         function openSettings() {
             document.getElementById('settingsModal').style.display = 'flex';
-            document.getElementById('apiKeyInput').value = userApiKey;
+            document.getElementById('apiKeyInput').value = userKey;
         }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
+        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+        
         function saveApiKey() {
-            const newKey = document.getElementById('apiKeyInput').value.trim();
-            userApiKey = newKey; 
-            localStorage.setItem('cvp_api_key', newKey);
+            userKey = document.getElementById('apiKeyInput').value.trim();
+            localStorage.setItem('cvp_api_key', userKey);
             closeSettings();
             searchQuery('müzik dinle'); 
         }
 
-        function getActiveKey() {
-            if (userApiKey && userApiKey.length > 10) return userApiKey;
-            const randomIndex = Math.floor(Math.random() * DEFAULT_KEYS.length);
-            return DEFAULT_KEYS[randomIndex];
-        }
-
-        function smartZoom(direction) {
-            const sizeStep = 30; const fontStep = 1;  
-            if (direction === 1) {
-                if(currentCardSize < 500) { currentCardSize += sizeStep; currentFontSize += fontStep; }
-            } else {
-                if(currentCardSize > 140) { currentCardSize -= sizeStep; currentFontSize -= fontStep; }
-            }
-            applyStyles();
-            saveSettings();
-        }
-
-        function applyStyles() {
-            const root = document.documentElement;
-            root.style.setProperty('--card-min-width', currentCardSize + "px");
-            root.style.setProperty('--base-font-size', currentFontSize + "px");
-        }
-
+        // --- YEDEKLEMELİ VERİ ÇEKME (FAILOVER) ---
         async function loadHome() { searchQuery('müzik dinle'); }
         function executeSearch() { searchQuery(searchInput.value); }
 
@@ -425,29 +379,54 @@
             searchInput.value = q;
             errorMsg.style.display = 'none';
 
-            const currentKey = getActiveKey();
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(q)}&maxResults=50&key=${currentKey}`;
-            await fetchAndRender(url, true);
+            // Eğer kullanıcı özel anahtar girdiyse önce onu dene
+            if (userKey.length > 10) {
+                const success = await tryFetchWithKey(q, userKey);
+                if(success) {
+                    showLoading(false);
+                    return;
+                }
+            }
+
+            // Kullanıcı anahtarı yoksa veya başarısızsa HAVUZA GEÇ
+            // Sırayla anahtarları dene
+            for (let i = 0; i < KEY_POOL.length; i++) {
+                let key = KEY_POOL[i];
+                console.log("Deneniyor: Key " + (i+1));
+                const success = await tryFetchWithKey(q, key);
+                if (success) {
+                    console.log("Başarılı: Key " + (i+1));
+                    showLoading(false);
+                    return;
+                }
+            }
+
+            // Hepsi başarısızsa
+            showError("Tüm API anahtarları kotayı doldurdu veya hatalı. Lütfen yarın tekrar deneyin veya yeni anahtar ekleyin.");
         }
 
-        async function fetchAndRender(url, isSearch = false) {
+        // Tek bir anahtarla veri çekmeyi dener, başarısızsa false döner
+        async function tryFetchWithKey(q, key) {
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(q)}&maxResults=50&key=${key}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if(data.error) {
-                    showError(`<b>HATA:</b> ${data.error.message}<br>Tekrar deneyin.`);
-                    return;
+                    console.warn("API Hatası:", data.error.message);
+                    return false; // Hata var, diğer anahtara geç
                 }
-                renderVideos(data.items, isSearch);
+                
+                renderVideos(data.items);
+                return true; // Başarılı
+
             } catch (e) {
-                showError("İnternet bağlantısı kurulamadı.");
-            } finally {
-                showLoading(false);
+                console.warn("Bağlantı Hatası");
+                return false;
             }
         }
 
-        function renderVideos(items, isSearch) {
+        function renderVideos(items) {
             videoGrid.innerHTML = "";
             if(!items || items.length === 0) {
                 videoGrid.innerHTML = "<p style='color:white; grid-column: 1/-1; text-align: center;'>Sonuç bulunamadı.</p>";
@@ -455,12 +434,10 @@
             }
 
             items.forEach(item => {
-                let videoId = isSearch ? item.id?.videoId : (typeof item.id === 'string' ? item.id : item.id?.videoId);
+                let videoId = item.id?.videoId;
                 if(!videoId) return;
 
                 let snippet = item.snippet;
-                if(!snippet) return;
-
                 let title = snippet.title;
                 let thumb = snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url;
                 let channel = snippet.channelTitle;
@@ -485,79 +462,67 @@
             });
         }
 
+        // --- ZOOM & UI ---
+        function smartZoom(direction) {
+            if (direction === 1 && currentCardSize < 500) { currentCardSize += 30; currentFontSize += 1; }
+            else if (direction === -1 && currentCardSize > 140) { currentCardSize -= 30; currentFontSize -= 1; }
+            applyStyles();
+            saveSettings();
+        }
+        function applyStyles() {
+            document.documentElement.style.setProperty('--card-min-width', currentCardSize + "px");
+            document.documentElement.style.setProperty('--base-font-size', currentFontSize + "px");
+        }
         function showLoading(show) {
             loading.style.display = show ? 'block' : 'none';
             if(show) videoGrid.innerHTML = "";
         }
-
         function showError(msg) {
-            errorMsg.innerHTML = msg;
-            errorMsg.style.display = 'block';
-            loading.style.display = 'none';
+            errorMsg.innerHTML = msg; errorMsg.style.display = 'block'; loading.style.display = 'none';
         }
 
-        // --- PLAYER FUNCTIONS ---
+        // --- PLAYER ---
         function openPlayer(id) {
             const modal = document.getElementById('playerModal');
             const frame = document.getElementById('youtubeFrame');
-            // Yeni video açınca tam boyutta aç
             modal.classList.remove('minimized');
             frame.src = `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
             modal.style.display = 'flex';
         }
-
-        // "Listeye Dön" tuşu -> Mini Player'a geçiş yapar
-        function minimizePlayer() {
-            const modal = document.getElementById('playerModal');
-            modal.classList.add('minimized');
-        }
-
-        // Mini Player üzerindeki overlay'e tıklayınca -> Tam boyuta geçer
-        function maximizePlayer() {
-            const modal = document.getElementById('playerModal');
-            modal.classList.remove('minimized');
-        }
-
-        // Kırmızı (X) tuşu -> Videoyu tamamen kapatır
+        function minimizePlayer() { document.getElementById('playerModal').classList.add('minimized'); }
+        function maximizePlayer() { document.getElementById('playerModal').classList.remove('minimized'); }
         function stopPlayer() {
             const modal = document.getElementById('playerModal');
-            const frame = document.getElementById('youtubeFrame');
-            frame.src = "";
+            document.getElementById('youtubeFrame').src = "";
             modal.style.display = 'none';
             modal.classList.remove('minimized');
-            if (document.fullscreenElement) { document.exitFullscreen(); }
+            if (document.fullscreenElement) document.exitFullscreen();
         }
-
-        // Eski kapatma fonksiyonunu stopPlayer'a yönlendiriyoruz
-        function closePlayer() {
-            minimizePlayer();
-        }
-
+        function closePlayer() { minimizePlayer(); }
         function toggleFullscreen() {
             const iframe = document.getElementById('youtubeFrame');
             if (!document.fullscreenElement) {
-                if(iframe.requestFullscreen) { iframe.requestFullscreen(); }
-                else if(iframe.webkitRequestFullscreen) { iframe.webkitRequestFullscreen(); }
+                if(iframe.requestFullscreen) iframe.requestFullscreen();
+                else if(iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
             } else {
-                if(document.exitFullscreen) { document.exitFullscreen(); }
+                if(document.exitFullscreen) document.exitFullscreen();
             }
         }
 
+        // --- SES ---
         const micBtn = document.getElementById('micBtn');
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
             recognition.lang = 'tr-TR';
             recognition.continuous = false;
-            
             recognition.onstart = () => { micBtn.classList.add('listening'); searchInput.placeholder = "Dinliyorum..."; }
-            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Müzik, Video Ara..."; }
+            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Ara..."; }
             recognition.onresult = (e) => searchQuery(e.results[0][0].transcript);
             window.toggleVoice = () => recognition.start();
         } else {
             window.toggleVoice = () => alert("Sesli komut desteklenmiyor.");
         }
-
         searchInput.addEventListener("keypress", (e) => { if(e.key==="Enter") executeSearch(); });
     </script>
 </body>
