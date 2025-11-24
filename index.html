@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro - Stable MultiKey</title>
+    <title>Car Video Pro - Overlay Back Button</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -44,7 +44,6 @@
             gap: 15px;
         }
 
-        /* ANA SAYFA BUTONU */
         .home-btn {
             width: 50px; height: 50px; 
             background-color: #1a1a1a; 
@@ -56,13 +55,11 @@
         }
         .home-btn:hover { background-color: #333; color: var(--accent-red); }
 
-        /* Orta Alan (Esnek) */
         .center-action-area { 
             display: flex; align-items: center; 
             gap: 10px; flex: 1; min-width: 0; 
         }
 
-        /* ARAMA KUTUSU */
         .search-box { 
             display: flex; flex: 2; 
             background-color: var(--search-bg); 
@@ -76,7 +73,6 @@
         .search-box input { flex: 1; background: transparent; border: none; padding: 0 20px; color: white; font-size: 1.1em; outline: none; min-width: 0; }
         .search-btn { width: 60px; background-color: #222; border: none; color: #aaa; border-left: 1px solid #333; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
 
-        /* MİKROFON */
         .mic-btn-pro { 
             width: 50px; height: 50px; flex-shrink: 0; border-radius: 50%; border: none; 
             background: #1a1a1a; border: 1px solid #333; color: white; cursor: pointer; 
@@ -87,7 +83,6 @@
         .mic-btn-pro.listening { animation: pulse 1.5s infinite; background: var(--accent-red); color: white; border-color: var(--accent-red); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
 
-        /* KAYAN YAZI */
         .info-box {
             display: flex; flex: 1; align-items: center;
             background-color: var(--search-bg);
@@ -103,7 +98,6 @@
         }
         @keyframes scrollText { 0% { transform: translateX(100%); } 100% { transform: translateX(-150%); } }
 
-        /* ZOOM */
         .zoom-controls-header {
             display: flex; align-items: center;
             background: #1a1a1a; border-radius: 50px; 
@@ -116,7 +110,6 @@
         }
         .zoom-btn:hover { background: #333; color: white; }
 
-        /* AYARLAR BUTONU */
         .settings-btn {
             width: 50px; height: 50px; background: #1a1a1a; border: 1px solid #333;
             border-radius: 50%; color: #aaa; cursor: pointer; font-size: 1.2em;
@@ -170,22 +163,46 @@
             transition: all 0.3s ease;
         }
         
-        /* Mini Player */
         .player-modal.minimized {
             top: auto; left: auto; bottom: 20px; right: 20px; width: 320px; height: 180px;
             background: black; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); border: 1px solid #333;
         }
         .player-modal.minimized .player-header { display: none; }
+        
+        /* ŞEFFAF GERİ BUTONU (YENİ) */
+        .floating-back-btn {
+            position: absolute;
+            top: 85px; /* Header'ın hemen altında */
+            right: 20px;
+            z-index: 50; /* İframe üzerinde dursun */
+            background: rgba(0, 0, 0, 0.6); /* Yarı şeffaf siyah */
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px); /* Buzlu cam efekti */
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .floating-back-btn:hover { background: rgba(200, 0, 0, 0.8); transform: scale(1.1); border-color: red;}
+        
+        /* Mini player olunca bu butonu gizle */
+        .player-modal.minimized .floating-back-btn { display: none; }
+
         .mini-close-btn {
             display: none; position: absolute; top: -12px; right: -12px; width: 30px; height: 30px;
             background: red; color: white; border-radius: 50%; border: 2px solid white;
             align-items: center; justify-content: center; cursor: pointer; z-index: 10001; font-weight: bold;
         }
         .player-modal.minimized .mini-close-btn { display: flex; }
+        
         .maximize-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 10000; }
         .player-modal.minimized .maximize-overlay { display: block; }
 
         .player-header { height: 70px; display: flex; align-items: center; padding: 0 20px; background: #111; border-bottom: 1px solid #333; gap: 15px; }
+        
         .back-btn { 
             color: white; font-size: 1.1em; cursor: pointer; display: flex; align-items: center; gap: 8px; 
             padding: 8px 20px; background: #333; border-radius: 25px; border: 1px solid #444; flex-shrink: 0; font-weight: bold; 
@@ -279,6 +296,10 @@
     </div>
 
     <div class="player-modal" id="playerModal">
+        <div class="floating-back-btn" onclick="minimizePlayer()" title="Geri / Küçült">
+            <i class="fa-solid fa-arrow-down"></i>
+        </div>
+
         <div class="mini-close-btn" onclick="stopPlayer()"><i class="fa-solid fa-times"></i></div>
         <div class="maximize-overlay" onclick="maximizePlayer()"></div>
 
@@ -304,16 +325,16 @@
 
     <div class="modal-overlay" id="settingsModal" style="z-index: 10000;">
         <div class="settings-box">
-            <h2>API Anahtarları</h2>
-            <p>5 Anahtarlı havuz devrede. Ekstra anahtar girmek isterseniz aşağıya yazın.</p>
-            <input type="text" id="apiKeyInput" placeholder="AIza...">
+            <h2>API Anahtarı</h2>
+            <p>5 Anahtarlı havuz devrede. Sorun yoksa boş bırakın.</p>
+            <input type="text" id="apiKeyInput" placeholder="Özel Anahtarınız (Opsiyonel)">
             <button class="save-btn" onclick="saveApiKey()">KAYDET</button>
             <button onclick="closeSettings()" style="background:transparent; color:#aaa; border:none; margin-top:10px; cursor:pointer;">Kapat</button>
         </div>
     </div>
 
     <script>
-        // GÜVENİLİR 5'Lİ API HAVUZU
+        // 5 API ANAHTARI
         const KEY_POOL = [
             'AIzaSyBS7n6xDGEPV6MP4XOsfyO5gbBEccowZC8',
             'AIzaSyCoDHyEH5SzyIjg0bfwSJBTKevF_6Jy5Qo',
@@ -322,9 +343,8 @@
             'AIzaSyA8psifPg6EF8u1xMqHVPlcS3FGPUrFLmY'
         ];
 
-        let userKey = '';
-        let currentKeyIndex = 0;
-
+        let userKey = ''; 
+        
         const videoGrid = document.getElementById('videoGrid');
         const searchInput = document.getElementById('searchInput');
         const loading = document.getElementById('loading');
@@ -338,7 +358,6 @@
             searchQuery('müzik dinle');
         };
 
-        // --- AYARLAR ---
         function loadSettings() {
             const savedSize = localStorage.getItem('cvp_card_size');
             const savedFont = localStorage.getItem('cvp_font_size');
@@ -360,16 +379,36 @@
             document.getElementById('settingsModal').style.display = 'flex';
             document.getElementById('apiKeyInput').value = userKey;
         }
-        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-        
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
         function saveApiKey() {
-            userKey = document.getElementById('apiKeyInput').value.trim();
-            localStorage.setItem('cvp_api_key', userKey);
+            const newKey = document.getElementById('apiKeyInput').value.trim();
+            userKey = newKey; 
+            localStorage.setItem('cvp_api_key', newKey);
             closeSettings();
             searchQuery('müzik dinle'); 
         }
 
-        // --- YEDEKLEMELİ VERİ ÇEKME (FAILOVER) ---
+        function smartZoom(direction) {
+            const sizeStep = 30; const fontStep = 1;  
+            if (direction === 1) {
+                if(currentCardSize < 500) { currentCardSize += sizeStep; currentFontSize += fontStep; }
+            } else {
+                if(currentCardSize > 140) { currentCardSize -= sizeStep; currentFontSize -= fontStep; }
+            }
+            applyStyles();
+            saveSettings();
+        }
+
+        function applyStyles() {
+            const root = document.documentElement;
+            root.style.setProperty('--card-min-width', currentCardSize + "px");
+            root.style.setProperty('--base-font-size', currentFontSize + "px");
+        }
+
         async function loadHome() { searchQuery('müzik dinle'); }
         function executeSearch() { searchQuery(searchInput.value); }
 
@@ -379,51 +418,28 @@
             searchInput.value = q;
             errorMsg.style.display = 'none';
 
-            // Eğer kullanıcı özel anahtar girdiyse önce onu dene
             if (userKey.length > 10) {
                 const success = await tryFetchWithKey(q, userKey);
-                if(success) {
-                    showLoading(false);
-                    return;
-                }
+                if(success) { showLoading(false); return; }
             }
 
-            // Kullanıcı anahtarı yoksa veya başarısızsa HAVUZA GEÇ
-            // Sırayla anahtarları dene
             for (let i = 0; i < KEY_POOL.length; i++) {
                 let key = KEY_POOL[i];
-                console.log("Deneniyor: Key " + (i+1));
                 const success = await tryFetchWithKey(q, key);
-                if (success) {
-                    console.log("Başarılı: Key " + (i+1));
-                    showLoading(false);
-                    return;
-                }
+                if (success) { showLoading(false); return; }
             }
-
-            // Hepsi başarısızsa
-            showError("Tüm API anahtarları kotayı doldurdu veya hatalı. Lütfen yarın tekrar deneyin veya yeni anahtar ekleyin.");
+            showError("Tüm API anahtarları kotayı doldurdu. Lütfen yarın tekrar deneyin.");
         }
 
-        // Tek bir anahtarla veri çekmeyi dener, başarısızsa false döner
         async function tryFetchWithKey(q, key) {
             const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(q)}&maxResults=50&key=${key}`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                
-                if(data.error) {
-                    console.warn("API Hatası:", data.error.message);
-                    return false; // Hata var, diğer anahtara geç
-                }
-                
+                if(data.error) return false;
                 renderVideos(data.items);
-                return true; // Başarılı
-
-            } catch (e) {
-                console.warn("Bağlantı Hatası");
-                return false;
-            }
+                return true;
+            } catch (e) { return false; }
         }
 
         function renderVideos(items) {
@@ -436,7 +452,6 @@
             items.forEach(item => {
                 let videoId = item.id?.videoId;
                 if(!videoId) return;
-
                 let snippet = item.snippet;
                 let title = snippet.title;
                 let thumb = snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url;
@@ -445,7 +460,6 @@
                 const card = document.createElement('div');
                 card.className = 'video-card';
                 card.onclick = () => openPlayer(videoId);
-                
                 card.innerHTML = `
                     <div class="thumbnail-container">
                         <img src="${thumb}" alt="thumb">
@@ -462,26 +476,17 @@
             });
         }
 
-        // --- ZOOM & UI ---
-        function smartZoom(direction) {
-            if (direction === 1 && currentCardSize < 500) { currentCardSize += 30; currentFontSize += 1; }
-            else if (direction === -1 && currentCardSize > 140) { currentCardSize -= 30; currentFontSize -= 1; }
-            applyStyles();
-            saveSettings();
-        }
-        function applyStyles() {
-            document.documentElement.style.setProperty('--card-min-width', currentCardSize + "px");
-            document.documentElement.style.setProperty('--base-font-size', currentFontSize + "px");
-        }
         function showLoading(show) {
             loading.style.display = show ? 'block' : 'none';
             if(show) videoGrid.innerHTML = "";
         }
+
         function showError(msg) {
-            errorMsg.innerHTML = msg; errorMsg.style.display = 'block'; loading.style.display = 'none';
+            errorMsg.innerHTML = msg;
+            errorMsg.style.display = 'block';
+            loading.style.display = 'none';
         }
 
-        // --- PLAYER ---
         function openPlayer(id) {
             const modal = document.getElementById('playerModal');
             const frame = document.getElementById('youtubeFrame');
@@ -489,8 +494,10 @@
             frame.src = `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
             modal.style.display = 'flex';
         }
+
         function minimizePlayer() { document.getElementById('playerModal').classList.add('minimized'); }
         function maximizePlayer() { document.getElementById('playerModal').classList.remove('minimized'); }
+        
         function stopPlayer() {
             const modal = document.getElementById('playerModal');
             document.getElementById('youtubeFrame').src = "";
@@ -498,7 +505,9 @@
             modal.classList.remove('minimized');
             if (document.fullscreenElement) document.exitFullscreen();
         }
+
         function closePlayer() { minimizePlayer(); }
+
         function toggleFullscreen() {
             const iframe = document.getElementById('youtubeFrame');
             if (!document.fullscreenElement) {
@@ -509,7 +518,6 @@
             }
         }
 
-        // --- SES ---
         const micBtn = document.getElementById('micBtn');
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -517,12 +525,13 @@
             recognition.lang = 'tr-TR';
             recognition.continuous = false;
             recognition.onstart = () => { micBtn.classList.add('listening'); searchInput.placeholder = "Dinliyorum..."; }
-            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Ara..."; }
+            recognition.onend = () => { micBtn.classList.remove('listening'); searchInput.placeholder = "Müzik, Video Ara..."; }
             recognition.onresult = (e) => searchQuery(e.results[0][0].transcript);
             window.toggleVoice = () => recognition.start();
         } else {
             window.toggleVoice = () => alert("Sesli komut desteklenmiyor.");
         }
+
         searchInput.addEventListener("keypress", (e) => { if(e.key==="Enter") executeSearch(); });
     </script>
 </body>
