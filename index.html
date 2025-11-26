@@ -9,9 +9,15 @@
         body {
             margin: 0;
             padding: 0;
-            /* Logo.jpg dosyası aynı klasörde olmalı */
-            background: #050505 url('logo.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background-color: #050505;
+            
+            /* Arka Plan: Resmi ekrana sündür (Stretch) */
+            background-image: url('logo.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: 100% 100%; 
+            
             font-family: 'Segoe UI', sans-serif;
             color: white;
             height: 100vh;
@@ -22,7 +28,7 @@
 
         .overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5);
             z-index: -1;
         }
 
@@ -45,7 +51,7 @@
             position: absolute;
             top: 0; left: 0;
             transform-origin: 0 0; 
-            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease, opacity 0.3s;
+            transition: transform 0.2s ease, opacity 0.3s;
         }
 
         .logo-area { text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,1); }
@@ -68,11 +74,13 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white; height: 100px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 1.3rem; font-weight: 600; border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 600; border-radius: 20px;
             cursor: pointer; position: relative; overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             text-align: center;
             transition: background 0.2s;
+            padding: 5px;
         }
         .app-btn:active { background: rgba(0, 201, 255, 0.4); border-color: #00C9FF; }
 
@@ -86,12 +94,12 @@
             background: #000;
         }
 
-        /* TAM EKRAN İÇİN GÜNCELLENEN IFRAME STİLİ */
         iframe {
             border: none;
             background: #fff;
             position: absolute;
             top: 0; left: 0;
+            width: 100%; height: 100%;
             transform-origin: 0 0;
             transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
         }
@@ -106,6 +114,7 @@
             padding: 0 10px;
             z-index: 999;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            height: 60px;
             transition: height 0.2s ease;
         }
 
@@ -135,7 +144,7 @@
         
         .ticker-text {
             white-space: nowrap; position: absolute; color: #00C9FF;
-            font-weight: 500; animation: marquee 25s linear infinite;
+            font-weight: 500; animation: marquee 35s linear infinite;
         }
         @keyframes marquee { 0% { left: 100%; } 100% { left: -100%; } }
         .icon-svg { fill: currentColor; display: block; }
@@ -153,23 +162,26 @@
             </div>
             <div class="button-grid">
                 <button class="app-btn" onclick="openSite('https://s.vuhuv.com/tvradyo/')">Vuhuv Tv</button>
-                <button class="app-btn" onclick="openSite('https://www.youtube.com/embed?listType=playlist&list=PL12345')">YouTube</button>
-                <button class="app-btn" onclick="openSite('https://www.google.com/webhp?igu=1')">Google</button>
-                <button class="app-btn" onclick="openSite('https://open.spotify.com/embed')">Spotify</button>
                 
-                <button class="app-btn" onclick="openSite('https://weather.com/')">Hava</button>
-                <button class="app-btn" onclick="openSite('https://news.google.com')">Haber</button>
-                <button class="app-btn" onclick="openSite('https://tunein.com/')">Radyo</button>
-                <button class="app-btn" onclick="openSite('https://fast.com')">Hız Testi</button>
+                <button class="app-btn" onclick="openSite('https://tv.garden')">TV Garden</button>
+                
+                <button class="app-btn" onclick="openSite('https://www.google.com/webhp?igu=1')">Google</button>
+                
+                <button class="app-btn" onclick="openSite('https://www.hdfilmizle.life/')">HD Film İzle</button>
+                
+                <button class="app-btn" onclick="openSite('https://yabancidizibox.com/')">Yabancı Dizi</button>
+                
+                <button class="app-btn" onclick="openSite('https://www.sinemafilmizle.com.tr')">Sinema Film</button>
+                
+                <button class="app-btn" onclick="openSite('https://sinemaizle.org')">Sinema İzle</button>
+                
+                <button class="app-btn" onclick="openSite('https://www.hdflim.net')">HD Film Net</button>
             </div>
         </div>
 
         <div id="browser-screen">
             <iframe id="web-frame" src="" 
-                allowfullscreen="true" 
-                webkitallowfullscreen="true" 
-                mozallowfullscreen="true" 
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture; gyroscope; accelerometer; clipboard-write">
+                allow="autoplay; encrypted-media; picture-in-picture; gyroscope; accelerometer; clipboard-write">
             </iframe>
         </div>
     </div>
@@ -182,7 +194,7 @@
 
         <div class="ticker-container" id="ticker-box">
             <div class="ticker-text" id="ticker-content">
-                Car Video Pro - Eğlencenin Adresi    |    İyi Yolculuklar...
+                Car Video Pro - Eğlencenin Adresi    |    Yukarıdaki içerikler internette paylaşılan ücretsiz servislerden eklenmiştir, içerikler ile site yayıncıları sorumludur    |    İyi Yolculuklar...
             </div>
         </div>
 
@@ -213,7 +225,7 @@
         const baseFontSize = 16;
 
         window.onload = function() {
-            const savedZoom = localStorage.getItem('carVideoZoomV4'); // Versiyonu değiştirdim
+            const savedZoom = localStorage.getItem('carVideoZoomV15');
             if (savedZoom) currentZoom = parseFloat(savedZoom);
             applyZoom();
             updateBackBtnState(false);
@@ -256,7 +268,7 @@
             if (currentZoom < 0.6) currentZoom = 0.6;
             if (currentZoom > 2.2) currentZoom = 2.2;
             applyZoom();
-            localStorage.setItem('carVideoZoomV4', currentZoom);
+            localStorage.setItem('carVideoZoomV15', currentZoom);
         }
 
         function applyZoom() {
@@ -268,8 +280,8 @@
             menuScreen.style.height = `${scalePercent}%`;
             menuScreen.style.transform = `scale(${currentZoom})`;
 
-            webFrame.style.width = `${scalePercent}%`;
-            webFrame.style.height = `${scalePercent}%`;
+            webFrame.style.width = `${100 / currentZoom}%`;
+            webFrame.style.height = `${100 / currentZoom}%`;
             webFrame.style.transform = `scale(${currentZoom})`;
 
             footerBar.style.height = `${newFooterHeight}px`;
