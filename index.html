@@ -1,308 +1,578 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Video Pro</title>
+    <title>Araç Bilgi Paneli</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     <style>
-        /* --- GENEL AYARLAR --- */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #050505;
-            
-            /* Arka Plan: Resmi ekrana sündür (Stretch) */
-            background-image: url('logo.png');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-attachment: fixed;
-            background-size: 100% 100%; 
-            
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-            height: 100vh;
+        /* --- GENEL STİLLER --- */
+        :root {
+            --background-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            --item-bg: rgba(255, 255, 255, 0.05);
+            --item-hover-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --text-color: #ffffff;
+            --accent-color: #00d2ff;
+            --accent-glow: 0 0 15px rgba(0, 210, 255, 0.6);
+            --danger-color: #ff7675;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: var(--font-main);
+            background: var(--background-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
-        .overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: -1;
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* --- İÇERİK ALANI --- */
-        #main-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
+        /* --- KONUM MODALI --- */
+        .location-prompt {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+        .location-content {
+            background: rgba(30, 30, 30, 0.6);
+            border: var(--glass-border); padding: 40px; border-radius: 25px;
+            text-align: center; width: 450px; max-width: 90%;
+        }
+        .hidden { display: none !important; }
+        .location-buttons button, #manual-selection button {
+            padding: 12px 30px; border: none; border-radius: 50px;
+            font-weight: 600; cursor: pointer; margin: 10px;
+            transition: 0.3s; text-transform: uppercase;
+        }
+        #confirm-yes-btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: white; }
+        #confirm-no-btn { background: linear-gradient(45deg, #cb2d3e, #ef473a); color: white; }
+        #manual-selection select {
+            width: 100%; padding: 15px; margin-top: 15px;
+            border-radius: 15px; background: rgba(0,0,0,0.5); color: white; border: 1px solid #555;
         }
 
-        /* --- MENÜ --- */
-        #menu-screen {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            top: 0; left: 0;
-            transform-origin: 0 0; 
-            transition: transform 0.2s ease, opacity 0.3s;
-        }
-
-        .logo-area { text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,1); }
-        .logo-area h1 {
-            margin: 0; font-size: 2.5rem; color: #fff;
-            text-shadow: 0 0 20px #00C9FF; 
-        }
-
-        .button-grid {
-            display: grid;
+        /* --- MENÜ GRID --- */
+        .dashboard-container {
+            display: none;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(2, 1fr);
-            gap: 15px;
-            width: 90%; max-width: 1200px; padding: 10px;
+            gap: 25px; padding: 30px;
+            width: 100%; height: calc(100% - 60px);
+        }
+        .menu-item {
+            background: var(--item-bg); border: var(--glass-border);
+            border-radius: 25px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            color: var(--text-color); font-size: 1.2em; font-weight: 600;
+            transition: 0.4s; cursor: pointer; position: relative; overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        .menu-item:hover {
+            transform: translateY(-10px); background: var(--item-hover-bg);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .menu-item i {
+            font-size: 3.5em; margin-bottom: 20px;
+            background: linear-gradient(to bottom, #fff, #aaa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
         }
 
-        .app-btn {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; height: 100px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 1.1rem;
-            font-weight: 600; border-radius: 20px;
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            text-align: center;
-            transition: background 0.2s;
-            padding: 5px;
+        /* --- FOOTER --- */
+        .footer-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center;
+            z-index: 100;
         }
-        .app-btn:active { background: rgba(0, 201, 255, 0.4); border-color: #00C9FF; }
-
-        /* --- TARAYICI --- */
-        #browser-screen {
-            width: 100%;
-            height: 100%;
-            display: none;
-            position: absolute;
-            top: 0; left: 0;
-            background: #000;
+        .marquee-container { flex-grow: 1; overflow: hidden; white-space: nowrap; }
+        .marquee-text {
+            display: inline-block; padding-left: 100%; animation: marquee 20s linear infinite;
+            font-size: 1.2em; color: var(--accent-color);
+        }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        .zoom-controls { display: flex; align-items: center; gap: 5px; padding: 0 15px; }
+        .zoom-btn-footer {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: white; width: 35px; height: 35px; border-radius: 50%; cursor: pointer;
         }
 
-        iframe {
-            border: none;
-            background: #fff;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            transform-origin: 0 0;
-            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+        /* --- İÇERİK EKRANI --- */
+        .content-display {
+            position: fixed; top: 0; left: 0; width: 100%; height: calc(100% - 60px);
+            background-color: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1500;
         }
-
-        /* --- ALT ÇUBUK --- */
-        #footer-bar {
-            background: #151515;
-            border-top: 1px solid #333;
+        .content-display.visible { display: flex; animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        #content-data { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* --- GÜNCELLENEN KAPATMA BUTONU (HER EKRANDA GÖRÜNÜR) --- */
+        .close-button {
+            position: absolute; 
+            top: 20px; 
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8); /* Koyu Arkaplan */
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.5); /* Beyaz Çerçeve */
+            border-radius: 50%; 
+            width: 50px; 
+            height: 50px; 
+            font-size: 1.5em; 
+            cursor: pointer; 
+            z-index: 2000; /* En üstte kalsın */
+            transition: 0.3s;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            z-index: 999;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
-            height: 60px;
-            transition: height 0.2s ease;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8); /* Güçlü Gölge */
+            backdrop-filter: blur(5px);
+        }
+        .close-button:hover { 
+            background-color: var(--danger-color); 
+            border-color: #fff;
+            transform: scale(1.1) rotate(90deg);
         }
 
-        .back-btn, .zoom-btn {
-            background: #333; color: white; border: none;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; border-radius: 12px;
-            font-family: inherit;
+        /* --- LOADER --- */
+        .loader {
+            border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid var(--accent-color);
+            border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: auto;
         }
-        
-        .back-btn { 
-            background: linear-gradient(135deg, #c0392b, #a93226); 
-            font-weight: bold; padding: 0 20px; 
-            box-shadow: 0 2px 10px rgba(192, 57, 43, 0.4);
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .zoom-controls { display: flex; gap: 8px; }
-        .zoom-btn { background: #252525; border: 1px solid #444; }
-        .zoom-btn:active { background: #00C9FF; color: black; border-color: #00C9FF; }
+        /* --- IFRAME --- */
+        .iframe-wrapper { width: 100%; height: 100%; background: #fff; border-radius: 15px; overflow: hidden; position: relative; }
+        .iframe-wrapper iframe { width: 100%; height: 100%; border: none; }
 
-        .ticker-container {
-            flex: 1; margin: 0 20px; background: rgba(0,0,0,0.5); 
-            border: 1px solid #333; border-radius: 8px; 
-            overflow: hidden; position: relative;
-            display: flex; align-items: center;
+        /* --- HAVA DURUMU STİLLERİ --- */
+        .weather-container { width: 100%; height: 100%; overflow-y: auto; padding: 20px; }
+        .weather-card-pro {
+            background: rgba(255,255,255,0.05); border-radius: 30px; padding: 40px;
+            max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 2fr; gap: 40px;
         }
-        
-        .ticker-text {
-            white-space: nowrap; position: absolute; color: #00C9FF;
-            font-weight: 500; animation: marquee 35s linear infinite;
-        }
-        @keyframes marquee { 0% { left: 100%; } 100% { left: -100%; } }
-        .icon-svg { fill: currentColor; display: block; }
+        .weather-left { text-align: center; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 40px; }
+        .weather-temp-big { font-size: 6em; font-weight: 800; line-height: 1; }
+        .weather-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; display: flex; gap: 15px; align-items: center; }
+        .forecast-row { display: flex; justify-content: space-between; gap: 10px; }
+        .forecast-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; text-align: center; flex: 1; }
 
+        /* --- NAMAZ VAKİTLERİ --- */
+        .prayer-container { width: 100%; height: 100%; overflow-y: auto; padding: 20px; }
+        .prayer-card-wrapper { max-width: 900px; margin: 0 auto; }
+        .prayer-grid-pro { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .prayer-item-pro {
+            background: rgba(30,30,30,0.6); border-radius: 20px; padding: 30px 20px; text-align: center;
+        }
+        .prayer-item-pro.active-time { background: linear-gradient(135deg, var(--accent-color), #0083b0); color: #000; }
+        .prayer-time-val { font-size: 1.8em; font-weight: bold; }
+
+        /* --- YAKIT HESAPLAMA --- */
+        .calculators-wrapper {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; width: 95%; max-width: 1400px; height: 100%; overflow-y: auto; padding: 40px 20px; align-items: start;
+        }
+        .fuel-calculator-container {
+            background: rgba(255,255,255,0.05); padding: 30px; border-radius: 25px;
+        }
+        .fuel-calculator-container h2 { text-align: center; color: var(--accent-color); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #ccc; font-size: 0.9em; }
+        .form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: rgba(0,0,0,0.4); color: white; }
+        .calculate-btn { width: 100%; padding: 15px; border-radius: 10px; background: var(--accent-color); border: none; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .fuel-result-area { margin-top: 20px; padding: 15px; background: rgba(0,210,255,0.1); border-radius: 10px; text-align: center; display: none; }
+        .fuel-result-area span { font-size: 1.3em; font-weight: bold; color: var(--accent-color); }
+
+        /* --- HIZ GÖSTERGESİ --- */
+        .speed-container { display: flex; gap: 50px; justify-content: center; align-items: center; flex-wrap: wrap; height: 100%; }
+        .analog-speedometer {
+            width: 300px; height: 300px; background: radial-gradient(circle, #222, #000); border-radius: 50%; border: 5px solid #333; position: relative;
+        }
+        .dial-line { position: absolute; width: 2px; height: 15px; background: #fff; left: 50%; top: 10px; transform-origin: 50% 140px; }
+        .dial-line:nth-child(5n) { height: 25px; width: 4px; background: var(--accent-color); }
+        .needle {
+            position: absolute; width: 4px; height: 110px; background: var(--danger-color); bottom: 50%; left: 50%;
+            transform-origin: bottom center; transform: rotate(-120deg); transition: transform 0.5s; z-index: 5;
+        }
+        .digital-speedometer { width: 250px; height: 250px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .speed-value { font-size: 6em; font-weight: 700; line-height: 1; }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .weather-card-pro, .prayer-grid-pro { grid-template-columns: 1fr; }
+            .weather-left { border-right: none; border-bottom: 1px solid #444; padding-bottom: 20px; }
+        }
+        @media (max-width: 600px) { .dashboard-container { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
+
 <body>
 
-    <div class="overlay"></div>
-
-    <div id="main-container">
-        <div id="menu-screen">
-            <div class="logo-area">
-                <h1>Car Video Pro</h1>
+    <div class="location-prompt" id="location-prompt" style="display: none;">
+        <div class="location-content">
+            <h2>Konum Belirleniyor</h2>
+            <p id="location-status">Lütfen bekleyin...</p>
+            <div class="loader" id="location-loader"></div>
+            <div id="confirmation-buttons" class="location-buttons hidden">
+                <button id="confirm-yes-btn">Evet, Doğru</button>
+                <button id="confirm-no-btn">Hayır, Yanlış</button>
             </div>
-            <div class="button-grid">
-                <button class="app-btn" onclick="openSite('https://s.vuhuv.com/tvradyo/')">Vuhuv Tv</button>
-                
-                <button class="app-btn" onclick="openSite('https://tv.garden')">TV Garden</button>
-                
-                <button class="app-btn" onclick="openSite('https://www.google.com/webhp?igu=1')">Google</button>
-                
-                <button class="app-btn" onclick="openSite('https://www.hdfilmizle.life/')">HD Film İzle</button>
-                
-                <button class="app-btn" onclick="openSite('https://yabancidizibox.com/')">Yabancı Dizi</button>
-                
-                <button class="app-btn" onclick="openSite('https://www.sinemafilmizle.com.tr')">Sinema Film</button>
-                
-                <button class="app-btn" onclick="openSite('https://sinemaizle.org')">Sinema İzle</button>
-                
-                <button class="app-btn" onclick="openSite('https://www.hdflim.net')">HD Film Net</button>
+            <div id="manual-selection" class="hidden">
+                <select id="city-select"><option value="">Şehir Seçin</option></select>
+                <button id="save-city-btn">Konumu Kaydet</button>
             </div>
-        </div>
-
-        <div id="browser-screen">
-            <iframe id="web-frame" src="" 
-                allow="autoplay; encrypted-media; picture-in-picture; gyroscope; accelerometer; clipboard-write">
-            </iframe>
         </div>
     </div>
 
-    <div id="footer-bar">
-        <button id="btn-back" class="back-btn" onclick="closeSite()">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right:8px;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-            MENÜ
-        </button>
+    <div class="dashboard-container" id="dashboard">
+        <div id="show-music-finder" class="menu-item"><i class="fas fa-music"></i><span>Müzik Bul</span></div>
+        <div id="show-weather" class="menu-item"><i class="fas fa-cloud-sun"></i><span>Hava Durumu</span></div>
+        <div id="show-prayer-times" class="menu-item"><i class="fas fa-mosque"></i><span>Namaz Vakitleri</span></div>
+        <div id="show-fuel-calculator" class="menu-item"><i class="fas fa-gas-pump"></i><span>Yakıt Hesaplama</span></div>
+        <div id="show-speed" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Hız Göstergesi</span></div>
+        <div id="show-match-scores" class="menu-item"><i class="fas fa-futbol"></i><span>Maç Sonuçları</span></div>
+        <div id="show-financial-data" class="menu-item"><i class="fas fa-chart-line"></i><span>Piyasalar</span></div>
+        <div id="reset-location" class="menu-item"><i class="fas fa-map-marker-alt"></i><span>Konumu Değiştir</span></div>
+    </div>
 
-        <div class="ticker-container" id="ticker-box">
-            <div class="ticker-text" id="ticker-content">
-                Car Video Pro - Eğlencenin Adresi    |    Yukarıdaki içerikler internette paylaşılan ücretsiz servislerden eklenmiştir, içerikler ile site yayıncıları sorumludur    |    İyi Yolculuklar...
-            </div>
+    <div class="content-display" id="content-display">
+        <button class="close-button" id="close-button">&times;</button>
+        <div id="content-data"></div>
+    </div>
+
+    <div class="footer-bar">
+        <div class="marquee-container">
+            <div class="marquee-text">Hoş Geldiniz! Araç Bilgi Ekranı Sistemine erişim sağlıyorsunuz. Güvenli sürüşler dileriz.</div>
         </div>
-
         <div class="zoom-controls">
-            <button class="zoom-btn" id="z-out" onclick="adjustZoom(-0.1)">
-                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
-            </button>
-            <button class="zoom-btn" id="z-in" onclick="adjustZoom(0.1)">
-                <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-            </button>
+            <button class="zoom-btn-footer" id="zoom-out-btn"><i class="fas fa-minus"></i></button>
+            <span class="zoom-label" id="zoom-val">100%</span>
+            <button class="zoom-btn-footer" id="zoom-in-btn"><i class="fas fa-plus"></i></button>
         </div>
     </div>
 
     <script>
-        const menuScreen = document.getElementById('menu-screen');
-        const browserScreen = document.getElementById('browser-screen');
-        const webFrame = document.getElementById('web-frame');
+        const API_KEY_WEATHER = '50aec06e5522a7e66a0800165a669562';
+        const turkiyeCities = ["Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkâri", "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"];
         
-        const footerBar = document.getElementById('footer-bar');
-        const btnBack = document.getElementById('btn-back');
-        const tickerBox = document.getElementById('ticker-box');
-        const tickerContent = document.getElementById('ticker-content');
-        const zOut = document.getElementById('z-out');
-        const zIn = document.getElementById('z-in');
+        let userLocation = null;
+        let speedWatchId = null;
 
-        let currentZoom = 1.0;
-        const baseFooterHeight = 60;
-        const baseFontSize = 16;
-
-        window.onload = function() {
-            const savedZoom = localStorage.getItem('carVideoZoomV15');
-            if (savedZoom) currentZoom = parseFloat(savedZoom);
-            applyZoom();
-            updateBackBtnState(false);
-        };
-
-        function openSite(url) {
-            menuScreen.style.opacity = '0';
-            setTimeout(() => {
-                menuScreen.style.display = 'none';
-                browserScreen.style.display = 'block';
-                webFrame.src = url;
-                updateBackBtnState(true);
-            }, 200);
+        // --- YARDIMCI FONKSİYONLAR ---
+        function showContentDisplay() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('content-display').classList.add('visible');
+            document.getElementById('content-data').innerHTML = '<div class="loader"></div>';
         }
 
-        function closeSite() {
-            browserScreen.style.display = 'none';
-            menuScreen.style.display = 'flex';
-            void menuScreen.offsetWidth; 
-            menuScreen.style.opacity = '1';
-            webFrame.src = "";
-            updateBackBtnState(false);
+        function hideContentDisplay() {
+            if (speedWatchId) { navigator.geolocation.clearWatch(speedWatchId); speedWatchId = null; }
+            document.getElementById('content-display').classList.remove('visible');
+            document.getElementById('dashboard').style.display = 'grid';
+            document.getElementById('content-data').innerHTML = '';
         }
 
-        function updateBackBtnState(isActive) {
-            if(isActive) {
-                btnBack.style.opacity = "1";
-                btnBack.style.pointerEvents = "all";
-                btnBack.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24" style="width:inherit; height:inherit; margin-right:8px;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg> MENÜ';
-            } else {
-                btnBack.style.opacity = "0.3";
-                btnBack.style.pointerEvents = "none";
-                btnBack.innerHTML = "ANA MENÜ";
-            }
-            applyZoom();
+        // --- MÜZİK BULMA ---
+        function showMusicRecognizer() {
+            showContentDisplay();
+            // URL https://www.aha-music.com/ olarak ayarlandı
+            document.getElementById('content-data').innerHTML = `
+                <div class="iframe-wrapper">
+                    <iframe src="https://www.aha-music.com/" allow="microphone *; autoplay *"></iframe>
+                    <div style="position:absolute; bottom:10px; right:20px; background:rgba(0,0,0,0.8); padding:5px; border-radius:5px; font-size:0.8em; color:#aaa; pointer-events:none;">Aha Music Entegrasyonu</div>
+                </div>`;
         }
 
-        function adjustZoom(change) {
-            currentZoom += change;
-            if (currentZoom < 0.6) currentZoom = 0.6;
-            if (currentZoom > 2.2) currentZoom = 2.2;
-            applyZoom();
-            localStorage.setItem('carVideoZoomV15', currentZoom);
+        // --- HAVA DURUMU ---
+        async function fetchAndShowWeather() {
+            if (!userLocation) return;
+            showContentDisplay();
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${userLocation.lat}&lon=${userLocation.lon}&appid=${API_KEY_WEATHER}&units=metric&lang=tr`);
+                const data = await response.json();
+                const current = data.list[0];
+                const daily = data.list.filter(item => item.dt_txt.includes("12:00:00")).slice(0, 5);
+                
+                let forecastHtml = daily.map(day => `
+                    <div class="forecast-item">
+                        <span style="display:block; font-weight:bold; margin-bottom:5px;">${new Intl.DateTimeFormat('tr-TR', {weekday:'short'}).format(new Date(day.dt_txt))}</span>
+                        <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png">
+                        <div style="font-size:0.9em; opacity:0.8;">${Math.round(day.main.temp_max)}° / ${Math.round(day.main.temp_min)}°</div>
+                    </div>`).join('');
+
+                document.getElementById('content-data').innerHTML = `
+                <div class="weather-container">
+                    <div class="weather-card-pro">
+                        <div class="weather-left">
+                            <div style="font-size:2.5em; font-weight:bold; color:var(--accent-color);">${data.city.name}</div>
+                            <img src="https://openweathermap.org/img/wn/${current.weather[0].icon}@4x.png" style="width:150px;">
+                            <div class="weather-temp-big">${Math.round(current.main.temp)}°</div>
+                            <div style="font-size:1.5em; text-transform:capitalize; color:#ccc;">${current.weather[0].description}</div>
+                        </div>
+                        <div class="weather-right">
+                            <div class="weather-stats-grid">
+                                <div class="stat-box"><i class="fas fa-thermometer-half"></i> <div><div style="font-size:0.8em;color:#aaa;">Hissedilen</div><div style="font-weight:bold;">${Math.round(current.main.feels_like)}°</div></div></div>
+                                <div class="stat-box"><i class="fas fa-tint"></i> <div><div style="font-size:0.8em;color:#aaa;">Nem</div><div style="font-weight:bold;">%${current.main.humidity}</div></div></div>
+                                <div class="stat-box"><i class="fas fa-wind"></i> <div><div style="font-size:0.8em;color:#aaa;">Rüzgar</div><div style="font-weight:bold;">${current.wind.speed} m/s</div></div></div>
+                                <div class="stat-box"><i class="fas fa-compress-arrows-alt"></i> <div><div style="font-size:0.8em;color:#aaa;">Basınç</div><div style="font-weight:bold;">${current.main.pressure} hPa</div></div></div>
+                            </div>
+                            <div class="forecast-row">${forecastHtml}</div>
+                        </div>
+                    </div>
+                </div>`;
+            } catch (e) { document.getElementById('content-data').innerHTML = `<p>${e.message}</p>`; }
         }
 
-        function applyZoom() {
-            const scalePercent = 100 / currentZoom;
-            const newFooterHeight = baseFooterHeight * currentZoom;
-            const newFontSize = baseFontSize * currentZoom;
+        // --- NAMAZ VAKİTLERİ ---
+        async function fetchAndShowPrayerTimes() {
+            if (!userLocation) return;
+            showContentDisplay();
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timings/today?latitude=${userLocation.lat}&longitude=${userLocation.lon}&method=13`);
+                const json = await res.json();
+                const t = json.data.timings;
+                const prayers = [
+                    {n:'İmsak', t:t.Fajr, i:'fa-cloud-moon'}, {n:'Güneş', t:t.Sunrise, i:'fa-sun'},
+                    {n:'Öğle', t:t.Dhuhr, i:'fa-sun'}, {n:'İkindi', t:t.Asr, i:'fa-cloud-sun'},
+                    {n:'Akşam', t:t.Maghrib, i:'fa-moon'}, {n:'Yatsı', t:t.Isha, i:'fa-star'}
+                ];
+                
+                let html = prayers.map(p => `
+                    <div class="prayer-item-pro">
+                        <i class="fas ${p.i}" style="font-size:2.5em; color:var(--accent-color); margin-bottom:15px;"></i>
+                        <span style="display:block; color:#aaa; margin-bottom:5px;">${p.n}</span>
+                        <span class="prayer-time-val">${p.t}</span>
+                    </div>`).join('');
 
-            menuScreen.style.width = `${scalePercent}%`;
-            menuScreen.style.height = `${scalePercent}%`;
-            menuScreen.style.transform = `scale(${currentZoom})`;
+                document.getElementById('content-data').innerHTML = `
+                <div class="prayer-container">
+                    <div class="prayer-card-wrapper">
+                        <div style="text-align:center; margin-bottom:30px;">
+                            <h2 style="font-size:2.5em; color:var(--accent-color);">Namaz Vakitleri</h2>
+                            <div style="background:rgba(255,255,255,0.1); padding:5px 20px; border-radius:20px; display:inline-block;"><i class="fas fa-map-marker-alt"></i> ${userLocation.city}</div>
+                        </div>
+                        <div class="prayer-grid-pro">${html}</div>
+                    </div>
+                </div>`;
+            } catch (e) { document.getElementById('content-data').innerHTML = `<p>${e.message}</p>`; }
+        }
 
-            webFrame.style.width = `${100 / currentZoom}%`;
-            webFrame.style.height = `${100 / currentZoom}%`;
-            webFrame.style.transform = `scale(${currentZoom})`;
+        // --- YAKIT HESAPLAMA ---
+        function showFuelCalculator() {
+            showContentDisplay();
+            document.getElementById('content-data').innerHTML = `
+                <div class="calculators-wrapper">
+                    <div class="fuel-calculator-container">
+                        <h2><i class="fas fa-calculator"></i> Tüketim Hesapla</h2>
+                        <div class="form-group"><label>Ödenen Tutar (₺)</label><input type="number" id="c-tutar" placeholder="500"></div>
+                        <div class="form-group"><label>Mesafe (km)</label><input type="number" id="c-mesafe" placeholder="450"></div>
+                        <div style="margin-bottom:15px; display:flex; align-items:center;">
+                            <input type="checkbox" id="c-use-price" style="width:20px; margin-right:10px;"> <label for="c-use-price" style="margin:0;">Litre fiyatı ile</label>
+                        </div>
+                        <div class="form-group" id="c-price-wrap" style="display:none;"><label>Litre Fiyatı</label><input type="number" id="c-fiyat"></div>
+                        <button id="btn-calc-1" class="calculate-btn">HESAPLA</button>
+                        <div id="res-1" class="fuel-result-area"><p id="res-txt-1"></p></div>
+                    </div>
+                    <div class="fuel-calculator-container">
+                        <h2><i class="fas fa-gas-pump"></i> Ne Kadar Yakar?</h2>
+                        <div class="form-group"><label>Gidilecek (km)</label><input type="number" id="k-dist"></div>
+                        <div class="form-group"><label>Tüketim (Lt/100km)</label><input type="number" id="k-cons"></div>
+                        <div class="form-group"><label>Litre Fiyatı</label><input type="number" id="k-price"></div>
+                        <button id="btn-calc-2" class="calculate-btn">HESAPLA</button>
+                        <div id="res-2" class="fuel-result-area"><p>Yakıt: <span id="res-fuel"></span> Lt</p><p>Tutar: <span id="res-cost"></span> ₺</p></div>
+                    </div>
+                    <div class="fuel-calculator-container">
+                        <h2><i class="fas fa-road"></i> Menzil</h2>
+                        <div class="form-group"><label>Yakıt (Lt)</label><input type="number" id="m-lit"></div>
+                        <div class="form-group"><label>Tüketim (Lt/100km)</label><input type="number" id="m-cons"></div>
+                        <button id="btn-calc-3" class="calculate-btn">HESAPLA</button>
+                        <div id="res-3" class="fuel-result-area"><p>Menzil: <span id="res-range"></span> km</p></div>
+                    </div>
+                </div>`;
 
-            footerBar.style.height = `${newFooterHeight}px`;
+            // Event Listeners
+            document.getElementById('c-use-price').addEventListener('change', (e) => {
+                document.getElementById('c-price-wrap').style.display = e.target.checked ? 'block' : 'none';
+            });
 
-            btnBack.style.height = `${newFooterHeight * 0.7}px`;
-            btnBack.style.fontSize = `${newFontSize}px`;
+            document.getElementById('btn-calc-1').addEventListener('click', () => {
+                const t = parseFloat(document.getElementById('c-tutar').value);
+                const m = parseFloat(document.getElementById('c-mesafe').value);
+                const useP = document.getElementById('c-use-price').checked;
+                const txt = document.getElementById('res-txt-1');
+                
+                if(isNaN(t) || isNaN(m) || m===0) { alert('Değerleri kontrol edin'); return; }
+
+                if(useP) {
+                    const p = parseFloat(document.getElementById('c-fiyat').value);
+                    if(isNaN(p) || p===0) { alert('Fiyat girin'); return; }
+                    const lit = t/p;
+                    const val = (lit/m)*100;
+                    txt.innerHTML = `100 km'de: <br><span>${val.toFixed(1)} Litre</span>`;
+                } else {
+                    const val = t/m;
+                    txt.innerHTML = `Kilometrede: <br><span>${val.toFixed(2)} ₺</span>`;
+                }
+                document.getElementById('res-1').style.display = 'block';
+            });
+
+            document.getElementById('btn-calc-2').addEventListener('click', () => {
+                const d = parseFloat(document.getElementById('k-dist').value);
+                const c = parseFloat(document.getElementById('k-cons').value);
+                const p = parseFloat(document.getElementById('k-price').value);
+                if(isNaN(d)||isNaN(c)||isNaN(p)) return;
+                document.getElementById('res-fuel').innerText = ((d/100)*c).toFixed(1);
+                document.getElementById('res-cost').innerText = (((d/100)*c)*p).toFixed(0);
+                document.getElementById('res-2').style.display = 'block';
+            });
+
+            document.getElementById('btn-calc-3').addEventListener('click', () => {
+                const l = parseFloat(document.getElementById('m-lit').value);
+                const c = parseFloat(document.getElementById('m-cons').value);
+                if(isNaN(l)||isNaN(c)||c===0) return;
+                document.getElementById('res-range').innerText = ((l/c)*100).toFixed(0);
+                document.getElementById('res-3').style.display = 'block';
+            });
+        }
+
+        // --- HIZ GÖSTERGESİ ---
+        function fetchAndShowSpeed() {
+            showContentDisplay();
+            let lines = '';
+            for(let i=0; i<60; i++) lines += `<div class="dial-line" style="transform: rotate(${6*i}deg)"></div>`;
             
-            [zOut, zIn].forEach(btn => {
-                btn.style.width = `${newFooterHeight * 0.7}px`;
-                btn.style.height = `${newFooterHeight * 0.7}px`;
-            });
+            document.getElementById('content-data').innerHTML = `
+            <div class="speed-container">
+                <div class="analog-speedometer">
+                    <div style="position:absolute; width:100%; height:100%;">${lines}</div>
+                    <div class="needle" id="needle"></div>
+                    <div style="position:absolute; width:20px; height:20px; background:#555; border-radius:50%; z-index:6; border:2px solid #fff;"></div>
+                    <div style="position:absolute; bottom:60px; font-size:1.5em; font-weight:bold; color:#fff;"><span id="analog-val">0</span></div>
+                </div>
+                <div class="digital-speedometer">
+                    <div id="speed-val" class="speed-value">0</div>
+                    <div style="font-size:1.2em; color:#888; letter-spacing:2px;">km/s</div>
+                </div>
+            </div>`;
 
-            const svgSize = 20 * currentZoom;
-            document.querySelectorAll('.icon-svg').forEach(svg => {
-                svg.style.width = `${svgSize}px`;
-                svg.style.height = `${svgSize}px`;
-            });
-
-            tickerBox.style.height = `${newFooterHeight * 0.7}px`;
-            tickerContent.style.fontSize = `${newFontSize}px`;
+            if('geolocation' in navigator) {
+                speedWatchId = navigator.geolocation.watchPosition(pos => {
+                    const spd = pos.coords.speed ? Math.round(pos.coords.speed * 3.6) : 0;
+                    if(document.getElementById('speed-val')) {
+                        document.getElementById('speed-val').innerText = spd;
+                        document.getElementById('analog-val').innerText = spd;
+                        const rot = -120 + Math.min(spd, 240);
+                        document.getElementById('needle').style.transform = `rotate(${rot}deg)`;
+                    }
+                }, null, {enableHighAccuracy:true});
+            } else { document.getElementById('content-data').innerHTML = '<p>GPS Desteklenmiyor</p>'; }
         }
+
+        // --- DİĞERLERİ ---
+        function fetchAndShowMatchScores() {
+            showContentDisplay();
+            document.getElementById('content-data').innerHTML = `<div class="iframe-wrapper"><iframe src="https://m.flashscore.com.tr/"></iframe></div>`;
+        }
+
+        function fetchAndShowFinancialData() {
+            showContentDisplay();
+            document.getElementById('content-data').innerHTML = `<div class="iframe-wrapper"><iframe src="https://piyasa.paratic.com/"></iframe></div>`;
+        }
+
+        // --- KONUM MANTIĞI ---
+        const locationPrompt = document.getElementById('location-prompt');
+        function startLocation() {
+            locationPrompt.style.display = 'flex';
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    try {
+                        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&appid=${API_KEY_WEATHER}&lang=tr`);
+                        const data = await res.json();
+                        userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude, city: data.name };
+                        document.getElementById('location-loader').classList.add('hidden');
+                        document.getElementById('location-status').innerHTML = `Konum: <strong>${data.name}</strong><br>Doğru mu?`;
+                        document.getElementById('confirmation-buttons').classList.remove('hidden');
+                    } catch { manualLoc(); }
+                }, () => manualLoc()
+            );
+        }
+        function manualLoc() {
+            document.getElementById('location-loader').classList.add('hidden');
+            document.getElementById('confirmation-buttons').classList.add('hidden');
+            document.getElementById('location-status').innerText = 'Listeden seçin:';
+            document.getElementById('manual-selection').classList.remove('hidden');
+        }
+        
+        // --- EVENT LISTENERS ---
+        document.getElementById('show-music-finder').addEventListener('click', showMusicRecognizer);
+        document.getElementById('show-weather').addEventListener('click', fetchAndShowWeather);
+        document.getElementById('show-prayer-times').addEventListener('click', fetchAndShowPrayerTimes);
+        document.getElementById('show-fuel-calculator').addEventListener('click', showFuelCalculator);
+        document.getElementById('show-speed').addEventListener('click', fetchAndShowSpeed);
+        document.getElementById('show-match-scores').addEventListener('click', fetchAndShowMatchScores);
+        document.getElementById('show-financial-data').addEventListener('click', fetchAndShowFinancialData);
+        
+        document.getElementById('close-button').addEventListener('click', hideContentDisplay);
+        document.getElementById('reset-location').addEventListener('click', () => { localStorage.removeItem('userLocation'); location.reload(); });
+        
+        document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+            localStorage.setItem('userLocation', JSON.stringify(userLocation));
+            locationPrompt.style.display = 'none';
+            document.getElementById('dashboard').style.display = 'grid';
+        });
+        document.getElementById('confirm-no-btn').addEventListener('click', manualLoc);
+        
+        document.getElementById('save-city-btn').addEventListener('click', async () => {
+            const city = document.getElementById('city-select').value;
+            if(!city) return;
+            try {
+                const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city},TR&limit=1&appid=${API_KEY_WEATHER}`);
+                const data = await res.json();
+                userLocation = { lat: data[0].lat, lon: data[0].lon, city: city };
+                localStorage.setItem('userLocation', JSON.stringify(userLocation));
+                locationPrompt.style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+            } catch { alert('Konum bulunamadı'); }
+        });
+
+        // --- BAŞLANGIÇ ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const sel = document.getElementById('city-select');
+            turkiyeCities.sort((a,b)=>a.localeCompare(b,'tr')).forEach(c=>{
+                const opt=document.createElement('option'); opt.value=c; opt.innerText=c; sel.appendChild(opt);
+            });
+
+            const saved = localStorage.getItem('userLocation');
+            if(saved) {
+                userLocation = JSON.parse(saved);
+                document.getElementById('dashboard').style.display = 'grid';
+            } else {
+                startLocation();
+            }
+
+            let zoom = parseInt(localStorage.getItem('savedZoom')) || 100;
+            const applyZoom = () => { document.body.style.zoom = zoom + '%'; document.getElementById('zoom-val').innerText = zoom + '%'; localStorage.setItem('savedZoom', zoom); };
+            applyZoom();
+            document.getElementById('zoom-in-btn').addEventListener('click', () => { if(zoom<200) { zoom+=10; applyZoom(); } });
+            document.getElementById('zoom-out-btn').addEventListener('click', () => { if(zoom>50) { zoom-=10; applyZoom(); } });
+        });
     </script>
 </body>
 </html>
