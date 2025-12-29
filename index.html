@@ -3,223 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TV Garden - Car Video Pro</title>
+    <title>Car Video Pro Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- GENEL AYARLAR --- */
-        body, html {
-            margin: 0;
-            padding: 0;
+        /* --- SIFIRLAMA VE TEMEL AYARLAR --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(circle at center, #1e272e, #000000);
+            height: 100vh; width: 100vw; overflow: hidden;
+            display: flex; flex-direction: column; color: white;
+        }
+
+        /* --- 1. ANA MENÜ ALANI --- */
+        .main-container {
+            height: calc(100vh - 60px); width: 100%;
+            display: flex; justify-content: center; align-items: center; padding: 10px;
+        }
+
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr);
+            gap: 15px; width: 98%; height: 95%;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; cursor: pointer;
+            transition: transform 0.2s, background 0.2s; min-height: 80px;
+        }
+
+        .menu-item:active, .menu-item:hover {
+            background: rgba(52, 152, 219, 0.2); transform: scale(1.02);
+            border-color: #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .menu-item i { font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .menu-item span { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; text-shadow: 0 2px 2px black; }
+
+        /* RENKLER */
+        .color-map i { background: -webkit-linear-gradient(#3498db, #2980b9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-radio i { background: -webkit-linear-gradient(#f1c40f, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-music i { background: -webkit-linear-gradient(#2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-video i { background: -webkit-linear-gradient(#e74c3c, #c0392b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-tv i { background: -webkit-linear-gradient(#9b59b6, #8e44ad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-twitch i { background: -webkit-linear-gradient(#a55eea, #8854d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .color-game i { background: -webkit-linear-gradient(#1abc9c, #16a085); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- 2. İÇERİK ALANI --- */
+        #content-area {
+            display: none; height: calc(100vh - 60px); width: 100%;
+            background: #000; position: relative;
+        }
+        
+        .app-screen { width: 100%; height: 100%; border: none; display: none; }
+        
+        /* Video Player */
+        #video-player-container { display:none; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; }
+        video { width: 100%; height: 100%; }
+
+        /* --- 3. OYUN GALERİSİ (YENİ EKLENEN KISIM - MEVCUT TASARIMA UYGUN) --- */
+        #game-gallery-area {
+            display: none; 
+            height: calc(100vh - 60px); 
             width: 100%;
-            height: 100%;
-            background-color: #000000;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; /* Dış kaydırma çubuklarını gizle */
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        /* --- 1. YÜKLENİYOR EKRANI (Loading) --- */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease-out; /* Yumuşak kapanış efekti */
+        .gallery-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding-bottom: 40px;
         }
 
-        .loader-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(0, 255, 157, 0.2);
-            border-top: 5px solid #00ff9d; /* TV Garden Yeşili */
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
-        }
-
-        .loading-text {
-            color: #ffffff;
-            font-size: 16px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .loading-subtext {
-            color: #666;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- 2. ANA ÇERÇEVE (Iframe) --- */
-        #iframe-wrapper {
-            width: 100%;
-            height: calc(100% - 45px); /* Alt bar için 45px boşluk */
+        .game-card {
+            background: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
             overflow: hidden;
-            position: relative;
-            background: #111;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            /* Zoom işlemleri için gerekli CSS */
-            transform-origin: 0 0;
-            transition: transform 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
-        }
-
-        /* --- 3. ALT KONTROL ÇUBUĞU --- */
-        #bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 45px;
-            background: linear-gradient(to top, #0f0f0f, #1a1a1a);
-            border-top: 1px solid #333;
-            display: flex;
-            align-items: center;
-            z-index: 5000;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.5);
-        }
-
-        /* Kayan Yazı Alanı */
-        .marquee-container {
-            flex: 1; /* Butonlardan kalan tüm alanı kapla */
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); /* Kenarları yumuşat */
-        }
-
-        .marquee-content {
-            display: inline-block;
-            color: #ddd;
-            font-size: 14px;
-            padding-left: 100%;
-            animation: scroll-text 20s linear infinite;
-        }
-
-        .highlight {
-            color: #00ff9d;
-            font-weight: bold;
-        }
-
-        @keyframes scroll-text {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Zoom Butonları */
-        .controls {
-            display: flex;
-            height: 100%;
-        }
-
-        .control-btn {
-            background: #222;
-            color: #fff;
-            border: none;
-            border-left: 1px solid #444;
-            width: 50px; /* Araçta kolay basılması için geniş */
-            height: 100%;
-            font-size: 20px;
+            text-align: center;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+        }
+        
+        .game-card:active { transform: scale(0.95); background: rgba(26, 188, 156, 0.3); }
+
+        .game-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .control-btn:active {
-            background: #00ff9d;
-            color: #000;
+        .game-title {
+            padding: 10px;
+            font-size: 0.9rem;
+            color: #ddd;
+            font-weight: bold;
         }
+
+        /* --- 4. ALT BAR --- */
+        .footer-bar {
+            height: 60px; width: 100%; background: #111;
+            border-top: 2px solid #3498db; display: flex; align-items: center; z-index: 99;
+        }
+
+        #ticker-mode { width: 100%; overflow: hidden; }
+        .ticker-wrapper { white-space: nowrap; display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
+        .ticker-content { font-size: 1.1rem; color: #ddd; line-height: 60px; }
+        .brand { color: #f1c40f; font-weight: 900; margin-right: 10px; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+
+        #control-mode { display: none; width: 100%; justify-content: space-between; padding: 0 15px; }
+        .btn-back { background: #c0392b; color: white; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .btn-full { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay">
-        <div class="loader-spinner"></div>
-        <div class="loading-text">TV Garden Bağlanıyor</div>
-        <div class="loading-subtext">Dünya Kanalları Yükleniyor...</div>
-    </div>
-
-    <div id="iframe-wrapper">
-        <iframe id="target-site" src="https://tv.garden/tr" allow="autoplay; fullscreen; geolocation; accelerometer; gyroscope"></iframe>
-    </div>
-
-    <div id="bottom-bar">
-        <div class="marquee-container">
-            <span class="marquee-content">
-                <span class="highlight">Car Video Pro</span>'ya Hoş Geldiniz! | TV Garden ile dünyadaki canlı yayınları harita üzerinden izleyebilirsiniz. | İyi seyirler dileriz...
-            </span>
+    <div id="main-menu" class="main-container">
+        <div class="menu-grid">
+            <div class="menu-item color-map" onclick="openIframeApp('maps')">
+                <i class="fa-solid fa-location-dot"></i><span>Navigasyon</span>
+            </div>
+            
+            <div class="menu-item color-radio" onclick="openIframeApp('https://carvideopro.github.io/carradio/')">
+                <i class="fa-solid fa-radio"></i><span>Radyo</span>
+            </div>
+            
+            <div class="menu-item color-music" onclick="openIframeApp('https://com.com.tr/muzik/')">
+                <i class="fa-solid fa-music"></i><span>Müzik</span>
+            </div>
+            
+            <div class="menu-item color-video" onclick="openVideoApp()">
+                <i class="fa-solid fa-video"></i><span>Video</span>
+            </div>
+            
+            <div class="menu-item color-tv" onclick="openIframeApp('https://carvideopro.github.io/cartv/')">
+                <i class="fa-solid fa-tv"></i><span>TV Kanalları</span>
+            </div>
+            
+            <div class="menu-item color-video" onclick="openIframeApp('https://www.hdfilmizle.life/')">
+                <i class="fa-solid fa-clapperboard"></i><span>Film İzle</span>
+            </div>
+            
+            <div class="menu-item color-twitch" onclick="openIframeApp('https://www.twitch.tv/')">
+                <i class="fa-brands fa-twitch"></i><span>Canlı Yayın</span>
+            </div>
+            
+            <div class="menu-item color-game" onclick="openGameGallery()">
+                <i class="fa-solid fa-gamepad"></i><span>Oyunlar</span>
+            </div>
         </div>
+    </div>
 
-        <div class="controls">
-            <button class="control-btn" onclick="zoomOut()">−</button>
-            <button class="control-btn" onclick="resetZoom()">R</button>
-            <button class="control-btn" onclick="zoomIn()">+</button>
+    <div id="game-gallery-area">
+        <div class="gallery-grid" id="gallery-container">
+            </div>
+    </div>
+
+    <div id="content-area">
+        <iframe id="app-frame" class="app-screen" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
+        
+        <div id="video-player-container" class="app-screen">
+            <video id="my-video" controls loop playsinline>
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+            </video>
+        </div>
+    </div>
+
+    <div class="footer-bar">
+        <div id="ticker-mode">
+            <div class="ticker-wrapper">
+                <div class="ticker-content">
+                    <span class="brand">CAR VIDEO PRO:</span> Dahili oyun arşivi yüklendi. İnternetsiz çalışabilir modlar aktif.
+                </div>
+            </div>
+        </div>
+        <div id="control-mode">
+            <button class="btn-back" onclick="closeAllApps()"><i class="fa-solid fa-house"></i> MENÜ</button>
+            <button class="btn-full" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
         </div>
     </div>
 
     <script>
-        // --- 1. Yükleme Ekranı Mantığı ---
+        const mainMenu = document.getElementById('main-menu');
+        const contentArea = document.getElementById('content-area');
+        const gameGalleryArea = document.getElementById('game-gallery-area'); // Yeni
+        const appFrame = document.getElementById('app-frame');
+        const videoContainer = document.getElementById('video-player-container');
+        const videoElement = document.getElementById('my-video');
+        
+        const tickerMode = document.getElementById('ticker-mode');
+        const controlMode = document.getElementById('control-mode');
+        
+        let userLat = 0, userLon = 0;
+
+        // CSV DATASI BURAYA GÖMÜLDÜ
+        const csvData = `id;turkce;ingilizce;resim;link
+233;Dikkat Testi;Brain Test;https://2slope.github.io/img/brain-test-tricky-puzzles.png;https://2slope.github.io/a2/brain-test-tricky-puzzles/
+232;Frozen Rush;Frozen Rush;https://i.hizliresim.com/6s8idzs.png;https://play.lol.disney.com/v1/files/a51313e0-e3dc-11e6-bf77-0609da000034/index.html
+231;Blumgi Castle;Blumgi Castle;https://2slope.github.io/img/blumgi-castle.png;https://2slope.github.io/a2/blumgi-castle
+230;Araba Birleştirme;Merge Car;https://23-azo.github.io/imgs/merge-round-racers.png;https://23-azo.github.io/a7/merge-round-racers
+229;Çöp Adam Koşusu;Stickman School Run;https://htmlxm.github.io/thumb/stickman-school-run.png;https://htmlxm.github.io/h3/stickman-school-run
+217;Maymun Marketçi;Monkey Mart;https://23azostore.github.io/img/monkey-mart.png;https://23azostore.github.io/s8/monkey-mart
+218;Çöp Adam Bisiklet;Stickman Bike;https://23azostore.github.io/img/stickman-bike.png;https://23azostore.github.io/s6/stickman-bike
+219;3D Basketbol;3D Basketball;https://i.ibb.co/jkQJj6qV/fpru4ep.jpg;https://play.famobi.com/3d-basketball/A-SPORX
+220;Futbol Dünya Kupası;Soccer World Cup;https://23azostore.github.io/img/soccer-skills-world-cup.png;https://23azostore.github.io/s6/soccer-skills-world-cup/#topvaz
+221;Halka Geçirme;Hoop Royale;https://html-online-game.github.io/assets/images/hoop-royale.png;https://html-online-game.github.io/hoop-royale/
+222;SwinGo;SwinGo;https://html-online-game.github.io/assets/images/swingo.png;https://html-online-game.github.io/swingo/
+223;Ayı Dövüşü;Bearsus;https://2slope.github.io/img/bearsus.png;https://2slope.github.io/a2/bearsus
+224;Balıkçı Amca;Tiny Fishing;https://2slope.github.io/img/tiny-fishing.png;https://2slope.github.io/a/tiny-fishing
+225;Bomba Kimde;TAG 2;https://lnahtml.github.io/img/tag-2.png;https://2slope.github.io/a77/tag-2
+226;Motorsiklet Yarışı;Moto X3m;https://2slope.github.io/img/moto-x3m.png;https://2slope.github.io/a8/moto-x3m
+227;Sausage Flip;Sausage Flip;https://23azostore.github.io/img/sausage-flip.png;https://23azostore.github.io/s6/sausage-flip
+228;Karıncalar;Idle Ants;https://23azostore.github.io/img/idle-ants.png;https://23azostore.github.io/s5/idle-ants
+1;Uçak Savaşı;Air Warfare;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/87a6e7b4-486d-4272-d4c2-e37ccb4e7500/fit=cover,w=180,h=180;https://air-warfare.games.playgama.net/cm6f7ucal000cz60e5721spwc/index.html
+2;Tren Gezisi;Train Master;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/af611c97-a5e0-4b29-46b4-8e5314cad800/fit=cover,w=180,h=180;https://train-master.games.playgama.net/cm8fquwkb005ho20g49lbhxnu/index.html
+3;Sigma Boy;Sigma Boy;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/a8f3bbe1-3e14-4a85-5e59-fd791ee2d300/fit=cover,w=180,h=180;https://sigma-boy-musical-clicker.games.playgama.net/cm6pl7rsk005zzg0ev3232myh/index.html
+4;Para Ping Pong;Money Ping Pong;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/9ceb6543-f33b-43b1-3235-bf3a1574f000/fit=cover,w=180,h=180;https://money-ping-pong-fe04-1.games.playgama.net/cm7z3eil5005ul60he15xktle/index.html
+5;4 Renk;4 Colors;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/76e1b730-b931-41d6-da56-bdfe8de55a00/fit=cover,w=180,h=180;https://4-colors.games.playgama.net/cm6es8k620057010eer7z49cv/index.html`;
+
         window.onload = function() {
-            // TV Garden ağır bir site olduğu için 5 saniye bekletiyoruz
-            setTimeout(function() {
-                var overlay = document.getElementById('loading-overlay');
-                overlay.style.opacity = '0'; // Yavaşça sol
-                setTimeout(function() {
-                    overlay.style.display = 'none'; // Tamamen kaldır
-                }, 800);
-            }, 5000);
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    userLat = pos.coords.latitude;
+                    userLon = pos.coords.longitude;
+                });
+            }
+            loadGamesFromCSV(); // Oyunları yükle
         };
 
-        // --- 2. Zoom Mantığı ---
-        var currentScale = 1.0;
-        var iframe = document.getElementById('target-site');
+        function resetDisplays() {
+            appFrame.style.display = 'none';
+            videoContainer.style.display = 'none';
+        }
 
-        function applyZoom() {
-            // CSS Transform ile Scale ediyoruz
-            iframe.style.transform = "scale(" + currentScale + ")";
+        function openIframeApp(url) {
+            resetDisplays();
+            gameGalleryArea.style.display = 'none'; // Galeriyi kapat
+            let finalUrl = url;
+            if (url === 'maps') {
+                finalUrl = userLat ? `https://maps.google.com/maps?q=$${userLat},${userLon}&z=15&output=embed` : "https://maps.google.com/maps?q=Istanbul&z=10&output=embed";
+            }
+            appFrame.src = finalUrl;
+            appFrame.style.display = 'block';
+            switchToApp();
+        }
+
+        function openVideoApp() {
+            resetDisplays();
+            gameGalleryArea.style.display = 'none';
+            videoContainer.style.display = 'flex';
+            videoElement.play();
+            switchToApp();
+        }
+
+        // --- YENİ EKLENEN OYUN FONKSİYONLARI ---
+        function loadGamesFromCSV() {
+            const lines = csvData.split('\n');
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
             
-            // Scale arttıkça iframe kenarlardan taşar, bunu önlemek için
-            // genişliği ve yüksekliği ters orantıda küçültüp/büyütüyoruz.
-            // Bu sayede içerik büyür ama çerçeve aynı kalır.
-            iframe.style.width = (100 / currentScale) + "%";
-            iframe.style.height = (100 / currentScale) + "%";
-        }
-
-        function zoomIn() {
-            if (currentScale < 2.5) { // Maksimum 2.5x zoom
-                currentScale += 0.1; // 0.1 adım büyüt
-                applyZoom();
+            for(let i=1; i<lines.length; i++) {
+                const line = lines[i].trim();
+                if(!line) continue;
+                const cols = line.split(';');
+                if(cols.length >= 5) {
+                    const gameDiv = document.createElement('div');
+                    gameDiv.className = 'game-card';
+                    gameDiv.onclick = function() { openIframeApp(cols[4]); }; // Oyunu iframe içinde aç
+                    
+                    const img = document.createElement('img');
+                    img.src = cols[3];
+                    img.onerror = function(){ this.src='https://via.placeholder.com/150?text=GAME'; };
+                    
+                    const title = document.createElement('div');
+                    title.className = 'game-title';
+                    title.innerText = cols[1]; // Türkçe isim
+                    
+                    gameDiv.appendChild(img);
+                    gameDiv.appendChild(title);
+                    container.appendChild(gameDiv);
+                }
             }
         }
 
-        function zoomOut() {
-            if (currentScale > 0.5) { // Minimum 0.5x zoom
-                currentScale -= 0.1; // 0.1 adım küçült
-                applyZoom();
-            }
+        function openGameGallery() {
+            mainMenu.style.display = 'none';
+            contentArea.style.display = 'none';
+            gameGalleryArea.style.display = 'block'; // Galeriyi aç
+            tickerMode.style.display = 'none';
+            controlMode.style.display = 'flex'; // Geri butonu için alt barı değiştir
+        }
+        // ----------------------------------------
+
+        function switchToApp() {
+            mainMenu.style.display = 'none';
+            contentArea.style.display = 'block';
+            tickerMode.style.display = 'none';
+            controlMode.style.display = 'flex';
         }
 
-        function resetZoom() {
-            currentScale = 1.0; // Normale dön
-            applyZoom();
+        function closeAllApps() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            videoElement.pause();
+            appFrame.src = "";
+            
+            // Tüm ekranları gizle
+            contentArea.style.display = 'none';
+            gameGalleryArea.style.display = 'none'; 
+            
+            // Ana menüyü göster
+            mainMenu.style.display = 'flex';
+            tickerMode.style.display = 'block';
+            controlMode.style.display = 'none';
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else if (document.exitFullscreen) document.exitFullscreen();
         }
     </script>
-
 </body>
 </html>
