@@ -50,7 +50,8 @@
         .color-music i { background: -webkit-linear-gradient(#2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .color-video i { background: -webkit-linear-gradient(#e74c3c, #c0392b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .color-tv i { background: -webkit-linear-gradient(#9b59b6, #8e44ad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-twitch i { background: -webkit-linear-gradient(#a55eea, #8854d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* Yeni Kitap Rengi */
+        .color-book i { background: -webkit-linear-gradient(#e67e22, #d35400); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .color-game i { background: -webkit-linear-gradient(#1abc9c, #16a085); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         /* --- 2. İÇERİK ALANI --- */
@@ -65,7 +66,7 @@
         #video-player-container { display:none; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; }
         video { width: 100%; height: 100%; }
 
-        /* --- 3. OYUN GALERİSİ (YENİ EKLENEN KISIM - MEVCUT TASARIMA UYGUN) --- */
+        /* --- 3. OYUN GALERİSİ ALANI --- */
         #game-gallery-area {
             display: none; 
             height: calc(100vh - 60px); 
@@ -119,9 +120,14 @@
         .brand { color: #f1c40f; font-weight: 900; margin-right: 10px; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        #control-mode { display: none; width: 100%; justify-content: space-between; padding: 0 15px; }
-        .btn-back { background: #c0392b; color: white; border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        .btn-full { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        #control-mode { display: none; width: 100%; justify-content: flex-end; padding: 0 15px; gap: 10px; }
+        
+        /* Buton Stilleri */
+        .btn-base { border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; color: white; }
+        
+        .btn-menu { background: #c0392b; } /* Kırmızı Menü */
+        .btn-back-game { background: #e67e22; display: none; } /* Turuncu Geri (Varsayılan Gizli) */
+        .btn-full { background: #34495e; padding: 8px 15px; } /* Mavi Tam Ekran */
 
     </style>
 </head>
@@ -153,8 +159,8 @@
                 <i class="fa-solid fa-clapperboard"></i><span>Film İzle</span>
             </div>
             
-            <div class="menu-item color-twitch" onclick="openIframeApp('https://www.twitch.tv/')">
-                <i class="fa-brands fa-twitch"></i><span>Canlı Yayın</span>
+            <div class="menu-item color-book" onclick="openIframeApp('https://365gunoyku.meb.gov.tr/')">
+                <i class="fa-solid fa-book-open"></i><span>Hikaye Oku</span>
             </div>
             
             <div class="menu-item color-game" onclick="openGameGallery()">
@@ -182,30 +188,40 @@
         <div id="ticker-mode">
             <div class="ticker-wrapper">
                 <div class="ticker-content">
-                    <span class="brand">CAR VIDEO PRO:</span> Dahili oyun arşivi yüklendi. İnternetsiz çalışabilir modlar aktif.
+                    <span class="brand">CAR VIDEO PRO:</span> Sistem hazır. Hikaye ve Oyun modülleri güncellendi.
                 </div>
             </div>
         </div>
+        
         <div id="control-mode">
-            <button class="btn-back" onclick="closeAllApps()"><i class="fa-solid fa-house"></i> MENÜ</button>
-            <button class="btn-full" onclick="toggleFullScreen()"><i class="fa-solid fa-expand"></i></button>
+            <button id="btn-back-to-gallery" class="btn-base btn-back-game" onclick="backToGallery()">
+                <i class="fa-solid fa-arrow-left"></i> GERİ
+            </button>
+
+            <button class="btn-base btn-menu" onclick="closeAllApps()">
+                <i class="fa-solid fa-house"></i> MENÜ
+            </button>
+            <button class="btn-base btn-full" onclick="toggleFullScreen()">
+                <i class="fa-solid fa-expand"></i>
+            </button>
         </div>
     </div>
 
     <script>
         const mainMenu = document.getElementById('main-menu');
         const contentArea = document.getElementById('content-area');
-        const gameGalleryArea = document.getElementById('game-gallery-area'); // Yeni
+        const gameGalleryArea = document.getElementById('game-gallery-area');
         const appFrame = document.getElementById('app-frame');
         const videoContainer = document.getElementById('video-player-container');
         const videoElement = document.getElementById('my-video');
         
         const tickerMode = document.getElementById('ticker-mode');
         const controlMode = document.getElementById('control-mode');
+        const btnBackToGallery = document.getElementById('btn-back-to-gallery');
         
         let userLat = 0, userLon = 0;
 
-        // CSV DATASI BURAYA GÖMÜLDÜ
+        // CSV DATASI
         const csvData = `id;turkce;ingilizce;resim;link
 233;Dikkat Testi;Brain Test;https://2slope.github.io/img/brain-test-tricky-puzzles.png;https://2slope.github.io/a2/brain-test-tricky-puzzles/
 232;Frozen Rush;Frozen Rush;https://i.hizliresim.com/6s8idzs.png;https://play.lol.disney.com/v1/files/a51313e0-e3dc-11e6-bf77-0609da000034/index.html
@@ -237,17 +253,18 @@
                     userLon = pos.coords.longitude;
                 });
             }
-            loadGamesFromCSV(); // Oyunları yükle
+            loadGamesFromCSV();
         };
 
         function resetDisplays() {
             appFrame.style.display = 'none';
             videoContainer.style.display = 'none';
+            btnBackToGallery.style.display = 'none';
         }
 
         function openIframeApp(url) {
             resetDisplays();
-            gameGalleryArea.style.display = 'none'; // Galeriyi kapat
+            gameGalleryArea.style.display = 'none';
             let finalUrl = url;
             if (url === 'maps') {
                 finalUrl = userLat ? `https://maps.google.com/maps?q=$${userLat},${userLon}&z=15&output=embed` : "https://maps.google.com/maps?q=Istanbul&z=10&output=embed";
@@ -265,7 +282,7 @@
             switchToApp();
         }
 
-        // --- YENİ EKLENEN OYUN FONKSİYONLARI ---
+        /* --- OYUN ÖZEL FONKSİYONLARI --- */
         function loadGamesFromCSV() {
             const lines = csvData.split('\n');
             const container = document.getElementById('gallery-container');
@@ -278,7 +295,7 @@
                 if(cols.length >= 5) {
                     const gameDiv = document.createElement('div');
                     gameDiv.className = 'game-card';
-                    gameDiv.onclick = function() { openIframeApp(cols[4]); }; // Oyunu iframe içinde aç
+                    gameDiv.onclick = function() { playGame(cols[4]); }; 
                     
                     const img = document.createElement('img');
                     img.src = cols[3];
@@ -286,7 +303,7 @@
                     
                     const title = document.createElement('div');
                     title.className = 'game-title';
-                    title.innerText = cols[1]; // Türkçe isim
+                    title.innerText = cols[1];
                     
                     gameDiv.appendChild(img);
                     gameDiv.appendChild(title);
@@ -298,11 +315,28 @@
         function openGameGallery() {
             mainMenu.style.display = 'none';
             contentArea.style.display = 'none';
-            gameGalleryArea.style.display = 'block'; // Galeriyi aç
+            gameGalleryArea.style.display = 'block';
             tickerMode.style.display = 'none';
-            controlMode.style.display = 'flex'; // Geri butonu için alt barı değiştir
+            controlMode.style.display = 'flex';
+            btnBackToGallery.style.display = 'none'; 
         }
-        // ----------------------------------------
+
+        function playGame(url) {
+            resetDisplays();
+            gameGalleryArea.style.display = 'none';
+            appFrame.src = url;
+            appFrame.style.display = 'block';
+            switchToApp();
+            
+            // OYUN MODU: Geri butonu aktif
+            btnBackToGallery.style.display = 'flex';
+        }
+
+        function backToGallery() {
+            appFrame.src = ""; // Oyunu durdur
+            openGameGallery();
+        }
+        /* -------------------------------- */
 
         function switchToApp() {
             mainMenu.style.display = 'none';
@@ -316,14 +350,14 @@
             videoElement.pause();
             appFrame.src = "";
             
-            // Tüm ekranları gizle
             contentArea.style.display = 'none';
             gameGalleryArea.style.display = 'none'; 
             
-            // Ana menüyü göster
             mainMenu.style.display = 'flex';
             tickerMode.style.display = 'block';
             controlMode.style.display = 'none';
+            
+            btnBackToGallery.style.display = 'none';
         }
 
         function toggleFullScreen() {
