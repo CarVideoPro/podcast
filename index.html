@@ -2,224 +2,138 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro TV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yapım Aşamasında | Yakında Buradayız</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- GENEL AYARLAR --- */
-        body, html {
+        /* Modern CSS Reset & Temel Ayarlar */
+        * {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; /* Dış kaydırma çubuklarını gizle */
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* --- 1. YÜKLENİYOR EKRANI (Loading) --- */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000000;
-            z-index: 9999;
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease-out; /* Yumuşak kapanış efekti */
+            color: white;
+            text-align: center;
+            overflow: hidden;
         }
 
-        .loader-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(0, 255, 157, 0.2);
-            border-top: 5px solid #00ff9d; /* TV Garden Yeşili */
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .loading-text {
-            color: #ffffff;
-            font-size: 16px;
-            letter-spacing: 1.5px;
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        /* Yükleme Çubuğu */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            height: 10px;
+            width: 100%;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: #fff;
+            height: 100%;
+            border-radius: 20px;
+            width: 75%; /* İlerleme yüzdesi */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+
+        /* Sosyal Medya İkonları */
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 15px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: #fdbb2d;
+            transform: scale(1.2);
+        }
+
+        .footer-text {
+            margin-top: 2rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            font-weight: bold;
+            letter-spacing: 1px;
         }
-
-        .loading-subtext {
-            color: #666;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* --- 2. ANA ÇERÇEVE (Iframe) --- */
-        #iframe-wrapper {
-            width: 100%;
-            height: calc(100% - 45px); /* Alt bar için 45px boşluk */
-            overflow: hidden;
-            position: relative;
-            background: #111;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            /* Zoom işlemleri için gerekli CSS */
-            transform-origin: 0 0;
-            transition: transform 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
-        }
-
-        /* --- 3. ALT KONTROL ÇUBUĞU --- */
-        #bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 45px;
-            background: linear-gradient(to top, #0f0f0f, #1a1a1a);
-            border-top: 1px solid #333;
-            display: flex;
-            align-items: center;
-            z-index: 5000;
-            box-shadow: 0 -5px 10px rgba(0,0,0,0.5);
-        }
-
-        /* Kayan Yazı Alanı */
-        .marquee-container {
-            flex: 1; /* Butonlardan kalan tüm alanı kapla */
-            overflow: hidden;
-            white-space: nowrap;
-            position: relative;
-            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); /* Kenarları yumuşat */
-        }
-
-        .marquee-content {
-            display: inline-block;
-            color: #ddd;
-            font-size: 14px;
-            padding-left: 100%;
-            animation: scroll-text 20s linear infinite;
-        }
-
-        .highlight {
-            color: #00ff9d;
-            font-weight: bold;
-        }
-
-        @keyframes scroll-text {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* Zoom Butonları */
-        .controls {
-            display: flex;
-            height: 100%;
-        }
-
-        .control-btn {
-            background: #222;
-            color: #fff;
-            border: none;
-            border-left: 1px solid #444;
-            width: 50px; /* Araçta kolay basılması için geniş */
-            height: 100%;
-            font-size: 20px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .control-btn:active {
-            background: #00ff9d;
-            color: #000;
-        }
-
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay">
-        <div class="loader-spinner"></div>
-        <div class="loading-text">Car Video Pro Bağlanıyor</div>
-        <div class="loading-subtext">Dünya Kanalları Yükleniyor...</div>
-    </div>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-tools"></i>
+        </div>
+        <h1>Çok Yakında!</h1>
+        <p>Sizlere daha iyi bir deneyim sunmak için web sitemizi güncelliyoruz. Çok yakında muhteşem yeniliklerle buradayız.</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        <p style="font-size: 0.9rem; margin-bottom: 1rem;">Tamamlanma Oranı: %75</p>
 
-    <div id="iframe-wrapper">
-        <iframe id="target-site" src="https://famelack.com/tr" allow="autoplay; fullscreen; geolocation; accelerometer; gyroscope"></iframe>
-    </div>
-
-    <div id="bottom-bar">
-        <div class="marquee-container">
-            <span class="marquee-content">
-                <span class="highlight">Car Video Pro</span>'ya Hoş Geldiniz! | Yeni hizmetimiz ile dünyadaki canlı yayınları harita üzerinden izleyebilirsiniz. | İyi seyirler dileriz...
-            </span>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
+            <a href="mailto:info@domain.com"><i class="fas fa-envelope"></i></a>
         </div>
 
-        <div class="controls">
-            <button class="control-btn" onclick="zoomOut()">−</button>
-            <button class="control-btn" onclick="resetZoom()">R</button>
-            <button class="control-btn" onclick="zoomIn()">+</button>
+        <div class="footer-text">
+            &copy; 2026 Marka Adınız. Tüm Hakları Saklıdır.
         </div>
     </div>
-
-    <script>
-        // --- 1. Yükleme Ekranı Mantığı ---
-        window.onload = function() {
-            // TV Garden ağır bir site olduğu için 5 saniye bekletiyoruz
-            setTimeout(function() {
-                var overlay = document.getElementById('loading-overlay');
-                overlay.style.opacity = '0'; // Yavaşça sol
-                setTimeout(function() {
-                    overlay.style.display = 'none'; // Tamamen kaldır
-                }, 800);
-            }, 5000);
-        };
-
-        // --- 2. Zoom Mantığı ---
-        var currentScale = 1.0;
-        var iframe = document.getElementById('target-site');
-
-        function applyZoom() {
-            // CSS Transform ile Scale ediyoruz
-            iframe.style.transform = "scale(" + currentScale + ")";
-            
-            // Scale arttıkça iframe kenarlardan taşar, bunu önlemek için
-            // genişliği ve yüksekliği ters orantıda küçültüp/büyütüyoruz.
-            // Bu sayede içerik büyür ama çerçeve aynı kalır.
-            iframe.style.width = (100 / currentScale) + "%";
-            iframe.style.height = (100 / currentScale) + "%";
-        }
-
-        function zoomIn() {
-            if (currentScale < 2.5) { // Maksimum 2.5x zoom
-                currentScale += 0.1; // 0.1 adım büyüt
-                applyZoom();
-            }
-        }
-
-        function zoomOut() {
-            if (currentScale > 0.5) { // Minimum 0.5x zoom
-                currentScale -= 0.1; // 0.1 adım küçült
-                applyZoom();
-            }
-        }
-
-        function resetZoom() {
-            currentScale = 1.0; // Normale dön
-            applyZoom();
-        }
-    </script>
 
 </body>
 </html>
