@@ -3,573 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro Interface</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
-    
+    <title>Car Video Pro TV</title>
     <style>
-        /* --- SIFIRLAMA VE TEMEL AYARLAR --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: radial-gradient(circle at center, #1e272e, #000000);
-            height: 100vh; width: 100vw; overflow: hidden;
-            display: flex; flex-direction: column; color: white;
-        }
-
-        /* --- 1. ANA MENÜ ALANI --- */
-        .main-container {
-            height: calc(100vh - 60px); width: 100%;
-            display: flex; justify-content: center; align-items: center; padding: 10px;
-        }
-
-        .menu-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr);
-            gap: 15px; width: 98%; height: 95%;
-        }
-
-        .menu-item {
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; cursor: pointer;
-            transition: transform 0.2s, background 0.2s; min-height: 80px;
-        }
-
-        .menu-item:active, .menu-item:hover {
-            background: rgba(52, 152, 219, 0.2); transform: scale(1.02);
-            border-color: #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
-        }
-
-        .menu-item i { font-size: 3rem; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        .menu-item span { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; text-shadow: 0 2px 2px black; }
-
-        /* RENKLER */
-        .color-map i { background: -webkit-linear-gradient(#3498db, #2980b9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-radio i { background: -webkit-linear-gradient(#f1c40f, #f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-music i { background: -webkit-linear-gradient(#2ecc71, #27ae60); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-video i { background: -webkit-linear-gradient(#e74c3c, #c0392b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-tv i { background: -webkit-linear-gradient(#9b59b6, #8e44ad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-book i { background: -webkit-linear-gradient(#e67e22, #d35400); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .color-game i { background: -webkit-linear-gradient(#1abc9c, #16a085); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        /* --- 2. İÇERİK ALANI --- */
-        #content-area {
-            display: none; height: calc(100vh - 60px); width: 100%;
-            background: #000; position: relative;
-        }
-        
-        .app-screen { width: 100%; height: 100%; border: none; display: none; }
-        
-        /* Video Player */
-        #video-player-container { display:none; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; }
-        video { width: 100%; height: 100%; }
-
-        /* --- 3. OYUN GALERİSİ ALANI --- */
-        #game-gallery-area {
-            display: none; 
-            height: calc(100vh - 60px); 
+        /* --- GENEL AYARLAR --- */
+        body, html {
+            margin: 0;
+            padding: 0;
             width: 100%;
-            padding: 20px;
-            overflow-y: auto;
+            height: 100%;
+            background-color: #000000;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; /* Dış kaydırma çubuklarını gizle */
         }
 
-        .gallery-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-            padding-bottom: 40px;
-        }
-
-        .game-card {
-            background: rgba(255, 255, 255, 0.1); 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .game-card:active { transform: scale(0.95); background: rgba(26, 188, 156, 0.3); }
-
-        .game-card img {
+        /* --- 1. YÜKLENİYOR EKRANI (Loading) --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            height: 100%;
+            background: #000000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease-out; /* Yumuşak kapanış efekti */
         }
 
-        .game-title {
-            padding: 10px;
-            font-size: 0.9rem;
-            color: #ddd;
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(0, 255, 157, 0.2);
+            border-top: 5px solid #00ff9d; /* TV Garden Yeşili */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .loading-text {
+            color: #ffffff;
+            font-size: 16px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             font-weight: bold;
         }
 
-        /* --- 4. ALT BAR --- */
-        .footer-bar {
-            height: 60px; width: 100%; background: #111;
-            border-top: 2px solid #3498db; display: flex; align-items: center; z-index: 99;
+        .loading-subtext {
+            color: #666;
+            font-size: 12px;
+            margin-top: 10px;
         }
 
-        #ticker-mode { width: 100%; overflow: hidden; }
-        .ticker-wrapper { white-space: nowrap; display: inline-block; padding-left: 100%; animation: ticker 25s linear infinite; }
-        .ticker-content { font-size: 1.1rem; color: #ddd; line-height: 60px; }
-        .brand { color: #f1c40f; font-weight: 900; margin-right: 10px; }
-        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        #control-mode { display: none; width: 100%; justify-content: flex-end; padding: 0 15px; gap: 10px; }
-        
-        /* Buton Stilleri */
-        .btn-base { border: none; padding: 8px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; color: white; }
-        
-        .btn-menu { background: #c0392b; } /* Kırmızı Menü */
-        .btn-back-game { background: #e67e22; display: none; } /* Turuncu Geri */
-        .btn-full { background: #34495e; padding: 8px 15px; } /* Mavi Tam Ekran */
+        /* --- 2. ANA ÇERÇEVE (Iframe) --- */
+        #iframe-wrapper {
+            width: 100%;
+            height: calc(100% - 45px); /* Alt bar için 45px boşluk */
+            overflow: hidden;
+            position: relative;
+            background: #111;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            /* Zoom işlemleri için gerekli CSS */
+            transform-origin: 0 0;
+            transition: transform 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
+        }
+
+        /* --- 3. ALT KONTROL ÇUBUĞU --- */
+        #bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 45px;
+            background: linear-gradient(to top, #0f0f0f, #1a1a1a);
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            z-index: 5000;
+            box-shadow: 0 -5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Kayan Yazı Alanı */
+        .marquee-container {
+            flex: 1; /* Butonlardan kalan tüm alanı kapla */
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); /* Kenarları yumuşat */
+        }
+
+        .marquee-content {
+            display: inline-block;
+            color: #ddd;
+            font-size: 14px;
+            padding-left: 100%;
+            animation: scroll-text 20s linear infinite;
+        }
+
+        .highlight {
+            color: #00ff9d;
+            font-weight: bold;
+        }
+
+        @keyframes scroll-text {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Zoom Butonları */
+        .controls {
+            display: flex;
+            height: 100%;
+        }
+
+        .control-btn {
+            background: #222;
+            color: #fff;
+            border: none;
+            border-left: 1px solid #444;
+            width: 50px; /* Araçta kolay basılması için geniş */
+            height: 100%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .control-btn:active {
+            background: #00ff9d;
+            color: #000;
+        }
 
     </style>
 </head>
 <body>
 
-    <div id="main-menu" class="main-container">
-        <div class="menu-grid">
-            <div class="menu-item color-map" onclick="openIframeApp('maps')">
-                <i class="fa-solid fa-location-dot"></i><span>Navigasyon</span>
-            </div>
-            
-            <div class="menu-item color-radio" onclick="openIframeApp('https://carvideopro.github.io/carradio/')">
-                <i class="fa-solid fa-radio"></i><span>Radyo</span>
-            </div>
-            
-            <div class="menu-item color-music" onclick="openIframeApp('https://com.com.tr/muzik/')">
-                <i class="fa-solid fa-music"></i><span>Müzik</span>
-            </div>
-            
-            <div class="menu-item color-video" onclick="openVideoApp()">
-                <i class="fa-solid fa-video"></i><span>Video</span>
-            </div>
-            
-            <div class="menu-item color-tv" onclick="openIframeApp('https://carvideopro.github.io/cartv/')">
-                <i class="fa-solid fa-tv"></i><span>TV Kanalları</span>
-            </div>
-            
-            <div class="menu-item color-video" onclick="openIframeApp('https://www.hdfilmizle.life/')">
-                <i class="fa-solid fa-clapperboard"></i><span>Film İzle</span>
-            </div>
-            
-            <div class="menu-item color-book" onclick="openIframeApp('https://365gunoyku.meb.gov.tr/')">
-                <i class="fa-solid fa-book-open"></i><span>Hikaye Oku</span>
-            </div>
-            
-            <div class="menu-item color-game" onclick="openGameGallery()">
-                <i class="fa-solid fa-gamepad"></i><span>Oyunlar</span>
-            </div>
-        </div>
+    <div id="loading-overlay">
+        <div class="loader-spinner"></div>
+        <div class="loading-text">Car Video Pro Bağlanıyor</div>
+        <div class="loading-subtext">Dünya Kanalları Yükleniyor...</div>
     </div>
 
-    <div id="game-gallery-area">
-        <div class="gallery-grid" id="gallery-container">
-            </div>
+    <div id="iframe-wrapper">
+        <iframe id="target-site" src="https://famelack.com/tr" allow="autoplay; fullscreen; geolocation; accelerometer; gyroscope"></iframe>
     </div>
 
-    <div id="content-area">
-        <iframe id="app-frame" class="app-screen" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
-        
-        <div id="video-player-container" class="app-screen">
-            <video id="my-video" controls loop playsinline>
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-            </video>
+    <div id="bottom-bar">
+        <div class="marquee-container">
+            <span class="marquee-content">
+                <span class="highlight">Car Video Pro</span>'ya Hoş Geldiniz! | Yeni hizmetimiz ile dünyadaki canlı yayınları harita üzerinden izleyebilirsiniz. | İyi seyirler dileriz...
+            </span>
         </div>
-    </div>
 
-    <div class="footer-bar">
-        <div id="ticker-mode">
-            <div class="ticker-wrapper">
-                <div class="ticker-content">
-                    <span class="brand">CAR VIDEO PRO:</span> Bu menü yapım aşamasındadır, sayfalar hata verebilir.
-                </div>
-            </div>
-        </div>
-        
-        <div id="control-mode">
-            <button id="btn-back-to-gallery" class="btn-base btn-back-game" onclick="backToGallery()">
-                <i class="fa-solid fa-arrow-left"></i> GERİ
-            </button>
-
-            <button class="btn-base btn-menu" onclick="closeAllApps()">
-                <i class="fa-solid fa-house"></i> MENÜ
-            </button>
-            <button class="btn-base btn-full" onclick="toggleFullScreen()">
-                <i class="fa-solid fa-expand"></i>
-            </button>
+        <div class="controls">
+            <button class="control-btn" onclick="zoomOut()">−</button>
+            <button class="control-btn" onclick="resetZoom()">R</button>
+            <button class="control-btn" onclick="zoomIn()">+</button>
         </div>
     </div>
 
     <script>
-        const mainMenu = document.getElementById('main-menu');
-        const contentArea = document.getElementById('content-area');
-        const gameGalleryArea = document.getElementById('game-gallery-area');
-        const appFrame = document.getElementById('app-frame');
-        const videoContainer = document.getElementById('video-player-container');
-        const videoElement = document.getElementById('my-video');
-        
-        const tickerMode = document.getElementById('ticker-mode');
-        const controlMode = document.getElementById('control-mode');
-        const btnBackToGallery = document.getElementById('btn-back-to-gallery');
-        
-        let userLat = 0, userLon = 0;
-
-        // SENİN EXCEL DOSYANDAN ÇEKİLEN TEMİZ VERİ
-        const csvData = `id;turkce;ingilizce;resim;link
-233;Dikkat Testi;Dikkat Testi;https://2slope.github.io/img/brain-test-tricky-puzzles.png;https://2slope.github.io/a2/brain-test-tricky-puzzles/
-232;Frozen Rush;Frozen Rush;https://i.hizliresim.com/6s8idzs.png;https://play.lol.disney.com/v1/files/a51313e0-e3dc-11e6-bf77-0609da000034/index.html
-231;Blumgi Castle;Blumgi Castle;https://2slope.github.io/img/blumgi-castle.png;https://2slope.github.io/a2/blumgi-castle
-230;Araba Birleştirme;Araba Birleştirme;https://23-azo.github.io/imgs/merge-round-racers.png;https://23-azo.github.io/a7/merge-round-racers
-229;Çöp Adam Koşusu;Çöp Adam Koşusu;https://htmlxm.github.io/thumb/stickman-school-run.png;https://htmlxm.github.io/h3/stickman-school-run
-217;Maymun Marketçi;Maymun Marketçi;https://23azostore.github.io/img/monkey-mart.png;https://23azostore.github.io/s8/monkey-mart
-218;Çöp Adam Bisiklet;Çöp Adam Bisiklet;https://23azostore.github.io/img/stickman-bike.png;https://23azostore.github.io/s6/stickman-bike
-219;3D Basketbol;3D Basketbol;https://i.ibb.co/jkQJj6qV/fpru4ep.jpg;https://play.famobi.com/3d-basketball/A-SPORX
-220;Futbol Dünya Kupası;Futbol Dünya Kupası;https://23azostore.github.io/img/soccer-skills-world-cup.png;https://23azostore.github.io/s6/soccer-skills-world-cup/#topvaz
-221;Halka Geçirme;Halka Geçirme;https://html-online-game.github.io/assets/images/hoop-royale.png;https://html-online-game.github.io/hoop-royale/
-222;SwinGo;SwinGo;https://html-online-game.github.io/assets/images/swingo.png;https://html-online-game.github.io/swingo/
-223;Ayı Dövüşü;Ayı Dövüşü;https://2slope.github.io/img/bearsus.png;https://2slope.github.io/a2/bearsus
-224;Balıkçı Amca;Balıkçı Amca;https://2slope.github.io/img/tiny-fishing.png;https://2slope.github.io/a/tiny-fishing
-225;Bomba Kimde;Bomba Kimde;https://lnahtml.github.io/img/tag-2.png;https://2slope.github.io/a77/tag-2
-226;Motorsiklet Yarışı;Motorsiklet Yarışı;https://2slope.github.io/img/moto-x3m.png;https://2slope.github.io/a8/moto-x3m
-227;Sausage Flip;Sausage Flip;https://23azostore.github.io/img/sausage-flip.png;https://23azostore.github.io/s6/sausage-flip
-228;Karıncalar;Karıncalar;https://23azostore.github.io/img/idle-ants.png;https://23azostore.github.io/s5/idle-ants
-1;Uçak Savaşı;Uçak Savaşı;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/87a6e7b4-486d-4272-d4c2-e37ccb4e7500/fit=cover,w=180,h=180;https://air-warfare.games.playgama.net/cm6f7ucal000cz60e5721spwc/index.html
-2;Tren Gezisi;Tren Gezisi;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/af611c97-a5e0-4b29-46b4-8e5314cad800/fit=cover,w=180,h=180;https://train-master.games.playgama.net/cm8fquwkb005ho20g49lbhxnu/index.html
-3;Sigma Boy;Sigma Boy;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/a8f3bbe1-3e14-4a85-5e59-fd791ee2d300/fit=cover,w=180,h=180;https://sigma-boy-musical-clicker.games.playgama.net/cm6pl7rsk005zzg0ev3232myh/index.html
-4;Para Ping Pong;Para Ping Pong;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/9ceb6543-f33b-43b1-3235-bf3a1574f000/fit=cover,w=180,h=180;https://money-ping-pong-fe04-1.games.playgama.net/cm7z3eil5005ul60he15xktle/index.html
-5;4 Renk;4 Renk;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/76e1b730-b931-41d6-da56-bdfe8de55a00/fit=cover,w=180,h=180;https://4-colors.games.playgama.net/cm6es8k620057010eer7z49cv/index.html
-6;Çağ Savaşları;Çağ Savaşları;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/f556cccc-8a47-4e10-5220-f4d9d931ca00/enlarged;https://apps.playgama.com/cm00qwb9y000u150e6bczdagm/index.html
-7;BS Simülatörü;BS Simülatörü;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/d34558b6-fff1-4877-a974-4fc795abcb00/enlarged;https://bs-simulator-559a-1.games.playgama.net/cm6sgenn10031vx0dp4he35ai/index.html
-8;Dart Ustası;Dart Ustası;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/a211470d-b8ca-4514-8fd1-fca5331bb400/fit=cover,w=180,h=180;https://darts-pro-3cf1-1.games.playgama.net/cm6t1tvw50065vx0dw15x5p2f/index.html
-9;Sosyal Medya Yılanı;Sosyal Medya Yılanı;https://avatars.mds.yandex.net/get-games/1881957/2a00000178fdfb2f45bbfd381a7fe71843ea/pjpg350x209;https://app-163000.games.s3.yandex.net/163000/v244i5htiwzkkae3cl5mqbky2zuqk5x7/index.html?
-10;Asker Koşucusu;Asker Koşucusu;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/af78bd7f-67dd-425c-854a-f07f37e3fa00/fit=cover,w=180,h=180;https://soldiers-runner.games.playgama.net/cm8z61d8v003zjx0hrr827vko/index.html
-11;Vahşi Batı Atıcılığı;Vahşi Batı Atıcılığı;https://avatars.mds.yandex.net/get-games/3006389/2a0000017869996bfdfaed46ecc7a47bcac6/pjpg350x209;https://app-158709.games.s3.yandex.net/158709/uval1ndouo803vt2tm2mergxjgm2v5mj/index.html?
-15;Hangisini Tercih Edersin;Hangisini Tercih Edersin;https://playgama.com/cdn-cgi/imagedelivery/LN2S-4p3-GgZvEx3IPaKUA/2118f77a-cdb6-4a9f-f8fa-5b7477835800/enlarged;https://would-you-rather--questions-for-couples.games.playgama.net/cm7vrqyq6000cis0h09am1cfp/index.html
-16;Matematik Araba Yarışı;Matematik Araba Yarışı;https://www.cokogames.com/wp-content/uploads/2022/06/arcademics-grand-prix-150x150.png;https://www.mathplayground.com/internal/arcademics_grand_prix.html
-24;Meyveleri Birleştir Matematik ;Meyveleri Birleştir Matematik ;https://cdn-t-3.bvkstatic.com/us/static/images/games/watermelon.png;https://www.tafeldiploma.nl/gf/fruit-merge/12/?l=0
-25;Birleştir Patlat;Birleştir Patlat;https://02rd6nna08dqg.h5games.usercontent.goog/v/4lgtf08m9f658/images/landscape480.png=w256?v=1;https://02rd6nna08dqg.h5games.usercontent.goog/v/4lgtf08m9f658/
-26;Dans Yarışması;Dans Yarışması;https://img.cdn.famobi.com/portal/html5games/images/tmp/DanceBattleTeaser.jpg?v=0.2-c60c58de;https://play.famobi.com/dance-battle/A-SPORX
-27;Speed Master;Speed Master;https://img.cdn.famobi.com/portal/html5games/images/tmp/SpeedMasterTeaser.jpg?v=0.2-c60c58de;https://play.famobi.com/speed-master/A-SPORX
-28;Neon Yarışçı;Neon Yarışçı;https://img.cdn.famobi.com/portal/html5games/images/tmp/NeonRiderTeaser.jpg?v=0.2-c60c58de;https://play.famobi.com/neon-rider/A-SPORX
-29;Serseri Yarışçı;Serseri Yarışçı;https://i.ibb.co/7VQM6x9/faateve.png;https://html-classic.itch.zone/html/10675770/index.html
-30;Cut the Rope Magic;Cut the Rope Magic;https://i.ibb.co/r6fSkm9/40cdm9o.png;https://emupedia.net/emupedia-game-cut-the-rope-magic/
-31;Temple Run 2;Temple Run 2;https://i.ibb.co/SwQWXS4/mudg2tu.jpg;https://emupedia.net/emupedia-game-temple-run2/
-32;Puding Birleştirme;Puding Birleştirme;https://i.ibb.co/ysS7F3P/ri9djqc.jpg;https://emupedia.net/emupedia-game-pudding-monsters/
-33;Solitaire;Solitaire;https://i.ibb.co/QpqF3jw/hgz9i6l.jpg;https://emupedia.net/emupedia-game-solitaire/
-34;Jetpack Joyride;Jetpack Joyride;https://i.ibb.co/bF6wbbK/2417awy.jpg;https://emupedia.net/emupedia-game-jetpack-joyride/
-42;Stickman Hook;Stickman Hook;https://i.ytimg.com/vi/UTDLsJY5LII/hqdefault.jpg;https://stickman.pro/iframe/index.html
-43;Rasgele Basket;Rasgele Basket;https://lh3.googleusercontent.com/2stSOfgeNOFbmf5riv4b6czd8g3zBqyDgPKBXo1WW_aYpFP5d_yNN6jYRlZKPeTHafOizujq8Ych-_F0_KlPsqvNzg=s1280-w1280-h800;https://www.twoplayergames.org/embed/basket-random
-44;Satranç Ustası;Satranç Ustası;https://chessmania.h5games.usercontent.goog/v/5c6baeab-0cb7-4d06-b733-eafadb522e04/med_res_banner.jpg=w256?v=1;https://chessmania.h5games.usercontent.goog/v/5c6baeab-0cb7-4d06-b733-eafadb522e04/
-45;Gym Stack;Gym Stack;https://gymstack.h5games.usercontent.goog/v/eee9d7c0-118d-4b2b-9d47-b3464d73f939/med_res_banner.jpg=w256;https://gymstack.h5games.usercontent.goog/v/eee9d7c0-118d-4b2b-9d47-b3464d73f939/
-46;Yıldız Birleştir;Yıldız Birleştir;https://starsaligned.h5games.usercontent.goog/v/8dd2f4cc-7085-4180-b895-0590a75bb621/med_res_banner.jpg=w256;https://starsaligned.h5games.usercontent.goog/v/8dd2f4cc-7085-4180-b895-0590a75bb621/
-47;Pro Basket;Pro Basket;https://06f80rna6d2sg.h5games.usercontent.goog/v/6ug3s5n1q08qg/images/hoophero-app-icon-256.png=w256;https://06f80rna6d2sg.h5games.usercontent.goog/v/6ug3s5n1q08qg/
-48;Çılgın Mağaralar;Çılgın Mağaralar;https://crazycaves.h5games.usercontent.goog/v/24bc2c61-c599-4c5a-9fde-fd3a14fd28a6/med_res_banner.jpg=w256?v=1;https://crazycaves.h5games.usercontent.goog/v/24bc2c61-c599-4c5a-9fde-fd3a14fd28a6/
-49;Tom and Jerry Taxi;Tom and Jerry Taxi;https://files.gamezhero.com/game/4a9/08e/4a908ea866ce4fe4/images/240/tomandjerryinnewyorktaxicabs.jpg;https://emea.iframed.cn.dmti.cloud/content/2297/tom--jerry-taxi-cabs/game/dk/tjcardcreatorcn-16032023-da.c2a68dcf/index.html
-50;Meyve Küpleri;Meyve Küpleri;https://5pj67mkaqugmo.h5games.usercontent.goog/v/0iiosri8tlc8o/image/FruitCubeBlast-med-res-banner.jpg=w256?v=1;https://5pj67mkaqugmo.h5games.usercontent.goog/v/0iiosri8tlc8o/
-51;Pizzacı Panda;Pizzacı Panda;https://pandapizzaparlor.h5games.usercontent.goog/v/696f7b56-a916-4c62-91c7-782b289a2277/high_res_icon.jpg;https://pandapizzaparlor.h5games.usercontent.goog/v/16ldgoh3to3f8/
-52;Yılan ve Merdivenler;Yılan ve Merdivenler;https://m.media-amazon.com/images/I/71CMXK5FXDL.png;https://snakesandladders.h5games.usercontent.goog/v/75mcopjgiis98/
-53;Ahmet Amca;Ahmet Amca;https://uncleahmed.h5games.usercontent.goog/v/31ca380f-5493-4371-b5ac-5c3c2da67626/high_res_icon.jpg;https://uncleahmed.h5games.usercontent.goog/v/31ca380f-5493-4371-b5ac-5c3c2da67626/
-54;Renk Patlaması 3D;Renk Patlaması 3D;https://colorburst3d.h5games.usercontent.goog/v/f9ac46fc-3e68-4395-ab17-fe9b056df979/high_res_banner.jpg;https://colorburst3d.h5games.usercontent.goog/v/3l27vlnq6dvto/
-55;Meyveleri Tamamla;Meyveleri Tamamla;https://0i1jh8boqif48.h5games.usercontent.goog/v/1643ot8on0v9g/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://0i1jh8boqif48.h5games.usercontent.goog/v/1643ot8on0v9g/
-56;Akıllı Balonlar;Akıllı Balonlar;https://smartybubbles.h5games.usercontent.goog/v/ffea9e87-19f8-46e9-94f7-f54a833b33f9/med_res_banner.jpg=w256?v=1;https://smartybubbles.h5games.usercontent.goog/v/ffea9e87-19f8-46e9-94f7-f54a833b33f9/
-57;Yalnız Yarışçı;Yalnız Yarışçı;https://trucktrials.h5games.usercontent.goog/v/01347635-6b10-4fe1-ae85-53c0fb6a95bb/med_res_banner.jpg=w256?v=1;https://trucktrials.h5games.usercontent.goog/v/01347635-6b10-4fe1-ae85-53c0fb6a95bb/
-58;Savaşcı;Savaşcı;https://hexadungeon.h5games.usercontent.goog/v/2b9ankkos3408/images/hexadungeon-horizontal-banner-2.png=w256?v=1;https://hexadungeon.h5games.usercontent.goog/v/2b9ankkos3408/
-59;Masa Futbolu;Masa Futbolu;https://pocketchampions.h5games.usercontent.goog/v/47dgni011hg0g/images/pocket-champions-horizontal-banner-2.png=w256?v=1;https://pocketchampions.h5games.usercontent.goog/v/47dgni011hg0g/
-60;Aynısını Bul 2;Aynısını Bul 2;https://onetconnectclassic.h5games.usercontent.goog/v/3548fcd4-da1a-47bd-ac18-01488239c660/med_res_banner.jpg=w256?v=1;https://onetconnectclassic.h5games.usercontent.goog/v/3548fcd4-da1a-47bd-ac18-01488239c660/
-61;Oduncu Amca;Oduncu Amca;https://timberguy.h5games.usercontent.goog/v/227aa761-6f5d-49c8-8291-9551bc7a2d8b/med_res_banner.jpg=w256?v=1;https://timberguy.h5games.usercontent.goog/v/227aa761-6f5d-49c8-8291-9551bc7a2d8b/
-62;Bubble Tower;Bubble Tower;https://bubbletower.h5games.usercontent.goog/v/5f770b77-7506-4f46-8662-3788d70bae7f/med_res_banner.jpg=w256?v=1;https://bubbletower.h5games.usercontent.goog/v/5f770b77-7506-4f46-8662-3788d70bae7f/
-63;Balık Oyunu;Balık Oyunu;https://pickergame.com/gamesource/Fish_Love/icons/icon-256.png;https://pickergame.com/gamesource/Fish_Love/index.html
-64;Bilardo;Bilardo;https://gamegfx.spielaffe.de/images/game/3189/3189855/39465_pool-mania-rcm120x120.png;https://html5.inlogic.sk/poolmania-stroer/game/?partner_id=poolmania_stroer
-65;Alien Attack;Alien Attack;https://img.gamemonetize.com/obxkm7l3340uetq3ys2xt1yheq4a7pdw/512x384.jpg;https://html5.inlogic.sk/aliensattack/
-66;Farm Block Puzzle;Farm Block Puzzle;https://www.roundgames.net/wp-content/uploads/2024/09/Farm-Block-Puzzle-Game-Online.jpg;https://html5.inlogic.sk/farmblockpuzzle/
-67;Meyve Puzzle;Meyve Puzzle;https://5u9qhnk84v07g.h5games.usercontent.goog/v/6oagub3k2dv6g/image/tilepuzzle-med-res-banner.jpg=w256?v=1;https://5u9qhnk84v07g.h5games.usercontent.goog/v/6oagub3k2dv6g/
-68;Sky Heroes;Sky Heroes;https://pickergame.com/gamesource/Sky_Heroes_Z/icons/icon-256.png;https://pickergame.com/gamesource/Sky_Heroes_Z/index.html
-69;Kafa Topu;Kafa Topu;https://pickergame.com/gamesource/Head_Soccer_2022/icons/icon-256.png;https://pickergame.com/gamesource/Head_Soccer_2022/index.html
-70;Sihirli Toplar;Sihirli Toplar;https://game-game.com/gamesimg/209932.jpg;https://www.yad.com/games/Magic-Balls/index.html
-71;Balık Tutma Oyunu;Balık Tutma Oyunu;https://images.crazygames.com/games/fishing-io/cover-1589904894408.png;https://html5.inlogic.sk/fishingio/
-72;Piksel Boyama;Piksel Boyama;https://img.cdn.famobi.com/portal/html5games/images/tmp/ColorPixelArtClassicTeaser.jpg?v=0.2-c5b5b387;https://play.famobi.com/color-pixel-art-classic/A-SPORX
-73;Zumba Mania;Zumba Mania;https://plays.org/wp-content/uploads/zumba-mania.png;https://html5.inlogic.sk/zumbamania/
-74;Uzay Savaşları;Uzay Savaşları;https://s3.envato.com/files/262258896/thumbs/1.jpg;https://showcase.codethislab.com/games/galactic_war/
-75;Aynısını Bul;Aynısını Bul;https://oddoneout.h5games.usercontent.goog/v/50nqosk9lm28o/image/oddoneout-med-res-banner.jpg=w256?v=1;https://oddoneout.h5games.usercontent.goog/v/50nqosk9lm28o/
-76;Piyano Oyunu;Piyano Oyunu;https://perfectpiano.h5games.usercontent.goog/v/48c3ch9soa7cg/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://perfectpiano.h5games.usercontent.goog/v/48c3ch9soa7cg/
-77;Fırlat Vur;Fırlat Vur;https://5699ri02mr840.h5games.usercontent.goog/v/0dov2qbpnafb0/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://5699ri02mr840.h5games.usercontent.goog/v/0dov2qbpnafb0/
-78;Masa Tenisi Oyunu;Masa Tenisi Oyunu;https://tabletennis.h5games.usercontent.goog/v/24f1dad4-8ec6-4a10-8700-168324e23c86/med_res_banner.jpg=w400?v=1;https://tabletennis.h5games.usercontent.goog/v/24f1dad4-8ec6-4a10-8700-168324e23c86/
-79;Jellystone Eşleştirme;Jellystone Eşleştirme;https://files.kidsearch.games/game/e62/929/e6292916057ba689/images/240/jellystonematchup.jpg;http://files.kidsearch.games/game/e62/929/e6292916057ba689/data/index.html
-80;Meyveleri Birleştir;Meyveleri Birleştir;https://mergemelons.h5games.usercontent.goog/v/7ipepd5h6vca0/images/horizontalBanners_19201080.png=w256?v=1;https://mergemelons.h5games.usercontent.goog/v/7ipepd5h6vca0/
-81;Justin ile Zıpla;Justin ile Zıpla;https://jumpwithjustin2.h5games.usercontent.goog/v/d9ce17aa-866a-4dd4-a338-b0069f66591d/med_res_banner.jpg=w256?v=1;https://jumpwithjustin2.h5games.usercontent.goog/v/d9ce17aa-866a-4dd4-a338-b0069f66591d/
-82;Kriket Kahramanı;Kriket Kahramanı;https://crickethero.h5games.usercontent.goog/v/3pju0ifgimfro/promo/1920x1080.jpg=w256?v=1;https://crickethero.h5games.usercontent.goog/v/3pju0ifgimfro/
-83;Dama Oyunu;Dama Oyunu;https://img.cdn.famobi.com/portal/html5games/images/tmp/CheckersClassicTeaser.jpg;play.famobi.com/checkers-classic/A-SPORX
-84;Satranç Oyunu;Satranç Oyunu;https://chessclassic.h5games.usercontent.goog/v/d94ef861-2fc9-4c60-b983-962237f8f981/med_res_banner.jpg=w256?v=1;https://chessclassic.h5games.usercontent.goog/v/d94ef861-2fc9-4c60-b983-962237f8f981/
-85;Mısır Patlatma Ustası;Mısır Patlatma Ustası;https://img.gamepix.com/games/popcorn-master/cover/popcorn-master.png;https://archive777.com/Game-Files/Popcorn%20Master%20Game/
-86;Harika Dilimler;Harika Dilimler;https://www4.minijuegosgratis.com/v3/games/thumbnails/229932_1.jpg;https://iclouds.space/HTML5GAMES/perfect-slice/
-88;Formula Yarışı;Formula Yarışı;https://www.primarygames.com/arcade/racing/formularush/logo200.png;https://www.puzzleplayground.com/games/formula-rush/
-89;Renk Toplama Oyunu;Renk Toplama Oyunu;https://s3.envato.com/files/425159721/image1.png;https://www.pogames.in/games/codecannyon/colorhoop/
-90;Online Football;Online Football;https://images.sftcdn.net/images/t_app-icon-l/p/babbf7ee-e9ed-4bbd-bbbe-2487b7872162/1384940051/soccer-online-987e7aae71b949c2b8eb9184636efe4f-512x512.jpeg;https://archive777.com/2563225775147/Soccer%20Online/
-91;Basketbol Oyunu;Basketbol Oyunu;https://img.cdn.famobi.com/portal/html5games/images/tmp/DunkBrushTeaser.jpg?v=0.2-67d50161;https://ubg77.github.io/fix/dunkbrush/
-92;Parkur Yarışı;Parkur Yarışı;https://imgs2.dab3games.com/parkour-race-3d-1615.png;https://ubg77.github.io/fix/parkour-race/
-93;Çılgın Yarışçı;Çılgın Yarışçı;https://dinosaur-game.io/data/image/drive-mad-3.jpg;https://ubg77.github.io/game131022/drive-mad/
-94;Zıpla ve Patlat;Zıpla ve Patlat;https://img.gamedistribution.com/51761a50c12a41f5a12819c29c43dcc5-512x512.jpeg;https://archive777.com/Game-Files/Jump%20and%20Splat/
-95;Çizgi Yarışı;Çizgi Yarışı;https://www5.minijuegosgratis.com/v3/games/thumbnails/233608_7_sq.jpg;https://ext.minijuegosgratis.com/draw-climber/gameCode/index.html
-96;Drift Oyunu Online;Drift Oyunu Online;https://img.cdn.famobi.com/portal/html5games/images/tmp/DriftDudesTeaser.jpg;https://play.famobi.com/drift-dudes/A-SPORX
-97;Golf Oyunu;Golf Oyunu;https://golfadventures.h5games.usercontent.goog/v/2er1vod6k6p0o/images/horizontal480.png=w256?v=1;https://golfadventures.h5games.usercontent.goog/v/2er1vod6k6p0o/
-98;Topun Yolunu Bul;Topun Yolunu Bul;https://rollthisball3.h5games.usercontent.goog/v/698f5df1-191f-4793-b12f-0940bacfc1f3/med_res_banner.jpg=w256?v=1;https://rollthisball3.h5games.usercontent.goog/v/698f5df1-191f-4793-b12f-0940bacfc1f3/
-99;Zar Puzzle;Zar Puzzle;https://0vfcifju4i900.h5games.usercontent.goog/v/4ko889nhn3c1o/image/dicepuzzle-med-res-banner.jpg=w256?v=1;https://0vfcifju4i900.h5games.usercontent.goog/v/4ko889nhn3c1o/
-100;Neon Kule Yarışı;Neon Kule Yarışı;https://2mk3ok3s7jl88.h5games.usercontent.goog/v/39vfhh0oku1j8/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://2mk3ok3s7jl88.h5games.usercontent.goog/v/39vfhh0oku1j8/
-101;Emoji Eşleştirme;Emoji Eşleştirme;https://0aijth0is3tko.h5games.usercontent.goog/v/1c1277hq9kr98/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://0aijth0is3tko.h5games.usercontent.goog/v/1c1277hq9kr98/
-102;The Tom and Jerry;The Tom and Jerry;https://files.kidsearch.games/game/b0a/7fb/b0a7fbb757893493/images/240/thetomandjerryshowbackyardhoops.jpg;http://files.kidsearch.games/game/b0a/7fb/b0a7fbb757893493/data/index.html
-103;Penalty Power ;Penalty Power ;https://files.gamezhero.com/game/a20/3b5/a203b5a03f0caec1/images/240/penaltypower3.jpg;http://files.gamezhero.com/game/a20/3b5/a203b5a03f0caec1/data/index.html
-104;Toon Cup 2022 ;Toon Cup 2022 ;https://files.gamezhero.com/game/aaf/0e1/aaf0e1bc9c23b87d/images/240/cntooncup2022.jpg;https://emea.iframed.cn.dmti.cloud/content/1317/toon-cup/game/ae/tooncup-16112022-uae.3ea9d131/index.html
-105;Color Sort Mania;Color Sort Mania;https://www.inlogic.sk/html5/248/assets/favicon/icon-152x152.png;https://html5.inlogic.sk/colorsortmania/
-106;Jump into Wow ;Jump into Wow ;https://files.kidsearch.games/game/032/4f2/0324f2c20a4023ad/images/240/jumpintowow.jpg;https://assets.games.corusent.com/wp-content/uploads/2021/10/game/1964/index.html
-107;Stack Ball 3D;Stack Ball 3D;https://stackbounce.h5games.usercontent.goog/v/1aqsvv0aegbjg/images/mid_res_banner.jpeg=w256?v=1;https://stackbounce.h5games.usercontent.goog/v/1aqsvv0aegbjg/
-108;Futbol Süperstar;Futbol Süperstar;https://www.inlogic.sk/html5/242/assets/favicon/icon-152x152.png;https://html5.inlogic.sk/footballsuperstars2024/
-109;Ring to Ring;Ring to Ring;https://files.kidsearch.games/game/68c/1df/68c1df7cc868c686/images/240/ringtoring.jpg;http://files.kidsearch.games/game/68c/1df/68c1df7cc868c686/data/index.html
-110;Basketbol Kralı;Basketbol Kralı;https://www.inlogic.sk/html5/235/assets/favicon/icon-152x152.png;https://html5.inlogic.sk/basketballkings2024/
-111;Free Kick Football;Free Kick Football;https://freekickfootball.h5games.usercontent.goog/v/0lqeu7698mvk0/images/horizontal480.png=w256?v=1;https://freekickfootball.h5games.usercontent.goog/v/0lqeu7698mvk0/
-112;3D Basketball;3D Basketball;https://i.ibb.co/jkQJj6qV/fpru4ep.jpg;https://play.famobi.com/3d-basketball/A-SPORX
-113;Sea Mahjong;Sea Mahjong;https://files.kidsearch.games/game/602/a0b/602a0b7b91859177/images/240/seamahjong.jpg;http://files.kidsearch.games/game/602/a0b/602a0b7b91859177/data/index.html
-114;8 Ball Billiards;8 Ball Billiards;https://billiardsclassic.h5games.usercontent.goog/v/dd1f188f-cef2-4a0f-bfb0-a58e0bb3c16e/med_res_banner.jpg=w256?v=1;https://billiardsclassic.h5games.usercontent.goog/v/dd1f188f-cef2-4a0f-bfb0-a58e0bb3c16e/
-115;Basketball Master;Basketball Master;https://basketballmaster2.h5games.usercontent.goog/v/d77686d1-b7f2-43ab-8a85-00ab1d8b065f/med_res_banner.jpg=w256?v=1;https://basketballmaster2.h5games.usercontent.goog/v/d77686d1-b7f2-43ab-8a85-00ab1d8b065f/
-116;Süper Tetris;Süper Tetris;https://62dfg8ps4f7lg.h5games.usercontent.goog/v/4cv3ubvtn4170/images/landscape480.png=w256?v=1;https://62dfg8ps4f7lg.h5games.usercontent.goog/v/4cv3ubvtn4170/
-117;Golf Fling;Golf Fling;https://golffling.h5games.usercontent.goog/v/0aa707a3-71a5-4ad8-be9b-32ce55e28d64/med_res_banner.jpg=w256?v=1;https://golffling.h5games.usercontent.goog/v/0aa707a3-71a5-4ad8-be9b-32ce55e28d64/
-118;Totemia Cursed Marbles;Totemia Cursed Marbles;https://totemiacursed.h5games.usercontent.goog/v/0df02b02-be39-4ad7-ba7f-4a3c08e71c68/med_res_banner.jpg=w256?v=1;https://totemiacursed.h5games.usercontent.goog/v/0df02b02-be39-4ad7-ba7f-4a3c08e71c68/
-119;Jigsaw Puzzle;Jigsaw Puzzle;https://jigsawpuzzledeluxe.h5games.usercontent.goog/v/f796c04d-5370-4c4f-93ea-de69d4cbdbe7/med_res_banner.jpg=w256?v=1;https://jigsawpuzzledeluxe.h5games.usercontent.goog/v/f796c04d-5370-4c4f-93ea-de69d4cbdbe7/
-120;Tiger Run;Tiger Run;https://tigerrun.h5games.usercontent.goog/v/1cl0c4rtsjsqo/images/mid_res_banner.jpeg=w256?v=1;https://tigerrun.h5games.usercontent.goog/v/1cl0c4rtsjsqo/
-121;Guns and Bottles;Guns and Bottles;https://aktestgunsandbottles.h5games.usercontent.goog/v/51pcsm84fc4ag/creatives/Horizontal_banners/480x270.png=w256?v=1;https://aktestgunsandbottles.h5games.usercontent.goog/v/51pcsm84fc4ag/
-122;Ok Fırlatma;Ok Fırlatma;https://archery.h5games.usercontent.goog/v/f12fb2aa-d64b-4074-8974-31705698e2e6/med_res_banner.jpg=w256?v=1;https://archery.h5games.usercontent.goog/v/f12fb2aa-d64b-4074-8974-31705698e2e6/
-123;Oh Nom Run;Oh Nom Run;https://omnomrun.h5games.usercontent.goog/v/5e921868-7442-48b7-8d4e-1433f4a900b5/med_res_banner.jpg=w256?v=1;https://omnomrun.h5games.usercontent.goog/v/5e921868-7442-48b7-8d4e-1433f4a900b5/
-124;Arctic Pong;Arctic Pong;https://arcticpong.h5games.usercontent.goog/v/49d5ba10-6308-4c30-872c-e7161297d6eb/med_res_banner.jpg=w256?v=1;https://arcticpong.h5games.usercontent.goog/v/49d5ba10-6308-4c30-872c-e7161297d6eb/
-125;Top Atışı 3D;Top Atışı 3D;https://cannonballs3d.h5games.usercontent.goog/v/004m7ejm69rs0/html5games/assets/marketingAssets/banners/480x270.png=w256?v=1;https://cannonballs3d.h5games.usercontent.goog/v/004m7ejm69rs0/
-126;Neon Line;Neon Line;https://diwalilights.h5games.usercontent.goog/v/0abe774c-6154-4dd3-a416-a02e80b390d4/med_res_banner.jpg=w256?v=1;https://diwalilights.h5games.usercontent.goog/v/0abe774c-6154-4dd3-a416-a02e80b390d4/
-127;Cake Slice Ninja;Cake Slice Ninja;https://cakesliceninja.h5games.usercontent.goog/v/0p06tu4g041i0/images/mid_res_banner.jpeg=w256?v=1;https://cakesliceninja.h5games.usercontent.goog/v/0p06tu4g041i0/
-128;Carrom Clash;Carrom Clash;https://carromclash.h5games.usercontent.goog/v/4pmfd00515bbg/images/carromclash-horizontal-banner-2.png=w256?v=1;https://carromclash.h5games.usercontent.goog/v/4pmfd00515bbg/
-129;Kızma Birader;Kızma Birader;https://35q41h2gp6dd8.h5games.usercontent.goog/v/6q7tggnmscsj8/images/ludo-horizontal-banner-2.png=w256?v=1;https://35q41h2gp6dd8.h5games.usercontent.goog/v/6q7tggnmscsj8/
-130;Pin the Ufo;Pin the Ufo;https://pintheufo.h5games.usercontent.goog/v/08ukqv01ac45o/images/mid_res_banner.jpeg=w256?v=1;https://pintheufo.h5games.usercontent.goog/v/08ukqv01ac45o/
-131;Park Uzmanı;Park Uzmanı;https://7nq79vktk8fho.h5games.usercontent.goog/v/4u3a6m3hm9lj8/html5games/assets/marketingAssets/banners/480x270.png=w400?v=1;https://7nq79vktk8fho.h5games.usercontent.goog/v/4u3a6m3hm9lj8/
-132;Connect 4 Board;Connect 4 Board;https://i.ibb.co/ymxW9rj5/8avvk0t.png;https://kenrick95.github.io/c4/
-133;Cut for Cat;Cut for Cat;https://i.ibb.co/Ld9JXyWx/gkugze0.png;https://plays.org/game/cut-for-cat-2/
-134;Pond Game;Pond Game;https://i.ibb.co/bZydq92/svbwzbu.png;https://thepond.zolmeister.com/
-135;Coil Game;Coil Game;https://i.ibb.co/2Y3DKhqr/qap4zaz.png;https://lab.hakim.se/coil/
-136;Pop Pop Win!;Pop Pop Win!;https://i.ibb.co/XkMSStvX/eet23mv.jpg;https://dart-lang.github.io/sample-pop_pop_win/
-137;Hextris;Hextris;https://i.ibb.co/JWDPVjT0/dknqu6s.png;https://hextris.io/
-138;Tower Game;Tower Game;https://i.ibb.co/230HfJzw/12kdiw1.png;https://iamkun.github.io/tower_game/
-139;Duck Hunt Game;Duck Hunt Game;https://i.ibb.co/vxZRFVT6/fdlknmh.png;https://duckhuntjs.com/
-140;Zop Game;Zop Game;https://i.ibb.co/CpVFc5BX/furxqhg.png;https://zop.zolmeister.com/
-141;Endless Siege;Endless Siege;https://i.ibb.co/zhCd1qcC/h90goep.png;https://plays.org/game/endless-siege/
-142;Pac Circle Game;Pac Circle Game;https://i.ibb.co/SDgXm1BH/rz60tco.png;https://previews.customer.envatousercontent.com/files/373255281/index.html
-143;Soldier Legend;Soldier Legend;https://i.ibb.co/Rk51jptC/ijqd9gc.png;https://plays.org/game/soldier-legend/
-144;Colour Tunnel;Colour Tunnel;https://i.ibb.co/NnpMDMmG/fn05nsk.png;https://play.famobi.com/color-tunnel/A-SPORX
-145;Ramp Game;Ramp Game;https://i.ibb.co/Tq4sxtcb/g4qiqrs.jpg;https://play.famobi.com/ramp/A-SPORX
-146;Tower Crash 3D;Tower Crash 3D;https://i.ibb.co/LzBKFPCR/ckkmuaj.jpg;https://play.famobi.com/tower-crash-3d/A-SPORX
-147;Bubble Spinner;Bubble Spinner;https://i.ibb.co/Fq6Nwkdb/iwxoemc.png;https://cdn2.addictinggames.com/addictinggames-content/ag-assets/content-items/html5-games/bubblespinner/index.html
-148;Bubble Woods;Bubble Woods;https://i.ibb.co/DPnqdhHm/s36pgsn.png;https://play.famobi.com/bubble-woods/A-SPORX
-149;Alien Bridge;Alien Bridge;https://i.ibb.co/RxrLM0r/6ylaawi.png;https://plays.org/game/alien-bridge/
-150;Pop it;Pop it;https://plays.org/wp-content/uploads/pop-it.png;https://plays.org/game/pop-it/
-151;Protect Emojis;Protect Emojis;https://i.ibb.co/q3TYPbVL/a6ch85p.png;https://plays.org/game/protect-emojis/
-152;Knife Hit;Knife Hit;https://i.ibb.co/bjwnJX0k/r6muyta.png;https://plays.org/game/knife-hit/
-153;Fireman Jet;Fireman Jet;https://i.ibb.co/7tkDj1vN/5jkxzqh.png;https://plays.org/game/fireman-jet/
-154;Popcorn Time;Popcorn Time;https://i.ibb.co/Hp4bcKTD/5329ibi.png;https://plays.org/game/popcorn-time/
-155;Şehir Planlayıcı;Şehir Planlayıcı;https://6nilllqpgkm6o.h5games.usercontent.goog/v/7d3689i7s5gfo/MarketingAssets/tiletopia-thumb-wide-480x270.png=w256?v=1;https://6nilllqpgkm6o.h5games.usercontent.goog/v/7d3689i7s5gfo/
-156;Meyve Birleştir;Meyve Birleştir;https://plays.org/images/merge-fruit.png;https://plays.org/game/merge-fruit/
-157;Scooby Doo;Scooby Doo;https://plays.org/game/scooby-doo-scoob-mystery-match/assets/images/levels/score.png;https://plays.org/game/scooby-doo-scoob-mystery-match/
-158;Yuvarlanan Top;Yuvarlanan Top;https://freegames.org/images/rolling-ball-1200.png;https://freegames.org/games/rolling-ball/v1/
-159;3D Satranç;3D Satranç;https://www.calculators.org/games/titles/master-chess.png;https://freegames.org/games/classic-chess/v1/
-160;Neon Drift;Neon Drift;https://freegames.org/images/neon-drift-big.png;https://freegames.org/games/neon-drift/v2/
-161;Simon Diyorki;Simon Diyorki;https://freegames.org/images/simon-says-big.png;https://freegames.org/games/simon-says/v1/
-162;Hexagon Fall;Hexagon Fall;https://www.cbc.ca/kids/images/hexagonfall_thumb.jpg;https://freegames.org/games/hexagon-fall/v1/
-163;Zombileri Parçala;Zombileri Parçala;https://freegames.org/images/zombubz500.png;https://freegames.org/games/zombubz/v1/
-164;Meyve Kesme;Meyve Kesme;https://a.silvergames.com/screenshots/fruit-slice/cutting-game.jpg;https://freegames.org/games/slice-fruit/v1/
-165;Pop Pop Candy;Pop Pop Candy;https://cdn2.spiele-umsonst.de/flash_thumb/poppopcandies.jpg;https://freegames.org/games/pop-pop-candies/v1/
-166;Katlama Sanatı;Katlama Sanatı;https://freegames.org/images/unfold-3.png;https://freegames.org/games/unfold-3/v1/
-167;Hex Pipes;Hex Pipes;https://i.ibb.co/GQd68fDK/8bc168i.png;https://freegames.org/games/hex-pipes/v1/
-168;Fruit Matching;Fruit Matching;https://i.ibb.co/V09pw4V2/437rdzo.png;https://freegames.org/games/fruit-matching/v1/
-169;Bubble Blaster;Bubble Blaster;https://i.ibb.co/LXG9mY4V/dnqqhbm.jpg;https://freegames.org/games/bubble-blaster/v1
-170;The Sea Rush;The Sea Rush;https://thesearush.h5games.usercontent.goog/v/28d09aff-9050-4da5-8e10-051ca084cdde/med_res_banner.jpg=w256?v=1;https://thesearush.h5games.usercontent.goog/v/28d09aff-9050-4da5-8e10-051ca084cdde/
-171;Tower Block;Tower Block;https://i.ibb.co/230HfJzw/12kdiw1.png;https://iamkun.github.io/tower_game/
-172;Unpark Me;Unpark Me;https://unparkme.h5games.usercontent.goog/v/bd1f1f83-f349-40a3-a153-297b0722bc10/med_res_banner.jpg=w256?v=1;https://unparkme.h5games.usercontent.goog/v/bd1f1f83-f349-40a3-a153-297b0722bc10/
-173;Nature Strikes;Nature Strikes;https://79gloe1v4okkg.h5games.usercontent.goog/v/0hmi0u8r883do/NatureStrikesBack-Landscape-1080x1920-medium.png=w256?v=1;https://79gloe1v4okkg.h5games.usercontent.goog/v/0hmi0u8r883do/
-174;Lake Jump;Lake Jump;https://lakejump.h5games.usercontent.goog/v/33bg3iluek1fg/images/horizontal480.png=w256?v=1;https://lakejump.h5games.usercontent.goog/v/33bg3iluek1fg/
-175;Road Fury;Road Fury;https://roadfury.h5games.usercontent.goog/v/a2a8cf2b-40b8-4c60-8bbd-5537053e72c6/med_res_banner.jpg=w256?v=1;https://roadfury.h5games.usercontent.goog/v/a2a8cf2b-40b8-4c60-8bbd-5537053e72c6/
-176;Scooter Xtreme 3D;Scooter Xtreme 3D;https://scooterxtreme.h5games.usercontent.goog/v/c842db43-7823-45bc-b575-acbd9bda5de4/med_res_banner.jpg=w256?v=1;https://scooterxtreme.h5games.usercontent.goog/v/c842db43-7823-45bc-b575-acbd9bda5de4/
-177;Truck Trials;Truck Trials;https://trucktrials.h5games.usercontent.goog/v/01347635-6b10-4fe1-ae85-53c0fb6a95bb/med_res_banner.jpg=w256?v=1;https://trucktrials.h5games.usercontent.goog/v/01347635-6b10-4fe1-ae85-53c0fb6a95bb/
-178;Traffic Tom;Traffic Tom;https://traffictom.h5games.usercontent.goog/v/7c1a9fb2-2097-4c14-b7b1-052d80d41adb/med_res_banner.jpg=w256?v=1;https://traffictom.h5games.usercontent.goog/v/7c1a9fb2-2097-4c14-b7b1-052d80d41adb/
-179;Sudoku Plus;Sudoku Plus;https://sudokuplus.h5games.usercontent.goog/v/3q827iuj6msno/image/sudokuplus-med-res-banner.jpg=w256?v=1;https://sudokuplus.h5games.usercontent.goog/v/3q827iuj6msno/
-180;Pics Word Game;Pics Word Game;https://picswordgame.h5games.usercontent.goog/v/57j20d78tccio/image/picswordgame-med-res-banner.jpg=w256?v=1;https://picswordgame.h5games.usercontent.goog/v/57j20d78tccio/
-181;Araba Yarışı 3D;Araba Yarışı 3D;https://tcf.admeen.org/game/17000/16952/400x246/stock-car-hero.jpg;https://freegames.org/games/stock-car-hero/v1/
-182;Kalp Animasyonu 1;Kalp Animasyonu 1;https://www.edevreler.com/lotani/animasyon1.png;https://www.edevreler.com/lotani/animasyon1.html
-183;Kalp Animasyonu 2;Kalp Animasyonu 2;https://www.edevreler.com/lotani/animasyon2.png;https://www.edevreler.com/lotani/animasyon2.html
-184;Kalp Animasyonu 3;Kalp Animasyonu 3;https://www.edevreler.com/lotani/animasyon3.png;https://www.edevreler.com/lotani/animasyon3.html
-185;Kalp Animasyonu 4;Kalp Animasyonu 4;https://www.edevreler.com/lotani/animasyon4.png;https://www.edevreler.com/lotani/animasyon4.html
-186;Kalp Animasyonu 5;Kalp Animasyonu 5;https://www.edevreler.com/lotani/animasyon5.png;https://www.edevreler.com/lotani/animasyon5.html
-187;Kalp Animasyonu 6;Kalp Animasyonu 6;https://www.edevreler.com/lotani/animasyon6.png;https://www.edevreler.com/lotani/animasyon6.html
-188;Kalp Animasyonu 7;Kalp Animasyonu 7;https://www.edevreler.com/lotani/animasyon7.png;https://www.edevreler.com/lotani/animasyon7.html
-189;Kalp Animasyonu 8;Kalp Animasyonu 8;https://www.edevreler.com/lotani/8.png;https://www.edevreler.com/lotani/8.html
-190;Kalp Animasyonu 9;Kalp Animasyonu 9;https://www.edevreler.com/lotani/9.png;https://www.edevreler.com/lotani/9.html
-191;Kalp Animasyonu 10;Kalp Animasyonu 10;https://www.edevreler.com/lotani/10.png;https://www.edevreler.com/lotani/10.html
-192;Kalp Animasyonu 11;Kalp Animasyonu 11;https://www.edevreler.com/lotani/11.png;https://www.edevreler.com/lotani/11.html
-193;Kalp Animasyonu 12;Kalp Animasyonu 12;https://www.edevreler.com/lotani/12.png;https://www.edevreler.com/lotani/12.html
-194;Kalp Animasyonu 13;Kalp Animasyonu 13;https://www.edevreler.com/lotani/13.png;https://www.edevreler.com/lotani/13.html
-195;Kalp Animasyonu 14;Kalp Animasyonu 14;https://www.edevreler.com/lotani/14.png;https://www.edevreler.com/lotani/14.html
-196;Kalp Animasyonu 15;Kalp Animasyonu 15;https://www.edevreler.com/lotani/15.png;https://www.edevreler.com/lotani/15.html
-197;Kalp Animasyonu 16;Kalp Animasyonu 16;https://www.edevreler.com/lotani/16.png;https://www.edevreler.com/lotani/16.html
-198;Kalp Animasyonu 17;Kalp Animasyonu 17;https://www.edevreler.com/lotani/17.png;https://www.edevreler.com/lotani/17.html
-199;Kalp Animasyonu 18;Kalp Animasyonu 18;https://www.edevreler.com/lotani/18.png;https://www.edevreler.com/lotani/18.html
-200;Kalp Animasyonu 19;Kalp Animasyonu 19;https://www.edevreler.com/lotani/19.png;https://www.edevreler.com/lotani/19.html
-201;Kalp Animasyonu 20;Kalp Animasyonu 20;https://www.edevreler.com/lotani/20.png;https://www.edevreler.com/lotani/20.html
-202;Ateş Animasyonu 1;Ateş Animasyonu 1;https://www.edevreler.com/lotani/ates1.png;https://www.edevreler.com/lotani/ates1.html
-203;Ateş Animasyonu 2;Ateş Animasyonu 2;https://www.edevreler.com/lotani/ates2.png;https://www.edevreler.com/lotani/ates2.html
-204;Ateş Animasyonu 3;Ateş Animasyonu 3;https://www.edevreler.com/lotani/ates3.png;https://www.edevreler.com/lotani/ates3.html
-205;Ateş Animasyonu 4;Ateş Animasyonu 4;https://www.edevreler.com/lotani/ates4.png;https://www.edevreler.com/lotani/ates4.html
-206;Ateş Animasyonu 5;Ateş Animasyonu 5;https://www.edevreler.com/lotani/ates5.png;https://www.edevreler.com/lotani/ates5.html
-207;Ateş Animasyonu 6;Ateş Animasyonu 6;https://www.edevreler.com/lotani/ates6.png;https://www.edevreler.com/lotani/ates6.html
-208;Ateş Animasyonu 7;Ateş Animasyonu 7;https://www.edevreler.com/lotani/ates7.png;https://www.edevreler.com/lotani/ates7.html
-209;Ateş Animasyonu 8;Ateş Animasyonu 8;https://www.edevreler.com/lotani/ates8.png;https://www.edevreler.com/lotani/ates8.html
-210;Ateş Animasyonu 9;Ateş Animasyonu 9;https://www.edevreler.com/lotani/ates9.png;https://www.edevreler.com/lotani/ates9.html
-211;Ateş Animasyonu 10;Ateş Animasyonu 10;https://www.edevreler.com/lotani/ates10.png;https://www.edevreler.com/lotani/ates10.html
-212;Yıldız Animasyonu 1;Yıldız Animasyonu 1;https://www.edevreler.com/lotani/yildiz1.png;https://www.edevreler.com/lotani/yildiz1.html
-213;Yıldız Animasyonu 2;Yıldız Animasyonu 2;https://www.edevreler.com/lotani/yildiz2.png;https://www.edevreler.com/lotani/yildiz2.html
-214;Yıldız Animasyonu 3;Yıldız Animasyonu 3;https://www.edevreler.com/lotani/yildiz3.png;https://www.edevreler.com/lotani/yildiz3.html
-215;Yıldız Animasyonu 4;Yıldız Animasyonu 4;https://www.edevreler.com/lotani/yildiz4.png;https://www.edevreler.com/lotani/yildiz4.html
-216;Yıldız Animasyonu 5;Yıldız Animasyonu 5;https://www.edevreler.com/lotani/yildiz5.png;https://www.edevreler.com/gemini/
-
-`;
-
+        // --- 1. Yükleme Ekranı Mantığı ---
         window.onload = function() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    userLat = pos.coords.latitude;
-                    userLon = pos.coords.longitude;
-                });
-            }
-            loadGamesFromCSV();
+            // TV Garden ağır bir site olduğu için 5 saniye bekletiyoruz
+            setTimeout(function() {
+                var overlay = document.getElementById('loading-overlay');
+                overlay.style.opacity = '0'; // Yavaşça sol
+                setTimeout(function() {
+                    overlay.style.display = 'none'; // Tamamen kaldır
+                }, 800);
+            }, 5000);
         };
 
-        function resetDisplays() {
-            appFrame.style.display = 'none';
-            videoContainer.style.display = 'none';
-            btnBackToGallery.style.display = 'none';
-        }
+        // --- 2. Zoom Mantığı ---
+        var currentScale = 1.0;
+        var iframe = document.getElementById('target-site');
 
-        function openIframeApp(url) {
-            resetDisplays();
-            gameGalleryArea.style.display = 'none';
-            let finalUrl = url;
-            if (url === 'maps') {
-                finalUrl = userLat ? `https://maps.google.com/maps?q=$${userLat},${userLon}&z=15&output=embed` : "https://maps.google.com/maps?q=Istanbul&z=10&output=embed";
-            }
-            appFrame.src = finalUrl;
-            appFrame.style.display = 'block';
-            switchToApp();
-        }
-
-        function openVideoApp() {
-            resetDisplays();
-            gameGalleryArea.style.display = 'none';
-            videoContainer.style.display = 'flex';
-            videoElement.play();
-            switchToApp();
-        }
-
-        /* --- OYUN ÖZEL FONKSİYONLARI --- */
-        function loadGamesFromCSV() {
-            const lines = csvData.split('\n');
-            const container = document.getElementById('gallery-container');
-            container.innerHTML = '';
+        function applyZoom() {
+            // CSS Transform ile Scale ediyoruz
+            iframe.style.transform = "scale(" + currentScale + ")";
             
-            for(let i=1; i<lines.length; i++) {
-                const line = lines[i].trim();
-                if(!line) continue;
-                const cols = line.split(';');
-                if(cols.length >= 5) {
-                    const gameDiv = document.createElement('div');
-                    gameDiv.className = 'game-card';
-                    gameDiv.onclick = function() { playGame(cols[4]); }; 
-                    
-                    const img = document.createElement('img');
-                    img.src = cols[3];
-                    img.onerror = function(){ this.src='https://via.placeholder.com/150?text=GAME'; };
-                    
-                    const title = document.createElement('div');
-                    title.className = 'game-title';
-                    title.innerText = cols[1];
-                    
-                    gameDiv.appendChild(img);
-                    gameDiv.appendChild(title);
-                    container.appendChild(gameDiv);
-                }
+            // Scale arttıkça iframe kenarlardan taşar, bunu önlemek için
+            // genişliği ve yüksekliği ters orantıda küçültüp/büyütüyoruz.
+            // Bu sayede içerik büyür ama çerçeve aynı kalır.
+            iframe.style.width = (100 / currentScale) + "%";
+            iframe.style.height = (100 / currentScale) + "%";
+        }
+
+        function zoomIn() {
+            if (currentScale < 2.5) { // Maksimum 2.5x zoom
+                currentScale += 0.1; // 0.1 adım büyüt
+                applyZoom();
             }
         }
 
-        function openGameGallery() {
-            mainMenu.style.display = 'none';
-            contentArea.style.display = 'none';
-            gameGalleryArea.style.display = 'block';
-            tickerMode.style.display = 'none';
-            controlMode.style.display = 'flex';
-            btnBackToGallery.style.display = 'none'; 
-        }
-
-        function playGame(url) {
-            resetDisplays();
-            gameGalleryArea.style.display = 'none';
-            appFrame.src = url;
-            appFrame.style.display = 'block';
-            switchToApp();
-            
-            // OYUN MODU: Geri butonu aktif
-            btnBackToGallery.style.display = 'flex';
-
-            // OTOMATİK TAM EKRAN (Mevcut yapı korundu)
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) { /* Firefox */
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) { /* IE/Edge */
-                document.documentElement.msRequestFullscreen();
+        function zoomOut() {
+            if (currentScale > 0.5) { // Minimum 0.5x zoom
+                currentScale -= 0.1; // 0.1 adım küçült
+                applyZoom();
             }
         }
 
-        function backToGallery() {
-            appFrame.src = ""; // Oyunu durdur
-            openGameGallery();
-        }
-        /* -------------------------------- */
-
-        function switchToApp() {
-            mainMenu.style.display = 'none';
-            contentArea.style.display = 'block';
-            tickerMode.style.display = 'none';
-            controlMode.style.display = 'flex';
-        }
-
-        function closeAllApps() {
-            if (document.fullscreenElement) document.exitFullscreen();
-            videoElement.pause();
-            appFrame.src = "";
-            
-            contentArea.style.display = 'none';
-            gameGalleryArea.style.display = 'none'; 
-            
-            mainMenu.style.display = 'flex';
-            tickerMode.style.display = 'block';
-            controlMode.style.display = 'none';
-            
-            btnBackToGallery.style.display = 'none';
-        }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else if (document.exitFullscreen) document.exitFullscreen();
+        function resetZoom() {
+            currentScale = 1.0; // Normale dön
+            applyZoom();
         }
     </script>
+
 </body>
 </html>
-
