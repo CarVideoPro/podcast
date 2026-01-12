@@ -4,92 +4,80 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="./vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CarTV - Global TV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CarTV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/index-DBxKVbd6.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-Bd6hMkao.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-gBEua0MN.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DMf3gc1S.css">
 </head>
 
 <body>
-  <div id="app">
-    <!-- Background Elements -->
-    <div class="bg-gradient-1"></div>
-    <div class="bg-gradient-2"></div>
+  <!-- Background -->
+  <div class="bg-gradient-1"></div>
+  <div class="bg-gradient-2"></div>
 
-    <!-- Navigation / Header -->
-    <nav class="glass-header">
-      <div class="logo">
-        <i data-lucide="tv" class="logo-icon"></i>
-        <span>CarTV</span>
+  <div id="app-layout">
+
+    <!-- Video Player Area (Always present, resizes) -->
+    <section id="player-area" class="player-area">
+      <video id="video-player" controls poster="https://placehold.co/1920x1080/1a1a1a/FFF?text=CarTV"></video>
+      <div class="player-overlay">
+        <div class="hint-text">Tam ekran için çift tıkla</div>
+        <button id="toggle-fullscreen" class="glass-btn icon-only"><i data-lucide="maximize"></i></button>
       </div>
-      <div class="controls">
-        <button id="country-btn" class="glass-btn">
-          <i data-lucide="globe"></i>
-          <span id="current-country-name">Ülke Seçiliyor...</span>
-        </button>
-      </div>
-    </nav>
+    </section>
 
-    <!-- Main Content -->
-    <main class="main-container">
+    <!-- Main Content Area (Lists) -->
+    <main id="content-view" class="content-view">
 
-      <!-- Player Section (Initially Hidden or Placeholder) -->
-      <div id="player-container" class="player-wrapper hidden">
-        <div class="video-container">
-          <video id="video-player" controls autoplay
-            poster="https://placehold.co/1920x1080/000000/FFF?text=Kanal+Se%C3%A7in"></video>
-          <button id="close-player" class="close-player-btn"><i data-lucide="x"></i></button>
-        </div>
-        <div class="channel-info-bar">
-          <h2 id="playing-channel-name">Kanal Seçin</h2>
-          <button id="favorite-btn" class="icon-btn" title="Favorilere Ekle">
-            <i data-lucide="heart"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Favorites Section -->
-      <section id="favorites-section" class="channel-section hidden">
+      <!-- Channels View -->
+      <div id="view-channels" class="view-section active">
         <div class="section-header">
-          <h3><i data-lucide="star" class="text-yellow"></i> Favorilerim</h3>
-        </div>
-        <div id="favorites-grid" class="channel-grid"></div>
-      </section>
-
-      <!-- All Channels Section -->
-      <section class="channel-section">
-        <div class="section-header">
-          <h3 id="country-title">Kanallar</h3>
-          <div class="search-wrapper">
-            <i data-lucide="search"></i>
-            <input type="text" id="channel-search" placeholder="Kanal ara...">
-          </div>
+          <h2 id="country-title">Kanallar</h2>
         </div>
         <div id="channels-loader" class="loader">Yükleniyor...</div>
-        <div id="channels-grid" class="channel-grid"></div>
-      </section>
+        <div id="channels-grid" class="grid-list"></div>
+      </div>
+
+      <!-- Countries View (Overlay/Page) -->
+      <div id="view-countries" class="view-section hidden">
+        <div class="section-header">
+          <h2>Ülke Seç</h2>
+        </div>
+        <div id="countries-grid" class="grid-list"></div>
+      </div>
 
     </main>
 
-    <!-- Country Selection Modal -->
-    <div id="country-modal" class="modal hidden">
-      <div class="modal-content glass-panel">
-        <div class="modal-header">
-          <h2>Ülke Seç</h2>
-          <button id="close-modal" class="icon-btn"><i data-lucide="x"></i></button>
+    <!-- Navigation Bar (Sidebar or Bottombar based on Aspect Ratio) -->
+    <nav id="nav-bar" class="nav-bar">
+
+      <div class="nav-group top">
+        <div class="logo-box">
+          <i data-lucide="tv" class="logo-icon"></i>
         </div>
-        <div class="search-wrapper modal-search">
-          <i data-lucide="search"></i>
-          <input type="text" id="country-search" placeholder="Ülke ara...">
-        </div>
-        <div id="countries-list" class="countries-grid">
-          <!-- Countries will be injected here -->
+
+        <button id="nav-channels" class="nav-btn active" title="Kanallar">
+          <i data-lucide="layout-grid"></i>
+          <span>Kanallar</span>
+        </button>
+
+        <button id="nav-country" class="nav-btn" title="Ülke Değiştir">
+          <span id="current-flag" class="emoji-icon">TR</span>
+          <span>Ülke</span>
+        </button>
+      </div>
+
+      <div class="nav-group bottom">
+        <div class="zoom-controls">
+          <button id="zoom-in" class="glass-btn sm"><i data-lucide="plus"></i></button>
+          <button id="zoom-out" class="glass-btn sm"><i data-lucide="minus"></i></button>
         </div>
       </div>
-    </div>
+
+    </nav>
 
   </div>
 </body>
