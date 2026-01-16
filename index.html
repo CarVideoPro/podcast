@@ -403,21 +403,25 @@
             }
         }
 
-        // --- DÜZELTME: KESİN ÇÖZÜM İÇİN ---
+        // --- KESİN ÇÖZÜM ---
         function playHls(url) {
-            const video = document.createElement('video');
-            video.controls = true;
-            video.autoplay = true;
+            // Video etiketini JS ile üretmek yerine, STRING olarak içine gömüyoruz.
+            // Bu sayede tarayıcı sayfayı render ederken 'playsinline' özelliğini görüp ona göre davranıyor.
+            playerWrapper.innerHTML = `
+                <video id="hls-video" 
+                       class="w-full h-full" 
+                       controls 
+                       autoplay 
+                       playsinline 
+                       webkit-playsinline 
+                       x5-playsinline>
+                </video>
+            `;
+
+            const video = document.getElementById('hls-video');
             
-            // 1. Doğrudan JS özelliği olarak ekle
+            // Ekstra güvenlik için JS üzerinden de zorlayalım
             video.playsInline = true;
-            
-            // 2. HTML özniteliği olarak ekle (Boş değer standarttır)
-            video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
-            
-            video.className = "w-full h-full";
-            playerWrapper.appendChild(video);
 
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls();
@@ -439,8 +443,10 @@
             let embedUrl = url;
             if (!url.includes('embed')) {
                 const videoId = url.split('v=')[1] || url.split('/').pop();
+                // playsinline=1 Youtube'u da hizaya sokar
                 embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&playsinline=1`;
             } else { embedUrl += "?autoplay=1&playsinline=1"; }
+            
             const iframe = document.createElement('iframe');
             iframe.src = embedUrl;
             iframe.allow = "autoplay; encrypted-media; gyroscope; picture-in-picture";
