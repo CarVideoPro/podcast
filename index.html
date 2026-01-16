@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Car Video Pro - TV Player</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -30,10 +30,13 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
             border-radius: 8px;
             overflow: hidden;
+            z-index: 1;
         }
         
         .video-wrapper video, .video-wrapper iframe {
-            width: 100%; height: 100%; object-fit: contain;
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain;
         }
 
         /* Kayan Yazı */
@@ -309,24 +312,18 @@
         let allChannels = [];
         let hlsPlayer = null;
 
-        // --- AYARLARI YÜKLE (KAYITLI ZOOM VE ÜLKE) ---
-        // LocalStorage'dan zoom seviyesini al, yoksa 16 yap
+        // --- AYARLARI YÜKLE ---
         let currentFontSize = localStorage.getItem('tvPlayerZoom') ? parseInt(localStorage.getItem('tvPlayerZoom')) : 16;
         document.documentElement.style.fontSize = currentFontSize + 'px';
 
-        // LocalStorage'dan ülkeyi al, yoksa 'tr' yap
         const savedCountry = localStorage.getItem('tvPlayerCountry') || 'tr';
         countrySelect.value = savedCountry;
         
-        // ZOOM FONKSİYONU (KAYIT ÖZELLİĞİ EKLENDİ)
         function changeZoom(amount) {
             currentFontSize += amount;
             if (currentFontSize < 12) currentFontSize = 12;
             if (currentFontSize > 24) currentFontSize = 24;
-            
-            // Ayarı uygula
             document.documentElement.style.fontSize = currentFontSize + 'px';
-            // Ayarı kaydet
             localStorage.setItem('tvPlayerZoom', currentFontSize);
         }
 
@@ -376,7 +373,6 @@
                 div.className = 'channel-item flex items-center p-3 border-b border-gray-700 cursor-pointer transition-all duration-200 text-xs text-gray-300 hover:text-white group';
                 div.onclick = () => playChannel(channel, div);
                 
-                // DEĞİŞİKLİK BURADA: fa-wifi YERİNE fa-tv KULLANILDI
                 const icon = isIptv 
                     ? '<i class="fas fa-tv text-green-500 w-5 text-center flex-shrink-0"></i>' 
                     : '<i class="fab fa-youtube text-red-500 w-5 text-center flex-shrink-0"></i>';
@@ -407,10 +403,19 @@
             }
         }
 
+        // --- DÜZELTME: KESİN ÇÖZÜM İÇİN ---
         function playHls(url) {
             const video = document.createElement('video');
             video.controls = true;
             video.autoplay = true;
+            
+            // 1. Doğrudan JS özelliği olarak ekle
+            video.playsInline = true;
+            
+            // 2. HTML özniteliği olarak ekle (Boş değer standarttır)
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            
             video.className = "w-full h-full";
             playerWrapper.appendChild(video);
 
@@ -434,8 +439,8 @@
             let embedUrl = url;
             if (!url.includes('embed')) {
                 const videoId = url.split('v=')[1] || url.split('/').pop();
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0`;
-            } else { embedUrl += "?autoplay=1"; }
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&playsinline=1`;
+            } else { embedUrl += "?autoplay=1&playsinline=1"; }
             const iframe = document.createElement('iframe');
             iframe.src = embedUrl;
             iframe.allow = "autoplay; encrypted-media; gyroscope; picture-in-picture";
@@ -455,13 +460,11 @@
             document.querySelector('.h-14').classList.toggle('opacity-5');
         }
 
-        // Ülke değiştiğinde kaydet
         countrySelect.addEventListener('change', (e) => {
             localStorage.setItem('tvPlayerCountry', e.target.value);
             fetchChannels(e.target.value);
         });
         
-        // Başlangıçta kayıtlı ülkeyi yükle
         fetchChannels(savedCountry);
     </script>
 </body>
