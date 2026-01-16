@@ -33,7 +33,7 @@
             z-index: 1;
         }
         
-        /* GÖRÜNTÜ TAŞMASINI ENGELLEME */
+        /* GÖRÜNTÜ TAŞMASINI ENGELLEME (contain) */
         video {
             object-fit: contain !important;
             width: 100% !important;
@@ -41,11 +41,12 @@
             background-color: #000 !important;
         }
         
+        /* Tam ekran olduğunda da sığdır */
         video:fullscreen {
             object-fit: contain !important;
             background-color: #000 !important;
         }
-        
+
         iframe {
             width: 100%; 
             height: 100%; 
@@ -323,8 +324,8 @@
         const sidebar = document.getElementById('sidebar');
         
         let allChannels = [];
-        let playableChannels = []; // Sadece oynatılabilir kanalların listesi
-        let currentChannelIndex = -1; // Şu anki kanalın indexi
+        let playableChannels = [];
+        let currentChannelIndex = -1;
         let hlsPlayer = null;
 
         // --- AYARLARI YÜKLE ---
@@ -353,6 +354,22 @@
             }
         }
 
+        // --- MEDYA TUŞLARI DİNLEYİCİSİ (KLAVYE/KUMANDA) ---
+        document.addEventListener('keydown', (e) => {
+            // Android veya Multimedya klavyeleri bu tuş kodlarını gönderir
+            if (e.key === 'MediaTrackNext' || e.code === 'MediaTrackNext') {
+                playNextChannel();
+            }
+            else if (e.key === 'MediaTrackPrevious' || e.code === 'MediaTrackPrevious') {
+                playPreviousChannel();
+            }
+            // Bazı cihazlarda Yön tuşları kullanılır
+            /* else if (e.key === 'ArrowRight' && e.ctrlKey) { // İsteğe bağlı: Ctrl+Sağ Ok
+                playNextChannel(); 
+            } 
+            */
+        });
+
         async function fetchChannels(countryCode) {
             channelListEl.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-40 text-gray-500">
@@ -372,7 +389,6 @@
         function renderChannels(channels) {
             channelListEl.innerHTML = '';
             
-            // Sadece linki olan kanalları filtrele ve global listeye ata
             playableChannels = channels.filter(ch => 
                 (ch.iptv_urls && ch.iptv_urls.length > 0) || 
                 (ch.youtube_urls && ch.youtube_urls.length > 0)
@@ -389,8 +405,7 @@
                 const isIptv = channel.iptv_urls && channel.iptv_urls.length > 0;
                 const div = document.createElement('div');
                 div.className = 'channel-item flex items-center p-3 border-b border-gray-700 cursor-pointer transition-all duration-200 text-xs text-gray-300 hover:text-white group';
-                // ID verelim ki kolayca active yapalım
-                div.id = `channel-row-${index}`;
+                div.id = `channel-row-${index}`; // ID ataması
                 div.onclick = () => playChannel(channel, index);
                 
                 const icon = isIptv 
@@ -409,7 +424,6 @@
         function playChannel(channel, index) {
             currentChannelIndex = index;
 
-            // Görsel olarak aktif kanalı işaretle
             document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active-channel'));
             const activeRow = document.getElementById(`channel-row-${index}`);
             if(activeRow) {
@@ -423,23 +437,15 @@
             if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
             playerWrapper.innerHTML = '';
 
-            // --- MEDIA SESSION API ENTEGRASYONU ---
+            // --- MEDIA SESSION (ANDROID BİLDİRİM PANELİ KONTROLÜ) ---
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: channel.name,
                     artist: 'Car Video Pro',
                     album: 'Canlı TV'
                 });
-
-                // Sonraki Parça (Kanal) Butonu
-                navigator.mediaSession.setActionHandler('nexttrack', function() {
-                    playNextChannel();
-                });
-
-                // Önceki Parça (Kanal) Butonu
-                navigator.mediaSession.setActionHandler('previoustrack', function() {
-                    playPreviousChannel();
-                });
+                navigator.mediaSession.setActionHandler('nexttrack', playNextChannel);
+                navigator.mediaSession.setActionHandler('previoustrack', playPreviousChannel);
             }
 
             if (channel.iptv_urls && channel.iptv_urls.length > 0) {
@@ -449,18 +455,18 @@
             }
         }
 
-        // --- YENİ FONKSİYONLAR: İLERİ/GERİ ---
+        // İLERİ - GERİ FONKSİYONLARI
         function playNextChannel() {
             if (playableChannels.length === 0) return;
             let nextIndex = currentChannelIndex + 1;
-            if (nextIndex >= playableChannels.length) nextIndex = 0; // Başa dön
+            if (nextIndex >= playableChannels.length) nextIndex = 0;
             playChannel(playableChannels[nextIndex], nextIndex);
         }
 
         function playPreviousChannel() {
             if (playableChannels.length === 0) return;
             let prevIndex = currentChannelIndex - 1;
-            if (prevIndex < 0) prevIndex = playableChannels.length - 1; // Sona dön
+            if (prevIndex < 0) prevIndex = playableChannels.length - 1;
             playChannel(playableChannels[prevIndex], prevIndex);
         }
 
@@ -478,6 +484,9 @@
 
             const video = document.getElementById('hls-video');
             video.playsInline = true;
+
+            // Video biterse veya hata verirse sonrakine geç (Playlist mantığı)
+            video.addEventListener('ended', playNextChannel);
 
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls();
