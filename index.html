@@ -31,9 +31,9 @@
             border-radius: 8px;
             overflow: hidden;
             z-index: 1;
+            /* Dokunmatik alanların çalışması için relative önemli */
         }
         
-        /* GÖRÜNTÜ TAŞMASINI ENGELLEME (contain) */
         video {
             object-fit: contain !important;
             width: 100% !important;
@@ -41,16 +41,48 @@
             background-color: #000 !important;
         }
         
-        /* Tam ekran olduğunda da sığdır */
         video:fullscreen {
             object-fit: contain !important;
             background-color: #000 !important;
         }
 
-        iframe {
-            width: 100%; 
-            height: 100%; 
-            border: none;
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* --- YENİ: DOKUNMATİK KONTROL ALANLARI --- */
+        .touch-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%; /* Ekranın %20'si */
+            z-index: 50; /* Videonun üstünde */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            /* Mobilde dokunma vurgusunu kaldır */
+            -webkit-tap-highlight-color: transparent; 
+        }
+
+        .touch-zone-left { left: 0; }
+        .touch-zone-right { right: 0; }
+
+        /* Animasyonlu İkonlar */
+        .zone-icon {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+            pointer-events: none; /* Tıklamayı engellemesin */
+        }
+
+        /* Dokunulduğunda parlayacak efekt */
+        .touch-zone:active .zone-icon {
+            opacity: 1;
+            transform: scale(1);
         }
 
         /* Kayan Yazı */
@@ -274,6 +306,15 @@
 
         <div class="flex-1 flex flex-col justify-center items-center p-4 overflow-hidden relative bg-black w-full">
             <div id="playerWrapper" class="video-wrapper">
+                
+                <div class="touch-zone touch-zone-left" onclick="playPreviousChannel()" title="Önceki Kanal">
+                    <div class="zone-icon"><i class="fas fa-chevron-left"></i></div>
+                </div>
+                
+                <div class="touch-zone touch-zone-right" onclick="playNextChannel()" title="Sonraki Kanal">
+                    <div class="zone-icon"><i class="fas fa-chevron-right"></i></div>
+                </div>
+
                 <div class="absolute inset-0 flex items-center justify-center text-gray-700 flex-col bg-gray-900">
                     <i class="fas fa-play-circle text-6xl mb-4 opacity-30"></i>
                     <p class="text-sm opacity-50">Yayın seçilmedi.</p>
@@ -354,22 +395,6 @@
             }
         }
 
-        // --- MEDYA TUŞLARI DİNLEYİCİSİ (KLAVYE/KUMANDA) ---
-        document.addEventListener('keydown', (e) => {
-            // Android veya Multimedya klavyeleri bu tuş kodlarını gönderir
-            if (e.key === 'MediaTrackNext' || e.code === 'MediaTrackNext') {
-                playNextChannel();
-            }
-            else if (e.key === 'MediaTrackPrevious' || e.code === 'MediaTrackPrevious') {
-                playPreviousChannel();
-            }
-            // Bazı cihazlarda Yön tuşları kullanılır
-            /* else if (e.key === 'ArrowRight' && e.ctrlKey) { // İsteğe bağlı: Ctrl+Sağ Ok
-                playNextChannel(); 
-            } 
-            */
-        });
-
         async function fetchChannels(countryCode) {
             channelListEl.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-40 text-gray-500">
@@ -405,7 +430,7 @@
                 const isIptv = channel.iptv_urls && channel.iptv_urls.length > 0;
                 const div = document.createElement('div');
                 div.className = 'channel-item flex items-center p-3 border-b border-gray-700 cursor-pointer transition-all duration-200 text-xs text-gray-300 hover:text-white group';
-                div.id = `channel-row-${index}`; // ID ataması
+                div.id = `channel-row-${index}`;
                 div.onclick = () => playChannel(channel, index);
                 
                 const icon = isIptv 
@@ -434,19 +459,18 @@
             currentChannelTitle.innerHTML = `<i class="fas fa-play-circle text-red-500 mr-2"></i> ${channel.name}`;
             statusMessage.classList.add('hidden');
 
-            if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
-            playerWrapper.innerHTML = '';
+            // --- YENİDEN OYNATIRKEN DOKUNMATİK ALANLARI KORU ---
+            // Önce videoyu temizle ama container'ı koru
+            const existingVideo = document.getElementById('hls-video');
+            const existingIframe = document.querySelector('#playerWrapper iframe');
+            if(existingVideo) existingVideo.remove();
+            if(existingIframe) existingIframe.remove();
+            
+            // Eğer boş state yazısı varsa kaldır
+            const emptyState = document.querySelector('#playerWrapper .flex-col');
+            if(emptyState) emptyState.remove();
 
-            // --- MEDIA SESSION (ANDROID BİLDİRİM PANELİ KONTROLÜ) ---
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: channel.name,
-                    artist: 'Car Video Pro',
-                    album: 'Canlı TV'
-                });
-                navigator.mediaSession.setActionHandler('nexttrack', playNextChannel);
-                navigator.mediaSession.setActionHandler('previoustrack', playPreviousChannel);
-            }
+            if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
 
             if (channel.iptv_urls && channel.iptv_urls.length > 0) {
                 playHls(channel.iptv_urls[0]);
@@ -458,6 +482,13 @@
         // İLERİ - GERİ FONKSİYONLARI
         function playNextChannel() {
             if (playableChannels.length === 0) return;
+            
+            // Görsel efekt: Sağ tarafın ikonunu parlat
+            const rightZone = document.querySelector('.touch-zone-right .zone-icon');
+            rightZone.style.opacity = '1';
+            rightZone.style.transform = 'scale(1.2)';
+            setTimeout(() => { rightZone.style.opacity = '0'; rightZone.style.transform = 'scale(0.5)'; }, 300);
+
             let nextIndex = currentChannelIndex + 1;
             if (nextIndex >= playableChannels.length) nextIndex = 0;
             playChannel(playableChannels[nextIndex], nextIndex);
@@ -465,27 +496,39 @@
 
         function playPreviousChannel() {
             if (playableChannels.length === 0) return;
+
+            // Görsel efekt: Sol tarafın ikonunu parlat
+            const leftZone = document.querySelector('.touch-zone-left .zone-icon');
+            leftZone.style.opacity = '1';
+            leftZone.style.transform = 'scale(1.2)';
+            setTimeout(() => { leftZone.style.opacity = '0'; leftZone.style.transform = 'scale(0.5)'; }, 300);
+
             let prevIndex = currentChannelIndex - 1;
             if (prevIndex < 0) prevIndex = playableChannels.length - 1;
             playChannel(playableChannels[prevIndex], prevIndex);
         }
 
         function playHls(url) {
-            playerWrapper.innerHTML = `
-                <video id="hls-video" 
-                       class="w-full h-full" 
-                       controls 
-                       autoplay 
-                       playsinline 
-                       webkit-playsinline 
-                       style="object-fit: contain; width: 100%; height: 100%; background-color: black;">
-                </video>
-            `;
-
-            const video = document.getElementById('hls-video');
+            // Video elementini oluşturup wrapper'a ekle (Dokunmatik alanların altına)
+            const video = document.createElement('video');
+            video.id = "hls-video";
+            video.className = "w-full h-full";
+            video.controls = true;
+            video.autoplay = true;
+            
+            // playsinline JS özellikleri
             video.playsInline = true;
+            
+            // Inline style ile taşma engelleme
+            video.style.cssText = "object-fit: contain; width: 100%; height: 100%; background-color: black;";
+            
+            // Attribute olarak ekleme
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
 
-            // Video biterse veya hata verirse sonrakine geç (Playlist mantığı)
+            playerWrapper.appendChild(video);
+
+            // Bittiğinde sonrakine geç
             video.addEventListener('ended', playNextChannel);
 
             if (Hls.isSupported()) {
@@ -494,9 +537,6 @@
                 hlsPlayer.attachMedia(video);
                 hlsPlayer.on(Hls.Events.MANIFEST_PARSED, function() {
                     video.play().catch(() => {});
-                });
-                hlsPlayer.on(Hls.Events.ERROR, function (event, data) {
-                    if (data.fatal) showStatus("Yayın hatası veya format desteklenmiyor.");
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
