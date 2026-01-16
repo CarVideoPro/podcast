@@ -33,10 +33,29 @@
             z-index: 1;
         }
         
-        .video-wrapper video, .video-wrapper iframe {
+        /* --- KESİN ÇÖZÜM: GÖRÜNTÜ TAŞMASINI ENGELLEME --- */
+        video {
+            object-fit: contain !important; /* Görüntüyü sığdır, kesme */
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #000 !important;
+        }
+        
+        /* Tam ekran olduğunda da bu kuralı zorla */
+        video:fullscreen {
+            object-fit: contain !important;
+            background-color: #000 !important;
+        }
+        
+        /* Webkit (Android/Chrome) için tam ekran kuralları */
+        video::-webkit-media-controls-enclosure {
+            overflow: hidden !important;
+        }
+
+        iframe {
             width: 100%; 
             height: 100%; 
-            object-fit: contain;
+            border: none;
         }
 
         /* Kayan Yazı */
@@ -403,10 +422,9 @@
             }
         }
 
-        // --- KESİN ÇÖZÜM ---
         function playHls(url) {
-            // Video etiketini JS ile üretmek yerine, STRING olarak içine gömüyoruz.
-            // Bu sayede tarayıcı sayfayı render ederken 'playsinline' özelliğini görüp ona göre davranıyor.
+            // object-fit: contain stilini DOĞRUDAN etiket içine gömüyoruz.
+            // Bu, videonun tam ekran olsa bile en-boy oranını korumasını ve ekrandan taşmamasını sağlar.
             playerWrapper.innerHTML = `
                 <video id="hls-video" 
                        class="w-full h-full" 
@@ -414,15 +432,12 @@
                        autoplay 
                        playsinline 
                        webkit-playsinline 
-                       x5-playsinline>
+                       style="object-fit: contain; width: 100%; height: 100%; background-color: black;">
                 </video>
             `;
 
             const video = document.getElementById('hls-video');
             
-            // Ekstra güvenlik için JS üzerinden de zorlayalım
-            video.playsInline = true;
-
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls();
                 hlsPlayer.loadSource(url);
@@ -443,7 +458,6 @@
             let embedUrl = url;
             if (!url.includes('embed')) {
                 const videoId = url.split('v=')[1] || url.split('/').pop();
-                // playsinline=1 Youtube'u da hizaya sokar
                 embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&playsinline=1`;
             } else { embedUrl += "?autoplay=1&playsinline=1"; }
             
