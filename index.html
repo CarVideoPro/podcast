@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Varsayılan Root Font Size */
+        /* Default Root Font Size */
         html { font-size: 16px; transition: font-size 0.2s ease; }
 
         /* Scrollbar */
@@ -29,7 +29,7 @@
             z-index: 1;
         }
         
-        /* Video Stilleri */
+        /* Video Styles */
         video {
             object-fit: contain !important;
             width: 100% !important;
@@ -42,44 +42,36 @@
         }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- YENİ KANAL LİSTESİ TASARIMI (MOBİL DOSTU) --- */
+        /* --- CHANNEL CARDS --- */
         .channel-item {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
-        /* Dokunma hissi (Tıklayınca küçülme) */
-        .channel-item:active {
-            transform: scale(0.97);
-        }
+        .channel-item:active { transform: scale(0.97); }
         
-        /* Seçili Kanal Stili */
         .active-channel { 
             background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%) !important; 
-            color: white !important; 
-            border: none !important;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
-            font-weight: bold;
+            color: white !important; border: none !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5); font-weight: bold;
         }
         .active-channel i { color: white !important; }
 
-        /* --- DOKUNMATİK KONTROL ALANLARI --- */
-        .touch-zone {
-            position: absolute;
-            top: 0; bottom: 0; width: 20%; z-index: 50;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; -webkit-tap-highlight-color: transparent; 
+        /* --- COUNTRY SELECTION GRID --- */
+        #countryOverlay {
+            backdrop-filter: blur(10px);
+            background-color: rgba(17, 24, 39, 0.95);
         }
-        .touch-zone-left { left: 0; }
-        .touch-zone-right { right: 0; }
-        .zone-icon {
-            font-size: 3rem; color: rgba(255, 255, 255, 0.8);
-            background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 50%;
-            opacity: 0; transform: scale(0.5); transition: all 0.2s ease;
-            pointer-events: none;
+        .country-card {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #1f2937; border: 1px solid #374151; border-radius: 12px;
+            padding: 1rem; cursor: pointer; transition: all 0.2s;
         }
+        .country-card:active { transform: scale(0.95); background: #374151; }
+        .country-flag { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .country-name { font-size: 0.8rem; font-weight: bold; color: #d1d5db; text-align: center; }
 
-        /* Kayan Yazı */
+        /* Marquee */
         .marquee-container {
             overflow: hidden; white-space: nowrap; position: relative;
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
@@ -96,7 +88,7 @@
 </head>
 <body class="bg-black text-gray-200 font-sans h-screen flex overflow-hidden">
 
-    <aside class="w-80 bg-gray-900 flex flex-col border-r border-gray-800 h-full flex-shrink-0 z-20 shadow-2xl" id="sidebar">
+    <aside class="w-80 bg-gray-900 flex flex-col border-r border-gray-800 h-full flex-shrink-0 z-20 shadow-2xl transition-all duration-300" id="sidebar">
         <div class="h-16 bg-gray-900 flex items-center justify-center px-4 flex-shrink-0 border-b border-gray-800">
             <h1 class="text-xl font-black text-red-600 tracking-wider flex items-center italic">
                 <i class="fas fa-play-circle mr-2 text-2xl"></i> CAR VIDEO PRO
@@ -104,189 +96,23 @@
         </div>
 
         <div class="p-4 bg-gray-900 border-b border-gray-800 flex-shrink-0">
-            <div class="relative">
-                <i class="fas fa-globe absolute left-3 top-3 text-gray-400"></i>
-                <select id="countrySelect" class="w-full bg-gray-800 text-white pl-10 pr-4 py-3 text-sm rounded-xl outline-none border border-gray-700 focus:border-red-600 focus:ring-1 focus:ring-red-600 appearance-none font-bold shadow-sm">
-                    <option value="tr" selected>🇹🇷 Türkiye</option>
-                    <option value="ad">🇦🇩 Andorra</option>
-                    <option value="ae">🇦🇪 Birleşik Arap Emirlikleri</option>
-                    <option value="af">🇦🇫 Afganistan</option>
-                    <option value="ag">🇦🇬 Antigua ve Barbuda</option>
-                    <option value="al">🇦🇱 Arnavutluk</option>
-                    <option value="am">🇦🇲 Ermenistan</option>
-                    <option value="ao">🇦🇴 Angola</option>
-                    <option value="ar">🇦🇷 Arjantin</option>
-                    <option value="at">🇦🇹 Avusturya</option>
-                    <option value="au">🇦🇺 Avustralya</option>
-                    <option value="aw">🇦🇼 Aruba</option>
-                    <option value="az">🇦🇿 Azerbaycan</option>
-                    <option value="ba">🇧🇦 Bosna Hersek</option>
-                    <option value="bd">🇧🇩 Bangladeş</option>
-                    <option value="be">🇧🇪 Belçika</option>
-                    <option value="bg">🇧🇬 Bulgaristan</option>
-                    <option value="bh">🇧🇭 Bahreyn</option>
-                    <option value="bj">🇧🇯 Benin</option>
-                    <option value="bo">🇧🇴 Bolivya</option>
-                    <option value="bq">🇧🇶 Bonaire</option>
-                    <option value="br">🇧🇷 Brezilya</option>
-                    <option value="bs">🇧🇸 Bahamalar</option>
-                    <option value="by">🇧🇾 Belarus</option>
-                    <option value="bz">🇧🇿 Belize</option>
-                    <option value="ca">🇨🇦 Kanada</option>
-                    <option value="cd">🇨🇩 Kongo DC</option>
-                    <option value="ch">🇨🇭 İsviçre</option>
-                    <option value="ci">🇨🇮 Fildişi Sahili</option>
-                    <option value="cl">🇨🇱 Şili</option>
-                    <option value="cm">🇨🇲 Kamerun</option>
-                    <option value="cn">🇨🇳 Çin</option>
-                    <option value="co">🇨🇴 Kolombiya</option>
-                    <option value="cr">🇨🇷 Kosta Rika</option>
-                    <option value="cu">🇨🇺 Küba</option>
-                    <option value="cv">🇨🇻 Yeşil Burun Adaları</option>
-                    <option value="cw">🇨🇼 Curaçao</option>
-                    <option value="cy">🇨🇾 Kıbrıs</option>
-                    <option value="cz">🇨🇿 Çekya</option>
-                    <option value="de">🇩🇪 Almanya</option>
-                    <option value="dj">🇩🇯 Cibuti</option>
-                    <option value="dk">🇩🇰 Danimarka</option>
-                    <option value="do">🇩🇴 Dominik Cumhuriyeti</option>
-                    <option value="dz">🇩🇿 Cezayir</option>
-                    <option value="ec">🇪🇨 Ekvador</option>
-                    <option value="ee">🇪🇪 Estonya</option>
-                    <option value="eg">🇪🇬 Mısır</option>
-                    <option value="eh">🇪🇭 Batı Sahra</option>
-                    <option value="er">🇪🇷 Eritre</option>
-                    <option value="es">🇪🇸 İspanya</option>
-                    <option value="et">🇪🇹 Etiyopya</option>
-                    <option value="fi">🇫🇮 Finlandiya</option>
-                    <option value="fo">🇫🇴 Faroe Adaları</option>
-                    <option value="fr">🇫🇷 Fransa</option>
-                    <option value="ge">🇬🇪 Gürcistan</option>
-                    <option value="gf">🇬🇫 Fransız Guyanası</option>
-                    <option value="gh">🇬🇭 Gana</option>
-                    <option value="gl">🇬🇱 Grönland</option>
-                    <option value="gm">🇬🇲 Gambiya</option>
-                    <option value="gn">🇬🇳 Gine</option>
-                    <option value="gp">🇬🇵 Guadeloupe</option>
-                    <option value="gq">🇬🇶 Ekvator Ginesi</option>
-                    <option value="gr">🇬🇷 Yunanistan</option>
-                    <option value="gt">🇬🇹 Guatemala</option>
-                    <option value="gu">🇬🇺 Guam</option>
-                    <option value="gy">🇬🇾 Guyana</option>
-                    <option value="hk">🇭🇰 Hong Kong</option>
-                    <option value="hn">🇭🇳 Honduras</option>
-                    <option value="hr">🇭🇷 Hırvatistan</option>
-                    <option value="ht">🇭🇹 Haiti</option>
-                    <option value="hu">🇭🇺 Macaristan</option>
-                    <option value="id">🇮🇩 Endonezya</option>
-                    <option value="ie">🇮🇪 İrlanda</option>
-                    <option value="il">🇮🇱 İsrail</option>
-                    <option value="in">🇮🇳 Hindistan</option>
-                    <option value="iq">🇮🇶 Irak</option>
-                    <option value="ir">🇮🇷 İran</option>
-                    <option value="is">🇮🇸 İzlanda</option>
-                    <option value="it">🇮🇹 İtalya</option>
-                    <option value="jm">🇯🇲 Jamaika</option>
-                    <option value="jo">🇯🇴 Ürdün</option>
-                    <option value="jp">🇯🇵 Japonya</option>
-                    <option value="ke">🇰🇪 Kenya</option>
-                    <option value="kh">🇰🇭 Kamboçya</option>
-                    <option value="kn">🇰🇳 Saint Kitts ve Nevis</option>
-                    <option value="kr">🇰🇷 Güney Kore</option>
-                    <option value="kw">🇰🇼 Kuveyt</option>
-                    <option value="kz">🇰🇿 Kazakistan</option>
-                    <option value="la">🇱🇦 Laos</option>
-                    <option value="lb">🇱🇧 Lübnan</option>
-                    <option value="lk">🇱🇰 Sri Lanka</option>
-                    <option value="lt">🇱🇹 Litvanya</option>
-                    <option value="lu">🇱🇺 Lüksemburg</option>
-                    <option value="lv">🇱🇻 Letonya</option>
-                    <option value="ly">🇱🇾 Libya</option>
-                    <option value="ma">🇲🇦 Fas</option>
-                    <option value="mc">🇲🇨 Monako</option>
-                    <option value="md">🇲🇩 Moldova</option>
-                    <option value="me">🇲🇪 Karadağ</option>
-                    <option value="mk">🇲🇰 Kuzey Makedonya</option>
-                    <option value="ml">🇲🇱 Mali</option>
-                    <option value="mm">🇲🇲 Myanmar</option>
-                    <option value="mn">🇲🇳 Moğolistan</option>
-                    <option value="mq">🇲🇶 Martinik</option>
-                    <option value="mt">🇲🇹 Malta</option>
-                    <option value="mv">🇲🇻 Maldivler</option>
-                    <option value="mx">🇲🇽 Meksika</option>
-                    <option value="my">🇲🇾 Malezya</option>
-                    <option value="mz">🇲🇿 Mozambik</option>
-                    <option value="na">🇳🇦 Namibya</option>
-                    <option value="ne">🇳🇪 Nijer</option>
-                    <option value="ng">🇳🇬 Nijerya</option>
-                    <option value="ni">🇳🇮 Nikaragua</option>
-                    <option value="nl">🇳🇱 Hollanda</option>
-                    <option value="no">🇳🇴 Norveç</option>
-                    <option value="np">🇳🇵 Nepal</option>
-                    <option value="nz">🇳🇿 Yeni Zelanda</option>
-                    <option value="om">🇴🇲 Umman</option>
-                    <option value="pa">🇵🇦 Panama</option>
-                    <option value="pe">🇵🇪 Peru</option>
-                    <option value="ph">🇵🇭 Filipinler</option>
-                    <option value="pk">🇵🇰 Pakistan</option>
-                    <option value="pl">🇵🇱 Polonya</option>
-                    <option value="pr">🇵🇷 Porto Riko</option>
-                    <option value="ps">🇵🇸 Filistin</option>
-                    <option value="pt">🇵🇹 Portekiz</option>
-                    <option value="py">🇵🇾 Paraguay</option>
-                    <option value="qa">🇶🇦 Katar</option>
-                    <option value="ro">🇷🇴 Romanya</option>
-                    <option value="rs">🇷🇸 Sırbistan</option>
-                    <option value="ru">🇷🇺 Rusya</option>
-                    <option value="rw">🇷🇼 Ruanda</option>
-                    <option value="sa">🇸🇦 Suudi Arabistan</option>
-                    <option value="sd">🇸🇩 Sudan</option>
-                    <option value="se">🇸🇪 İsveç</option>
-                    <option value="sg">🇸🇬 Singapur</option>
-                    <option value="si">🇸🇮 Slovenya</option>
-                    <option value="sk">🇸🇰 Slovakya</option>
-                    <option value="sn">🇸🇳 Senegal</option>
-                    <option value="sr">🇸🇷 Surinam</option>
-                    <option value="sv">🇸🇻 El Salvador</option>
-                    <option value="sx">🇸🇽 Sint Maarten</option>
-                    <option value="sy">🇸🇾 Suriye</option>
-                    <option value="td">🇹🇩 Çad</option>
-                    <option value="tg">🇹🇬 Togo</option>
-                    <option value="th">🇹🇭 Tayland</option>
-                    <option value="tj">🇹🇯 Tacikistan</option>
-                    <option value="tn">🇹🇳 Tunus</option>
-                    <option value="tt">🇹🇹 Trinidad ve Tobago</option>
-                    <option value="tw">🇹🇼 Tayvan</option>
-                    <option value="tz">🇹🇿 Tanzanya</option>
-                    <option value="ua">🇺🇦 Ukrayna</option>
-                    <option value="ug">🇺🇬 Uganda</option>
-                    <option value="uk">🇬🇧 İngiltere</option>
-                    <option value="us">🇺🇸 ABD</option>
-                    <option value="uy">🇺🇾 Uruguay</option>
-                    <option value="uz">🇺🇿 Özbekistan</option>
-                    <option value="ve">🇻🇪 Venezuela</option>
-                    <option value="vg">🇻🇬 İngiliz Virgin Adaları</option>
-                    <option value="vn">🇻🇳 Vietnam</option>
-                    <option value="xk">🇽🇰 Kosova</option>
-                    <option value="ye">🇾🇪 Yemen</option>
-                    <option value="za">🇿🇦 Güney Afrika</option>
-                    <option value="zw">🇿🇼 Zimbabve</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                    <i class="fas fa-chevron-down text-xs"></i>
-                </div>
+            <button onclick="toggleCountryMenu()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center">
+                <i class="fas fa-globe mr-2"></i> SELECT COUNTRY
+            </button>
+            <div id="selectedCountryDisplay" class="text-center text-xs text-gray-500 mt-2 font-mono">
+                Selected: <span class="text-white">Türkiye</span>
             </div>
         </div>
 
         <div id="channelList" class="flex-1 overflow-y-auto p-3 space-y-2 scroll-smooth bg-gray-900">
             <div class="text-center text-gray-500 mt-10">
                 <i class="fas fa-circle-notch fa-spin text-2xl text-red-600 mb-3"></i>
-                <p class="mt-2 text-xs">Yükleniyor...</p>
+                <p class="mt-2 text-xs">Loading...</p>
             </div>
         </div>
         
         <div class="h-10 bg-gray-900 flex items-center justify-center text-[10px] text-gray-500 border-t border-gray-800 flex-shrink-0">
-            Toplam Kanal: <span id="channelCount" class="text-white font-bold ml-1 text-sm">0</span>
+            Total Channels: <span id="channelCount" class="text-white font-bold ml-1 text-sm">0</span>
         </div>
     </aside>
 
@@ -294,9 +120,9 @@
         
         <div class="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-4 flex-shrink-0 z-10">
             <h2 id="currentChannelTitle" class="text-base font-bold text-gray-200 truncate mr-2 flex items-center">
-                <i class="fas fa-tv mr-3 text-red-600"></i>Lütfen Kanal Seçiniz
+                <i class="fas fa-tv mr-3 text-red-600"></i>Select a Channel
             </h2>
-            <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white transition flex-shrink-0 p-3 bg-gray-800 rounded-full">
+            <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white transition flex-shrink-0 p-3 bg-gray-800 rounded-full md:hidden">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -304,17 +130,14 @@
         <div class="flex-1 flex flex-col justify-center items-center p-2 md:p-4 overflow-hidden relative bg-black w-full">
             <div id="playerWrapper" class="video-wrapper">
                 
-                <div class="touch-zone touch-zone-left" onclick="playPreviousChannel()" title="Önceki Kanal">
-                    <div class="zone-icon"><i class="fas fa-chevron-left"></i></div>
-                </div>
-                
-                <div class="touch-zone touch-zone-right" onclick="playNextChannel()" title="Sonraki Kanal">
-                    <div class="zone-icon"><i class="fas fa-chevron-right"></i></div>
+                <div id="countryOverlay" class="absolute inset-0 z-[60] hidden overflow-y-auto p-4">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3" id="countryGrid">
+                        </div>
                 </div>
 
-                <div class="absolute inset-0 flex items-center justify-center text-gray-700 flex-col bg-gray-900">
+                <div id="placeholderContent" class="absolute inset-0 flex items-center justify-center text-gray-700 flex-col bg-gray-900">
                     <i class="fas fa-play-circle text-6xl mb-4 opacity-30"></i>
-                    <p class="text-sm opacity-50">Yayın seçilmedi.</p>
+                    <p class="text-sm opacity-50">No channel selected.</p>
                 </div>
             </div>
             <div id="statusMessage" class="absolute bottom-4 bg-red-900/90 text-white px-4 py-2 rounded text-xs hidden backdrop-blur-sm z-50 shadow-lg"></div>
@@ -339,7 +162,7 @@
                     <span class="mx-6 text-gray-600">|</span> 
                     <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/androidautocarvideopro 
                     <span class="mx-6 text-gray-600">|</span> 
-                    İyi Seyirler Diler...
+                    Enjoy the show...
                 </div>
             </div>
 
@@ -351,26 +174,92 @@
     </main>
 
     <script>
-        // DOM Elementleri
-        const countrySelect = document.getElementById('countrySelect');
+        // DOM Elements
         const channelListEl = document.getElementById('channelList');
         const playerWrapper = document.getElementById('playerWrapper');
         const currentChannelTitle = document.getElementById('currentChannelTitle');
         const channelCountEl = document.getElementById('channelCount');
         const statusMessage = document.getElementById('statusMessage');
         const sidebar = document.getElementById('sidebar');
+        const countryOverlay = document.getElementById('countryOverlay');
+        const countryGrid = document.getElementById('countryGrid');
+        const selectedCountryDisplay = document.getElementById('selectedCountryDisplay');
+        const placeholderContent = document.getElementById('placeholderContent');
         
         let allChannels = [];
         let playableChannels = [];
-        let currentChannelIndex = -1;
         let hlsPlayer = null;
 
-        // --- AYARLARI YÜKLE ---
+        // FULL COUNTRY LIST (Translated to English)
+        const countryList = [
+            {code:"tr",name:"Türkiye",flag:"🇹🇷"},{code:"ad",name:"Andorra",flag:"🇦🇩"},{code:"ae",name:"UAE",flag:"🇦🇪"},
+            {code:"af",name:"Afghanistan",flag:"🇦🇫"},{code:"ag",name:"Antigua",flag:"🇦🇬"},{code:"al",name:"Albania",flag:"🇦🇱"},
+            {code:"am",name:"Armenia",flag:"🇦🇲"},{code:"ao",name:"Angola",flag:"🇦🇴"},{code:"ar",name:"Argentina",flag:"🇦🇷"},
+            {code:"at",name:"Austria",flag:"🇦🇹"},{code:"au",name:"Australia",flag:"🇦🇺"},{code:"aw",name:"Aruba",flag:"🇦🇼"},
+            {code:"az",name:"Azerbaijan",flag:"🇦🇿"},{code:"ba",name:"Bosnia",flag:"🇧🇦"},{code:"bd",name:"Bangladesh",flag:"🇧🇩"},
+            {code:"be",name:"Belgium",flag:"🇧🇪"},{code:"bg",name:"Bulgaria",flag:"🇧🇬"},{code:"bh",name:"Bahrain",flag:"🇧🇭"},
+            {code:"bj",name:"Benin",flag:"🇧🇯"},{code:"bo",name:"Bolivia",flag:"🇧🇴"},{code:"bq",name:"Bonaire",flag:"🇧🇶"},
+            {code:"br",name:"Brazil",flag:"🇧🇷"},{code:"bs",name:"Bahamas",flag:"🇧🇸"},{code:"by",name:"Belarus",flag:"🇧🇾"},
+            {code:"bz",name:"Belize",flag:"🇧🇿"},{code:"ca",name:"Canada",flag:"🇨🇦"},{code:"cd",name:"DR Congo",flag:"🇨🇩"},
+            {code:"ch",name:"Switzerland",flag:"🇨🇭"},{code:"ci",name:"Ivory Coast",flag:"🇨🇮"},{code:"cl",name:"Chile",flag:"🇨🇱"},
+            {code:"cm",name:"Cameroon",flag:"🇨🇲"},{code:"cn",name:"China",flag:"🇨🇳"},{code:"co",name:"Colombia",flag:"🇨🇴"},
+            {code:"cr",name:"Costa Rica",flag:"🇨🇷"},{code:"cu",name:"Cuba",flag:"🇨🇺"},{code:"cv",name:"Cape Verde",flag:"🇨🇻"},
+            {code:"cw",name:"Curacao",flag:"🇨🇼"},{code:"cy",name:"Cyprus",flag:"🇨🇾"},{code:"cz",name:"Czechia",flag:"🇨🇿"},
+            {code:"de",name:"Germany",flag:"🇩🇪"},{code:"dj",name:"Djibouti",flag:"🇩🇯"},{code:"dk",name:"Denmark",flag:"🇩🇰"},
+            {code:"do",name:"Dominican Rep.",flag:"🇩🇴"},{code:"dz",name:"Algeria",flag:"🇩🇿"},{code:"ec",name:"Ecuador",flag:"🇪🇨"},
+            {code:"ee",name:"Estonia",flag:"🇪🇪"},{code:"eg",name:"Egypt",flag:"🇪🇬"},{code:"eh",name:"Western Sahara",flag:"🇪🇭"},
+            {code:"er",name:"Eritrea",flag:"🇪🇷"},{code:"es",name:"Spain",flag:"🇪🇸"},{code:"et",name:"Ethiopia",flag:"🇪🇹"},
+            {code:"fi",name:"Finland",flag:"🇫🇮"},{code:"fo",name:"Faroe Is.",flag:"🇫🇴"},{code:"fr",name:"France",flag:"🇫🇷"},
+            {code:"ge",name:"Georgia",flag:"🇬🇪"},{code:"gf",name:"French Guiana",flag:"🇬🇫"},{code:"gh",name:"Ghana",flag:"🇬🇭"},
+            {code:"gl",name:"Greenland",flag:"🇬🇱"},{code:"gm",name:"Gambia",flag:"🇬🇲"},{code:"gn",name:"Guinea",flag:"🇬🇳"},
+            {code:"gp",name:"Guadeloupe",flag:"🇬🇵"},{code:"gq",name:"Eq. Guinea",flag:"🇬🇶"},{code:"gr",name:"Greece",flag:"🇬🇷"},
+            {code:"gt",name:"Guatemala",flag:"🇬🇹"},{code:"gu",name:"Guam",flag:"🇬🇺"},{code:"gy",name:"Guyana",flag:"🇬🇾"},
+            {code:"hk",name:"Hong Kong",flag:"🇭🇰"},{code:"hn",name:"Honduras",flag:"🇭🇳"},{code:"hr",name:"Croatia",flag:"🇭🇷"},
+            {code:"ht",name:"Haiti",flag:"🇭🇹"},{code:"hu",name:"Hungary",flag:"🇭🇺"},{code:"id",name:"Indonesia",flag:"🇮🇩"},
+            {code:"ie",name:"Ireland",flag:"🇮🇪"},{code:"il",name:"Israel",flag:"🇮🇱"},{code:"in",name:"India",flag:"🇮🇳"},
+            {code:"iq",name:"Iraq",flag:"🇮🇶"},{code:"ir",name:"Iran",flag:"🇮🇷"},{code:"is",name:"Iceland",flag:"🇮🇸"},
+            {code:"it",name:"Italy",flag:"🇮🇹"},{code:"jm",name:"Jamaica",flag:"🇯🇲"},{code:"jo",name:"Jordan",flag:"🇯🇴"},
+            {code:"jp",name:"Japan",flag:"🇯🇵"},{code:"ke",name:"Kenya",flag:"🇰🇪"},{code:"kh",name:"Cambodia",flag:"🇰🇭"},
+            {code:"kn",name:"St. Kitts",flag:"🇰🇳"},{code:"kr",name:"South Korea",flag:"🇰🇷"},{code:"kw",name:"Kuwait",flag:"🇰🇼"},
+            {code:"kz",name:"Kazakhstan",flag:"🇰🇿"},{code:"la",name:"Laos",flag:"🇱🇦"},{code:"lb",name:"Lebanon",flag:"🇱🇧"},
+            {code:"lk",name:"Sri Lanka",flag:"🇱🇰"},{code:"lt",name:"Lithuania",flag:"🇱🇹"},{code:"lu",name:"Luxembourg",flag:"🇱🇺"},
+            {code:"lv",name:"Latvia",flag:"🇱🇻"},{code:"ly",name:"Libya",flag:"🇱🇾"},{code:"ma",name:"Morocco",flag:"🇲🇦"},
+            {code:"mc",name:"Monaco",flag:"🇲🇨"},{code:"md",name:"Moldova",flag:"🇲🇩"},{code:"me",name:"Montenegro",flag:"🇲🇪"},
+            {code:"mk",name:"North Macedonia",flag:"🇲🇰"},{code:"ml",name:"Mali",flag:"🇲🇱"},{code:"mm",name:"Myanmar",flag:"🇲🇲"},
+            {code:"mn",name:"Mongolia",flag:"🇲🇳"},{code:"mq",name:"Martinique",flag:"🇲🇶"},{code:"mt",name:"Malta",flag:"🇲🇹"},
+            {code:"mv",name:"Maldives",flag:"🇲🇻"},{code:"mx",name:"Mexico",flag:"🇲🇽"},{code:"my",name:"Malaysia",flag:"🇲🇾"},
+            {code:"mz",name:"Mozambique",flag:"🇲🇿"},{code:"na",name:"Namibia",flag:"🇳🇦"},{code:"ne",name:"Niger",flag:"🇳🇪"},
+            {code:"ng",name:"Nigeria",flag:"🇳🇬"},{code:"ni",name:"Nicaragua",flag:"🇳🇮"},{code:"nl",name:"Netherlands",flag:"🇳🇱"},
+            {code:"no",name:"Norway",flag:"🇳🇴"},{code:"np",name:"Nepal",flag:"🇳🇵"},{code:"nz",name:"New Zealand",flag:"🇳🇿"},
+            {code:"om",name:"Oman",flag:"🇴🇲"},{code:"pa",name:"Panama",flag:"🇵🇦"},{code:"pe",name:"Peru",flag:"🇵🇪"},
+            {code:"ph",name:"Philippines",flag:"🇵🇭"},{code:"pk",name:"Pakistan",flag:"🇵🇰"},{code:"pl",name:"Poland",flag:"🇵🇱"},
+            {code:"pr",name:"Puerto Rico",flag:"🇵🇷"},{code:"ps",name:"Palestine",flag:"🇵🇸"},{code:"pt",name:"Portugal",flag:"🇵🇹"},
+            {code:"py",name:"Paraguay",flag:"🇵🇾"},{code:"qa",name:"Qatar",flag:"🇶🇦"},{code:"ro",name:"Romania",flag:"🇷🇴"},
+            {code:"rs",name:"Serbia",flag:"🇷🇸"},{code:"ru",name:"Russia",flag:"🇷🇺"},{code:"rw",name:"Rwanda",flag:"🇷🇼"},
+            {code:"sa",name:"Saudi Arabia",flag:"🇸🇦"},{code:"sd",name:"Sudan",flag:"🇸🇩"},{code:"se",name:"Sweden",flag:"🇸🇪"},
+            {code:"sg",name:"Singapore",flag:"🇸🇬"},{code:"si",name:"Slovenia",flag:"🇸🇮"},{code:"sk",name:"Slovakia",flag:"🇸🇰"},
+            {code:"sn",name:"Senegal",flag:"🇸🇳"},{code:"sr",name:"Suriname",flag:"🇸🇷"},{code:"sv",name:"El Salvador",flag:"🇸🇻"},
+            {code:"sx",name:"Sint Maarten",flag:"🇸🇽"},{code:"sy",name:"Syria",flag:"🇸🇾"},{code:"td",name:"Chad",flag:"🇹🇩"},
+            {code:"tg",name:"Togo",flag:"🇹🇬"},{code:"th",name:"Thailand",flag:"🇹🇭"},{code:"tj",name:"Tajikistan",flag:"🇹🇯"},
+            {code:"tn",name:"Tunisia",flag:"🇹🇳"},{code:"tr",name:"Türkiye",flag:"🇹🇷"},{code:"tt",name:"Trinidad",flag:"🇹🇹"},
+            {code:"tw",name:"Taiwan",flag:"🇹🇼"},{code:"tz",name:"Tanzania",flag:"🇹🇿"},{code:"ua",name:"Ukraine",flag:"🇺🇦"},
+            {code:"ug",name:"Uganda",flag:"🇺🇬"},{code:"uk",name:"UK",flag:"🇬🇧"},{code:"us",name:"USA",flag:"🇺🇸"},
+            {code:"uy",name:"Uruguay",flag:"🇺🇾"},{code:"uz",name:"Uzbekistan",flag:"🇺🇿"},{code:"ve",name:"Venezuela",flag:"🇻🇪"},
+            {code:"vg",name:"Brit. Virgin Is.",flag:"🇻🇬"},{code:"vn",name:"Vietnam",flag:"🇻🇳"},{code:"xk",name:"Kosovo",flag:"🇽🇰"},
+            {code:"ye",name:"Yemen",flag:"🇾🇪"},{code:"za",name:"South Africa",flag:"🇿🇦"},{code:"zw",name:"Zimbabwe",flag:"🇿🇼"}
+        ];
+
+        // --- LOAD SETTINGS ---
         let currentFontSize = localStorage.getItem('tvPlayerZoom') ? parseInt(localStorage.getItem('tvPlayerZoom')) : 16;
         document.documentElement.style.fontSize = currentFontSize + 'px';
 
         const savedCountry = localStorage.getItem('tvPlayerCountry') || 'tr';
-        countrySelect.value = savedCountry;
+        updateCountryDisplay(savedCountry);
+
+        function updateCountryDisplay(code) {
+            const country = countryList.find(c => c.code === code) || { name: code.toUpperCase(), flag: '🏳️' };
+            selectedCountryDisplay.innerHTML = `Selected: <span class="text-white">${country.flag} ${country.name}</span>`;
+        }
         
         function changeZoom(amount) {
             currentFontSize += amount;
@@ -391,10 +280,8 @@
             }
         }
         
-        // Mobilde Menü Aç/Kapa
         function toggleSidebar() {
             sidebar.classList.toggle('hidden');
-            // Mobilde menü gizlendiğinde tam ekran hissiyatı
             if (window.innerWidth < 768) {
                 sidebar.style.position = sidebar.classList.contains('hidden') ? 'relative' : 'absolute';
                 sidebar.style.zIndex = '100';
@@ -402,19 +289,50 @@
             }
         }
 
+        // --- COUNTRY MENU FUNCTIONS ---
+        function toggleCountryMenu() {
+            if (countryOverlay.classList.contains('hidden')) {
+                renderCountryGrid();
+                countryOverlay.classList.remove('hidden');
+            } else {
+                countryOverlay.classList.add('hidden');
+            }
+        }
+
+        function renderCountryGrid() {
+            countryGrid.innerHTML = '';
+            countryList.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'country-card';
+                div.onclick = () => selectCountry(c.code);
+                div.innerHTML = `
+                    <div class="country-flag">${c.flag}</div>
+                    <div class="country-name">${c.name}</div>
+                `;
+                countryGrid.appendChild(div);
+            });
+        }
+
+        function selectCountry(code) {
+            localStorage.setItem('tvPlayerCountry', code);
+            updateCountryDisplay(code);
+            fetchChannels(code);
+            countryOverlay.classList.add('hidden');
+        }
+
         async function fetchChannels(countryCode) {
             channelListEl.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-40 text-gray-500">
                     <i class="fas fa-circle-notch fa-spin text-2xl text-red-600 mb-3"></i>
-                    <span class="text-xs">Liste Güncelleniyor...</span>
+                    <span class="text-xs">Updating List...</span>
                 </div>`;
             try {
                 const response = await fetch(`${BASE_URL}${countryCode}.json`);
-                if (!response.ok) throw new Error('Hata');
+                if (!response.ok) throw new Error('Error');
                 allChannels = await response.json();
                 renderChannels(allChannels);
             } catch (error) {
-                channelListEl.innerHTML = '<div class="p-4 text-center text-red-400 text-xs">Liste yüklenemedi.</div>';
+                channelListEl.innerHTML = '<div class="p-4 text-center text-red-400 text-xs">Failed to load list.</div>';
             }
         }
 
@@ -429,23 +347,14 @@
             channelCountEl.innerText = playableChannels.length;
 
             if (playableChannels.length === 0) {
-                channelListEl.innerHTML = '<div class="p-4 text-center text-gray-500 text-xs">Kanal bulunamadı.</div>';
+                channelListEl.innerHTML = '<div class="p-4 text-center text-gray-500 text-xs">No channels found.</div>';
                 return;
             }
 
             playableChannels.forEach((channel, index) => {
                 const isIptv = channel.iptv_urls && channel.iptv_urls.length > 0;
                 const div = document.createElement('div');
-                
-                // --- PROFESYONEL KART TASARIMI ---
-                // flex: esnek kutu
-                // p-4: geniş iç boşluk (dokunmayı kolaylaştırır)
-                // mb-3: kartlar arası boşluk
-                // bg-gray-800: koyu kart rengi
-                // rounded-xl: modern yuvarlak köşeler
-                // select-none: yazı seçilmesini engelle
                 div.className = `channel-item w-full flex items-center p-4 mb-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl cursor-pointer text-sm text-gray-300 group select-none shadow-md`;
-                
                 div.id = `channel-row-${index}`;
                 div.onclick = () => playChannel(channel, index);
                 
@@ -463,12 +372,9 @@
         }
 
         function playChannel(channel, index) {
-            currentChannelIndex = index;
-
-            // Aktif Kanalı İşaretle
             document.querySelectorAll('.channel-item').forEach(el => {
                 el.classList.remove('active-channel');
-                el.classList.replace('bg-red-600', 'bg-gray-800'); // Eskiyi normale çevir
+                el.classList.replace('bg-red-600', 'bg-gray-800');
             });
             
             const activeRow = document.getElementById(`channel-row-${index}`);
@@ -477,17 +383,15 @@
                 activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            currentChannelTitle.innerHTML = `<span class="text-red-500 mr-2">CANLI:</span> ${channel.name}`;
+            currentChannelTitle.innerHTML = `<span class="text-red-500 mr-2">LIVE:</span> ${channel.name}`;
             statusMessage.classList.add('hidden');
+            if(placeholderContent) placeholderContent.style.display = 'none';
 
             const existingVideo = document.getElementById('hls-video');
             const existingIframe = document.querySelector('#playerWrapper iframe');
             if(existingVideo) existingVideo.remove();
             if(existingIframe) existingIframe.remove();
             
-            const emptyState = document.querySelector('#playerWrapper .flex-col');
-            if(emptyState) emptyState.remove();
-
             if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
 
             if (channel.iptv_urls && channel.iptv_urls.length > 0) {
@@ -495,28 +399,6 @@
             } else if (channel.youtube_urls && channel.youtube_urls.length > 0) {
                 playYoutube(channel.youtube_urls[0]);
             }
-        }
-
-        function playNextChannel() {
-            if (playableChannels.length === 0) return;
-            const rightZone = document.querySelector('.touch-zone-right .zone-icon');
-            rightZone.style.opacity = '1'; rightZone.style.transform = 'scale(1.2)';
-            setTimeout(() => { rightZone.style.opacity = '0'; rightZone.style.transform = 'scale(0.5)'; }, 300);
-
-            let nextIndex = currentChannelIndex + 1;
-            if (nextIndex >= playableChannels.length) nextIndex = 0;
-            playChannel(playableChannels[nextIndex], nextIndex);
-        }
-
-        function playPreviousChannel() {
-            if (playableChannels.length === 0) return;
-            const leftZone = document.querySelector('.touch-zone-left .zone-icon');
-            leftZone.style.opacity = '1'; leftZone.style.transform = 'scale(1.2)';
-            setTimeout(() => { leftZone.style.opacity = '0'; leftZone.style.transform = 'scale(0.5)'; }, 300);
-
-            let prevIndex = currentChannelIndex - 1;
-            if (prevIndex < 0) prevIndex = playableChannels.length - 1;
-            playChannel(playableChannels[prevIndex], prevIndex);
         }
 
         function playHls(url) {
@@ -531,7 +413,6 @@
             video.setAttribute('webkit-playsinline', '');
 
             playerWrapper.appendChild(video);
-            video.addEventListener('ended', playNextChannel);
 
             if (Hls.isSupported()) {
                 hlsPlayer = new Hls();
@@ -567,11 +448,6 @@
             setTimeout(() => statusMessage.classList.add('hidden'), 4000);
         }
 
-        countrySelect.addEventListener('change', (e) => {
-            localStorage.setItem('tvPlayerCountry', e.target.value);
-            fetchChannels(e.target.value);
-        });
-        
         fetchChannels(savedCountry);
     </script>
 </body>
