@@ -8,19 +8,21 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- KESİN ÇÖZÜM: PULL-TO-REFRESH ENGELLEME --- */
+        /* --- KESİN ÇÖZÜM: BODY LOCK TEKNİĞİ --- */
         html, body {
-            overscroll-behavior: none; /* Sayfa yenileme tetikleyicisini kapatır */
-            overscroll-behavior-y: none;
-            touch-action: pan-x pan-y;
+            position: fixed; /* Sayfayı ekrana çiviler, kaymayı fiziksel olarak engeller */
+            width: 100%;
             height: 100%;
-            overflow: hidden; /* Sayfa genelinde kaydırmayı kapat, sadece kutular kaysın */
+            overflow: hidden; /* Taşmaları gizle */
+            background-color: #000;
+            overscroll-behavior: none;
         }
 
-        /* Liste ve Sidebar için kaydırma zincirini kır */
-        #sidebar, #channelList, #countryOverlay {
-            overscroll-behavior: contain;
-            overscroll-behavior-y: contain;
+        /* --- Sadece kayması gereken alanlara izin ver --- */
+        #channelList, #countryOverlay {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Yumuşak kaydırma */
+            overscroll-behavior: contain; /* Kaydırmayı içine hapset */
         }
 
         /* Default Root Font Size */
@@ -110,7 +112,7 @@
         }
     </style>
 </head>
-<body class="bg-black text-gray-200 font-sans h-screen flex overflow-hidden">
+<body class="bg-black text-gray-200 font-sans flex overflow-hidden">
 
     <aside class="w-80 bg-gray-900 flex flex-col border-r border-gray-800 h-full flex-shrink-0 z-20 shadow-2xl transition-all duration-300" id="sidebar">
         <div class="h-16 bg-gray-900 flex items-center justify-center px-4 flex-shrink-0 border-b border-gray-800">
@@ -203,6 +205,16 @@
     </main>
 
     <script>
+        // --- JS TABANLI YENİLEME ENGELLEME ---
+        // Android WebView için kaydırma kısıtlayıcı
+        document.body.addEventListener('touchmove', function(e) {
+            // Eğer dokunulan yer liste veya ülke menüsü değilse engelle
+            const isScrollable = e.target.closest('#channelList') || e.target.closest('#countryOverlay');
+            if (!isScrollable) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
         // DOM Elements
         const channelListEl = document.getElementById('channelList');
         const playerWrapper = document.getElementById('playerWrapper');
@@ -218,7 +230,7 @@
         let allChannels = [];
         let playableChannels = [];
         let hlsPlayer = null;
-        let favoriteChannels = []; // Favorites array
+        let favoriteChannels = []; 
 
         // FULL COUNTRY LIST
         const countryList = [
