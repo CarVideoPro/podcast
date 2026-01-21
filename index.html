@@ -8,6 +8,15 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* --- SAYFA YENİLEMEYİ (PULL-TO-REFRESH) ENGELLEME --- */
+        html, body {
+            overscroll-behavior: none;
+            overscroll-behavior-y: none;
+            touch-action: pan-x pan-y;
+            height: 100%;
+            overflow: hidden;
+        }
+
         /* Default Root Font Size */
         html { font-size: 16px; transition: font-size 0.2s ease; }
 
@@ -64,12 +73,12 @@
             transition: transform 0.2s;
         }
         .fav-btn:active { transform: scale(1.2); }
-        .is-favorite { color: #ef4444 !important; } /* Kırmızı Kalp */
+        .is-favorite { color: #ef4444 !important; }
 
         /* --- COUNTRY SELECTION GRID --- */
         #countryOverlay {
-            backdrop-filter: blur(15px); /* Daha güçlü bulanıklık */
-            background-color: rgba(10, 10, 10, 0.98); /* Daha koyu arka plan */
+            backdrop-filter: blur(15px);
+            background-color: rgba(10, 10, 10, 0.98);
         }
         .country-card {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -203,9 +212,9 @@
         let allChannels = [];
         let playableChannels = [];
         let hlsPlayer = null;
-        let favoriteChannels = []; // Favori kanalları tutacak dizi
+        let favoriteChannels = []; // Favorites array
 
-        // FULL COUNTRY LIST
+        // --- FULL COUNTRY LIST (ENGLISH) ---
         const countryList = [
             {code:"tr",name:"Turkey",flag:"🇹🇷"},{code:"ad",name:"Andorra",flag:"🇦🇩"},{code:"ae",name:"UAE",flag:"🇦🇪"},
             {code:"af",name:"Afghanistan",flag:"🇦🇫"},{code:"ag",name:"Antigua",flag:"🇦🇬"},{code:"al",name:"Albania",flag:"🇦🇱"},
@@ -270,7 +279,7 @@
 
         const savedCountry = localStorage.getItem('tvPlayerCountry') || 'tr';
         
-        // FAVORİLERİ YÜKLE
+        // Load Favorites
         try {
             favoriteChannels = JSON.parse(localStorage.getItem('tvPlayerFavorites')) || [];
         } catch(e) { favoriteChannels = []; }
@@ -341,25 +350,20 @@
             countryOverlay.classList.add('hidden');
         }
 
-        // --- FAVORİ SİSTEMİ FONKSİYONLARI ---
+        // --- FAVORITE SYSTEM ---
         function toggleFavorite(channel, event) {
-            // Tıklamanın satıra geçmesini engelle
             event.stopPropagation();
             
-            // Favorilerde var mı kontrol et (name'e göre)
+            // Check based on NAME
             const index = favoriteChannels.findIndex(fav => fav.name === channel.name);
-            
             if (index > -1) {
-                // Varsa çıkar
                 favoriteChannels.splice(index, 1);
             } else {
-                // Yoksa ekle
                 favoriteChannels.push(channel);
             }
             
-            // Kaydet ve Listeyi Yenile
             localStorage.setItem('tvPlayerFavorites', JSON.stringify(favoriteChannels));
-            renderChannels(playableChannels); // Mevcut listeyi yeniden render et
+            renderChannels(playableChannels); 
         }
 
         function isFavorite(channel) {
@@ -385,7 +389,7 @@
         function renderChannels(channels) {
             channelListEl.innerHTML = '';
             
-            // 1. Oynatılabilir Kanalları Filtrele
+            // Filter playable
             playableChannels = channels.filter(ch => 
                 (ch.iptv_urls && ch.iptv_urls.length > 0) || 
                 (ch.youtube_urls && ch.youtube_urls.length > 0)
@@ -398,13 +402,10 @@
                 return;
             }
 
-            // --- FAVORİLERİ AYIR ---
-            // Favori olan kanallar
+            // Separate Favorites
             const favs = playableChannels.filter(ch => isFavorite(ch));
-            // Diğer kanallar
             const others = playableChannels.filter(ch => !isFavorite(ch));
 
-            // Eğer favori varsa başlık ekle
             if (favs.length > 0) {
                 const favTitle = document.createElement('div');
                 favTitle.className = "text-xs font-bold text-red-500 uppercase tracking-widest px-2 pt-2 pb-1";
@@ -427,7 +428,6 @@
         function createChannelRow(channel, index, isFavList) {
             const isIptv = channel.iptv_urls && channel.iptv_urls.length > 0;
             const div = document.createElement('div');
-            // ID unique olmalı, favori listesindekiler çakışmasın
             const uniqueId = isFavList ? `fav-${index}` : `ch-${index}`;
             
             div.className = `channel-item w-full flex items-center p-4 mb-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl cursor-pointer text-sm text-gray-300 group select-none shadow-md`;
@@ -438,7 +438,6 @@
                 ? '<div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center mr-3 flex-shrink-0 border border-gray-700"><i class="fas fa-tv text-green-500 text-lg"></i></div>' 
                 : '<div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center mr-3 flex-shrink-0 border border-gray-700"><i class="fab fa-youtube text-red-500 text-lg"></i></div>';
             
-            // Favori Kalp İkonu Rengi
             const heartClass = isFavorite(channel) ? "fas fa-heart is-favorite" : "far fa-heart text-gray-600";
             
             div.innerHTML = `
@@ -448,20 +447,16 @@
                 <i class="fas fa-chevron-right text-gray-600 text-xs group-hover:text-white transition-colors"></i>
             `;
             
-            // Nesne referansını elemente ekle (kolay erişim için)
             div.channelData = channel;
-            
             channelListEl.appendChild(div);
         }
 
         function playChannel(channel, element) {
-            // Aktif Sınıfını Temizle
             document.querySelectorAll('.channel-item').forEach(el => {
                 el.classList.remove('active-channel');
                 el.classList.replace('bg-red-600', 'bg-gray-800');
             });
             
-            // Yeni Aktif Sınıfı Ekle
             if(element) {
                 element.classList.add('active-channel');
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
