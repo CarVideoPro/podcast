@@ -8,21 +8,20 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- KESİN ÇÖZÜM: BODY LOCK TEKNİĞİ --- */
+        /* --- KESİN ÇÖZÜM: CSS RESET --- */
         html, body {
-            position: fixed; /* Sayfayı ekrana çiviler, kaymayı fiziksel olarak engeller */
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Taşmaları gizle */
+            overflow: hidden; /* Sayfa asla kaymaz */
+            position: fixed; /* Ekrana kilitler */
             background-color: #000;
-            overscroll-behavior: none;
         }
 
-        /* --- Sadece kayması gereken alanlara izin ver --- */
+        /* Liste ve Overlay için özel kaydırma alanı */
         #channelList, #countryOverlay {
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Yumuşak kaydırma */
-            overscroll-behavior: contain; /* Kaydırmayı içine hapset */
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none; /* Modern tarayıcılar için ek koruma */
         }
 
         /* Default Root Font Size */
@@ -205,24 +204,65 @@
     </main>
 
     <script>
-        // --- JS TABANLI YENİLEME ENGELLEME ---
-        // Android WebView için kaydırma kısıtlayıcı
+        // --- GELİŞMİŞ KAYDIRMA KONTROLÜ (Bounce Fix) ---
+        // Bu kod, tarayıcının varsayılan kaydırmasını engeller ve
+        // sadece izin verilen alanlarda akıllı kaydırma sağlar.
+        
+        // 1. Tüm belge üzerinde varsayılan sürüklemeyi engelle
         document.body.addEventListener('touchmove', function(e) {
-            // Eğer dokunulan yer liste veya ülke menüsü değilse engelle
-            const isScrollable = e.target.closest('#channelList') || e.target.closest('#countryOverlay');
-            if (!isScrollable) {
-                e.preventDefault();
-            }
+            e.preventDefault();
         }, { passive: false });
+
+        // 2. Belirli elemanlarda kaydırmayı serbest bırak (Sınır kontrolleriyle)
+        function enableScroll(element) {
+            let startY;
+
+            element.addEventListener('touchstart', function(e) {
+                startY = e.touches[0].clientY;
+            }, { passive: false });
+
+            element.addEventListener('touchmove', function(e) {
+                const currentY = e.touches[0].clientY;
+                const deltaY = currentY - startY;
+                const scrollTop = this.scrollTop;
+                const scrollHeight = this.scrollHeight;
+                const height = this.clientHeight;
+
+                // Yukarı mı aşağı mı kaydırılıyor?
+                const isScrollingDown = deltaY > 0;
+                const isScrollingUp = deltaY < 0;
+
+                // En tepedeyken aşağı çekmeye çalışıyorsa -> ENGELLE (Refresh tetiklenmesin)
+                if (scrollTop <= 0 && isScrollingDown) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // En alttayken yukarı çekmeye çalışıyorsa -> ENGELLE (Sayfa zıplamasın)
+                if (scrollTop + height >= scrollHeight && isScrollingUp) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Diğer durumlarda kaydırmaya izin ver ama body'ye iletme
+                e.stopPropagation();
+            }, { passive: false });
+        }
 
         // DOM Elements
         const channelListEl = document.getElementById('channelList');
+        const countryOverlay = document.getElementById('countryOverlay');
+        
+        // Kaydırma düzeltmelerini uygula
+        enableScroll(channelListEl);
+        enableScroll(countryOverlay);
+
+        // --- Diğer Değişkenler ve Fonksiyonlar ---
         const playerWrapper = document.getElementById('playerWrapper');
         const currentChannelTitle = document.getElementById('currentChannelTitle');
         const channelCountEl = document.getElementById('channelCount');
         const statusMessage = document.getElementById('statusMessage');
         const sidebar = document.getElementById('sidebar');
-        const countryOverlay = document.getElementById('countryOverlay');
         const countryGrid = document.getElementById('countryGrid');
         const selectedCountryDisplay = document.getElementById('selectedCountryDisplay');
         const placeholderContent = document.getElementById('placeholderContent');
