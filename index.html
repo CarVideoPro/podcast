@@ -8,13 +8,19 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- SAYFA YENİLEMEYİ (PULL-TO-REFRESH) ENGELLEME --- */
+        /* --- KESİN ÇÖZÜM: PULL-TO-REFRESH ENGELLEME --- */
         html, body {
-            overscroll-behavior: none;
+            overscroll-behavior: none; /* Sayfa yenileme tetikleyicisini kapatır */
             overscroll-behavior-y: none;
             touch-action: pan-x pan-y;
             height: 100%;
-            overflow: hidden;
+            overflow: hidden; /* Sayfa genelinde kaydırmayı kapat, sadece kutular kaysın */
+        }
+
+        /* Liste ve Sidebar için kaydırma zincirini kır */
+        #sidebar, #channelList, #countryOverlay {
+            overscroll-behavior: contain;
+            overscroll-behavior-y: contain;
         }
 
         /* Default Root Font Size */
@@ -183,7 +189,7 @@
                     <span class="mx-4 text-red-500">CAR VIDEO PRO</span> 
                     <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/car_video_pro 
                     <span class="mx-6 text-gray-600">|</span> 
-                    <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/aacarvideopro 
+                    <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/androidautocarvideopro 
                     <span class="mx-6 text-gray-600">|</span> 
                     Enjoy the show...
                 </div>
@@ -214,7 +220,7 @@
         let hlsPlayer = null;
         let favoriteChannels = []; // Favorites array
 
-        // --- FULL COUNTRY LIST (ENGLISH) ---
+        // FULL COUNTRY LIST
         const countryList = [
             {code:"tr",name:"Turkey",flag:"🇹🇷"},{code:"ad",name:"Andorra",flag:"🇦🇩"},{code:"ae",name:"UAE",flag:"🇦🇪"},
             {code:"af",name:"Afghanistan",flag:"🇦🇫"},{code:"ag",name:"Antigua",flag:"🇦🇬"},{code:"al",name:"Albania",flag:"🇦🇱"},
@@ -279,7 +285,7 @@
 
         const savedCountry = localStorage.getItem('tvPlayerCountry') || 'tr';
         
-        // Load Favorites
+        // FAVORİLERİ YÜKLE
         try {
             favoriteChannels = JSON.parse(localStorage.getItem('tvPlayerFavorites')) || [];
         } catch(e) { favoriteChannels = []; }
