@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Car Video Pro - Horizontal</title>
+    <title>Car Video Pro - Ultimate Archive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -11,164 +11,209 @@
         /* --- TEMEL AYARLAR --- */
         html, body {
             width: 100%; height: 100%; overflow: hidden; background-color: #000;
-            overscroll-behavior: none; /* Ekstra güvenlik */
         }
 
-        /* Default Root Font Size */
-        html { font-size: 16px; transition: font-size 0.2s ease; }
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #111827; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #dc2626; }
 
-        /* Scrollbar (Yatay İçin) */
-        ::-webkit-scrollbar { height: 4px; }
-        ::-webkit-scrollbar-track { background: #111; }
-        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 2px; }
-
-        /* --- VIDEO WRAPPER (TAM EKRAN OTURUM) --- */
+        /* --- VIDEO WRAPPER --- */
         .video-wrapper {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            width: 100%; height: 100%; background: #000; position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
         
-        video {
-            object-fit: contain !important;
-            width: 100% !important; height: 100% !important;
-            background-color: #000 !important;
-        }
-        video:fullscreen { object-fit: contain !important; background-color: #000 !important; }
+        video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
         iframe { width: 100%; height: 100%; border: none; }
 
-        /* --- YATAY KANAL KARTLARI --- */
-        #channelList {
-            display: flex;
-            flex-direction: row; /* Yan yana dizilim */
-            overflow-x: auto; /* Yatay kaydırma */
-            overflow-y: hidden;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            padding: 0.5rem;
-            background: #111827; /* Gri arka plan */
-            gap: 0.5rem;
-            align-items: center;
-        }
-
+        /* --- KANAL KARTLARI --- */
         .channel-item {
-            flex-shrink: 0; /* Küçülmeyi engelle */
-            width: 240px; /* Sabit genişlik */
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
+            transition: all 0.2s ease; border-left: 3px solid transparent;
         }
-        .channel-item:active { transform: scale(0.95); }
+        .channel-item:hover { background-color: #1f2937; }
+        .channel-item:active { transform: scale(0.98); }
         
         .active-channel { 
-            background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%) !important; 
-            color: white !important; border: 1px solid #ffaaaa !important;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5); font-weight: bold;
+            background: #1f2937 !important;
+            border-left: 3px solid #dc2626 !important;
+            box-shadow: inset 0 0 20px rgba(220, 38, 38, 0.1);
         }
-        .active-channel i { color: white !important; }
+        .active-channel .channel-name { color: #dc2626 !important; font-weight: bold; }
 
-        /* Favori İkonu */
-        .fav-btn { z-index: 10; padding: 8px; transition: transform 0.2s; }
-        .fav-btn:active { transform: scale(1.2); }
-        .is-favorite { color: #ef4444 !important; }
+        .is-favorite { color: #ef4444 !important; animation: heartbeat 1.5s infinite; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        /* --- ÜLKE MENÜSÜ (GRID) --- */
-        #countryOverlay {
-            backdrop-filter: blur(15px); background-color: rgba(10, 10, 10, 0.98);
-        }
-        .country-card {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #1f2937; border: 1px solid #374151; border-radius: 12px;
-            padding: 1rem; cursor: pointer; transition: all 0.2s;
-        }
-        .country-card:active { transform: scale(0.95); background: #374151; }
-        .country-flag { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .country-name { font-size: 0.8rem; font-weight: bold; color: #d1d5db; text-align: center; }
+        /* --- ÜLKE MENÜSÜ --- */
+        #countryOverlay { backdrop-filter: blur(15px); background-color: rgba(5, 5, 5, 0.95); }
+        .country-card { transition: all 0.2s; border: 1px solid #374151; }
+        .country-card:hover { border-color: #dc2626; background: #1f2937; }
 
-        /* Marquee */
-        .marquee-container {
-            overflow: hidden; white-space: nowrap; position: relative;
-            background: #0f172a; border-top: 1px solid #1e293b; border-bottom: 1px solid #1e293b;
+        /* --- TELEGRAM REKLAM ALANI --- */
+        .tg-card {
+            background: linear-gradient(145deg, #111827, #000000);
+            border: 1px solid #374151;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
+        
+        .tg-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: default; 
+            user-select: text; 
+        }
+
+        /* --- OFFLINE SCREEN --- */
+        #offlineScreen {
+            background: radial-gradient(circle at center, #1f2937 0%, #000000 100%);
+        }
+
+        /* --- MARQUEE --- */
+        .marquee-wrapper {
+            position: relative; overflow: hidden; background: #111827;
+            border: 1px solid #374151; border-radius: 6px;
+        }
+        .marquee-wrapper::before, .marquee-wrapper::after {
+            content: ''; position: absolute; top: 0; bottom: 0; width: 30px; z-index: 2; pointer-events: none;
+        }
+        .marquee-wrapper::before { left: 0; background: linear-gradient(to right, #111827, transparent); }
+        .marquee-wrapper::after { right: 0; background: linear-gradient(to left, #111827, transparent); }
         .marquee-content {
-            display: inline-block; padding-left: 100%;
-            animation: marquee 35s linear infinite;
+            display: inline-block; white-space: nowrap; padding-left: 100%;
+            animation: marquee 40s linear infinite;
         }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden bg-black text-white">
+<body class="flex flex-col h-screen bg-black text-white font-sans overflow-hidden">
 
-    <header class="flex-shrink-0 bg-gray-900 border-b border-gray-800 z-20">
-        <div class="flex items-center justify-between p-2">
-            
-            <div class="flex items-center">
-                <h1 class="text-lg font-black text-red-600 tracking-wider italic mr-4">
-                    <i class="fas fa-play-circle mr-1"></i> CAR VIDEO PRO
-                </h1>
+    <div id="offlineScreen" class="fixed inset-0 z-[9999] hidden flex flex-col items-center justify-center text-center p-5">
+        <div class="w-24 h-24 rounded-full bg-red-900/20 flex items-center justify-center mb-6 border border-red-900 animate-pulse">
+            <i class="fas fa-wifi-slash text-4xl text-red-500"></i>
+        </div>
+        <h2 class="text-3xl font-black text-white mb-2 tracking-wide">NO INTERNET CONNECTION</h2>
+        <p class="text-gray-400 max-w-md">Please check your network settings. The player will automatically reconnect when you are back online.</p>
+        <button onclick="window.location.reload()" class="mt-8 bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-full border border-gray-700 transition">
+            TRY AGAIN
+        </button>
+    </div>
+
+    <header class="flex-shrink-0 bg-gray-900 border-b border-gray-800 z-30 shadow-md h-16 flex items-center justify-between px-2 gap-2 sm:px-3 sm:gap-4">
+        <div class="flex items-center flex-shrink-0">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-600 to-red-900 rounded-lg flex items-center justify-center shadow-lg mr-2 sm:mr-3">
+                <i class="fas fa-play text-white text-sm sm:text-lg"></i>
             </div>
-
-            <button onclick="toggleCountryMenu()" class="flex-1 max-w-xs bg-gray-800 hover:bg-gray-700 text-white text-xs font-bold py-2 px-4 rounded-full border border-gray-700 transition flex items-center justify-center mx-2">
-                <i class="fas fa-globe mr-2 text-red-500"></i>
-                <span id="selectedCountryDisplay">SELECT COUNTRY</span>
-            </button>
-
-            <div class="flex items-center space-x-2">
-                <button onclick="changeZoom(-1)" class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded-full hover:bg-gray-700"><i class="fas fa-minus text-xs"></i></button>
-                <button onclick="changeZoom(1)" class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded-full hover:bg-gray-700"><i class="fas fa-plus text-xs"></i></button>
-                <button onclick="toggleFullScreen()" class="w-8 h-8 flex items-center justify-center bg-red-600 rounded-full hover:bg-red-700 text-white ml-2"><i class="fas fa-expand text-xs"></i></button>
+            <div class="hidden md:flex flex-col">
+                <h1 class="text-lg font-black text-white tracking-wide leading-tight">CAR VIDEO <span class="text-red-600">PRO</span></h1>
+                <span class="text-[10px] text-gray-400 uppercase tracking-widest">Ultimate Stream</span>
             </div>
         </div>
 
-        <div class="h-6 flex items-center marquee-container">
-            <div class="marquee-content font-bold text-xs tracking-wider text-gray-300 flex items-center">
-                <span class="mx-4 text-red-500">CAR VIDEO PRO</span> 
-                <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/car_video_pro 
+        <div class="flex-1 min-w-0 h-10 flex items-center marquee-wrapper">
+            <div class="marquee-content flex items-center text-xs font-semibold text-gray-300">
+                <span class="text-red-500 font-bold mx-2">● LIVE:</span> 
+                Welcome to Car Video Pro Archive. 
                 <span class="mx-6 text-gray-600">|</span> 
-                <i class="fab fa-telegram mx-2 text-blue-400"></i> t.me/aacarvideopro 
+                Official: <span class="text-blue-400 mx-1">t.me/car_video_pro</span>
                 <span class="mx-6 text-gray-600">|</span> 
-                Enjoy the show...
+                Backup: <span class="text-blue-400 mx-1">t.me/aacarvideopro</span>
+                <span class="mx-6 text-gray-600">|</span> 
+                <i class="fas fa-globe text-yellow-500 mx-2"></i> All Countries Added
             </div>
+        </div>
+
+        <div class="flex items-center space-x-2 flex-shrink-0">
+            <button onclick="toggleCountryMenu()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-bold h-9 px-3 rounded-lg border border-gray-700 transition flex items-center shadow-sm whitespace-nowrap">
+                <span id="selectedCountryDisplay" class="mr-2 hidden sm:inline">COUNTRY</span>
+                <span class="sm:hidden"><i class="fas fa-globe"></i></span>
+                <i class="fas fa-chevron-down text-[10px] text-gray-500 ml-1"></i>
+            </button>
+            
+            <div class="flex bg-gray-800 rounded-lg p-0.5 border border-gray-700 h-9 items-center">
+                <button onclick="changeZoom(-1)" class="w-8 h-full flex items-center justify-center hover:bg-gray-700 rounded text-gray-400"><i class="fas fa-minus text-xs"></i></button>
+                <div class="w-px h-4 bg-gray-700"></div>
+                <button onclick="changeZoom(1)" class="w-8 h-full flex items-center justify-center hover:bg-gray-700 rounded text-gray-400"><i class="fas fa-plus text-xs"></i></button>
+            </div>
+
+            <button onclick="toggleFullScreen()" class="w-9 h-9 flex items-center justify-center bg-red-600 hover:bg-red-700 rounded-lg text-white shadow-lg transition">
+                <i class="fas fa-expand text-xs"></i>
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 relative bg-black w-full min-h-0">
-        <div id="playerWrapper" class="video-wrapper">
-            
-            <div id="countryOverlay" class="absolute inset-0 z-[100] hidden overflow-y-auto p-4 flex flex-col">
-                <div class="flex justify-end mb-4 sticky top-0 z-10">
-                    <button onclick="toggleCountryMenu()" class="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg font-bold">
-                        <i class="fas fa-times mr-2"></i> CLOSE
-                    </button>
+    <main class="flex-1 flex flex-col md:flex-row min-h-0 relative">
+        
+        <aside class="w-full md:w-80 flex-shrink-0 bg-gray-900 border-r border-gray-800 flex flex-col z-20 h-[40vh] md:h-full order-2 md:order-1">
+            <div class="p-3 border-b border-gray-800 bg-gray-900 sticky top-0 z-10 flex justify-between items-center shadow-sm">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Channel List</span>
+                <span class="bg-red-900/30 text-red-500 text-[10px] font-bold px-2 py-0.5 rounded border border-red-900/50" id="channelCount">0</span>
+            </div>
+            <div id="channelList" class="flex-1 overflow-y-auto custom-scroll p-2 space-y-1">
+                <div class="flex flex-col items-center justify-center h-40 text-gray-500">
+                    <i class="fas fa-circle-notch fa-spin mb-2"></i> Loading...
                 </div>
-                <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 pb-20" id="countryGrid">
+            </div>
+        </aside>
+
+        <section class="flex-1 bg-black relative flex flex-col min-w-0 order-1 md:order-2 h-[60vh] md:h-full">
+            
+            <div id="playerWrapper" class="video-wrapper">
+                <div id="countryOverlay" class="absolute inset-0 z-[100] hidden overflow-y-auto p-6 flex flex-col">
+                    <div class="flex justify-between items-center mb-6 sticky top-0 z-10 bg-black/80 p-2 rounded-lg border border-gray-800 backdrop-blur">
+                        <h2 class="text-xl font-bold text-white"><i class="fas fa-globe text-red-600 mr-2"></i> Select Country</h2>
+                        <button onclick="toggleCountryMenu()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition border border-gray-700">
+                            CLOSE X
+                        </button>
                     </div>
-            </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 pb-20" id="countryGrid"></div>
+                </div>
 
-            <div id="placeholderContent" class="absolute inset-0 flex items-center justify-center text-gray-700 flex-col bg-gray-900">
-                <i class="fas fa-play-circle text-8xl mb-6 opacity-20"></i>
-                <p class="text-lg opacity-40 font-light">Select a Channel Below</p>
-                <h2 id="currentChannelTitle" class="text-xl font-bold text-red-600 mt-4">Waiting...</h2>
+                <div id="placeholderContent" class="absolute inset-0 flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920&auto=format&fit=crop')] bg-cover bg-center">
+                    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+                    
+                    <div class="relative z-10 max-w-sm w-full tg-card rounded-xl p-6 text-center transform scale-95 md:scale-100">
+                        <div class="w-16 h-16 bg-gray-800/50 rounded-full mx-auto flex items-center justify-center mb-4 border border-gray-700 shadow-lg backdrop-blur">
+                            <i class="fab fa-telegram-plane text-4xl text-blue-500 ml-[-2px]"></i>
+                        </div>
+                        
+                        <h2 class="text-2xl font-black text-white mb-2">OFFICIAL CHANNELS</h2>
+                        <p class="text-gray-400 mb-6 text-xs leading-relaxed">Join our community to get the latest updates and exclusive content.</p>
+                        
+                        <div class="space-y-2">
+                            <div class="tg-badge rounded-lg p-3 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fab fa-telegram text-blue-400 text-lg mr-3"></i>
+                                    <span class="font-bold text-gray-200 text-sm">t.me/car_video_pro</span>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500 text-xs opacity-50"></i>
+                            </div>
+                            
+                            <div class="tg-badge rounded-lg p-3 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fab fa-telegram text-gray-400 text-lg mr-3"></i>
+                                    <span class="font-bold text-gray-200 text-sm">t.me/aacarvideopro</span>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500 text-xs opacity-50"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-gray-800">
+                            <p class="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Select a channel from the list</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div id="statusMessage" class="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded text-xs hidden shadow-lg z-50"></div>
+            
+            <div id="statusMessage" class="absolute top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold hidden shadow-lg z-50 flex items-center">
+                <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span> LIVE
+            </div>
+            
+            <div id="currentChannelTitle" class="absolute top-4 left-4 bg-black/60 backdrop-blur text-white px-4 py-2 rounded-lg text-sm border-l-4 border-red-600 font-bold z-40 hidden">
+                Waiting...
+            </div>
+        </section>
     </main>
-
-    <footer class="flex-shrink-0 bg-gray-900 border-t border-gray-800 z-20 h-24 flex flex-col">
-        <div class="bg-black px-2 py-1 text-[10px] text-gray-500 flex justify-between">
-            <span>Favorites are sorted first.</span>
-            <span>Total: <span id="channelCount" class="text-white font-bold">0</span></span>
-        </div>
-        
-        <div id="channelList" class="flex-1 w-full">
-            <div class="flex items-center justify-center w-full h-full text-gray-500">
-                <i class="fas fa-circle-notch fa-spin mr-2"></i> Loading List...
-            </div>
-        </div>
-    </footer>
 
     <script>
         // DOM Elements
@@ -181,97 +226,105 @@
         const countryGrid = document.getElementById('countryGrid');
         const selectedCountryDisplay = document.getElementById('selectedCountryDisplay');
         const placeholderContent = document.getElementById('placeholderContent');
+        const offlineScreen = document.getElementById('offlineScreen');
         
+        // --- INTERNET CONNECTION HANDLING ---
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineScreen.classList.add('hidden');
+            } else {
+                offlineScreen.classList.remove('hidden');
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus(); 
+
         let allChannels = [];
         let playableChannels = [];
         let hlsPlayer = null;
         let favoriteChannels = []; 
 
-        // FULL COUNTRY LIST
+        // --- DEVASA ÜLKE LİSTESİ ---
         const countryList = [
-            {code:"tr",name:"Turkey",flag:"🇹🇷"},{code:"ad",name:"Andorra",flag:"🇦🇩"},{code:"ae",name:"UAE",flag:"🇦🇪"},
-            {code:"af",name:"Afghanistan",flag:"🇦🇫"},{code:"ag",name:"Antigua",flag:"🇦🇬"},{code:"al",name:"Albania",flag:"🇦🇱"},
-            {code:"am",name:"Armenia",flag:"🇦🇲"},{code:"ao",name:"Angola",flag:"🇦🇴"},{code:"ar",name:"Argentina",flag:"🇦🇷"},
-            {code:"at",name:"Austria",flag:"🇦🇹"},{code:"au",name:"Australia",flag:"🇦🇺"},{code:"aw",name:"Aruba",flag:"🇦🇼"},
-            {code:"az",name:"Azerbaijan",flag:"🇦🇿"},{code:"ba",name:"Bosnia",flag:"🇧🇦"},{code:"bd",name:"Bangladesh",flag:"🇧🇩"},
-            {code:"be",name:"Belgium",flag:"🇧🇪"},{code:"bg",name:"Bulgaria",flag:"🇧🇬"},{code:"bh",name:"Bahrain",flag:"🇧🇭"},
-            {code:"bj",name:"Benin",flag:"🇧🇯"},{code:"bo",name:"Bolivia",flag:"🇧🇴"},{code:"bq",name:"Bonaire",flag:"🇧🇶"},
-            {code:"br",name:"Brazil",flag:"🇧🇷"},{code:"bs",name:"Bahamas",flag:"🇧🇸"},{code:"by",name:"Belarus",flag:"🇧🇾"},
-            {code:"bz",name:"Belize",flag:"🇧🇿"},{code:"ca",name:"Canada",flag:"🇨🇦"},{code:"cd",name:"DR Congo",flag:"🇨🇩"},
-            {code:"ch",name:"Switzerland",flag:"🇨🇭"},{code:"ci",name:"Ivory Coast",flag:"🇨🇮"},{code:"cl",name:"Chile",flag:"🇨🇱"},
-            {code:"cm",name:"Cameroon",flag:"🇨🇲"},{code:"cn",name:"China",flag:"🇨🇳"},{code:"co",name:"Colombia",flag:"🇨🇴"},
-            {code:"cr",name:"Costa Rica",flag:"🇨🇷"},{code:"cu",name:"Cuba",flag:"🇨🇺"},{code:"cv",name:"Cape Verde",flag:"🇨🇻"},
-            {code:"cw",name:"Curacao",flag:"🇨🇼"},{code:"cy",name:"Cyprus",flag:"🇨🇾"},{code:"cz",name:"Czechia",flag:"🇨🇿"},
-            {code:"de",name:"Germany",flag:"🇩🇪"},{code:"dj",name:"Djibouti",flag:"🇩🇯"},{code:"dk",name:"Denmark",flag:"🇩🇰"},
-            {code:"do",name:"Dominican Rep.",flag:"🇩🇴"},{code:"dz",name:"Algeria",flag:"🇩🇿"},{code:"ec",name:"Ecuador",flag:"🇪🇨"},
-            {code:"ee",name:"Estonia",flag:"🇪🇪"},{code:"eg",name:"Egypt",flag:"🇪🇬"},{code:"eh",name:"Western Sahara",flag:"🇪🇭"},
-            {code:"er",name:"Eritrea",flag:"🇪🇷"},{code:"es",name:"Spain",flag:"🇪🇸"},{code:"et",name:"Ethiopia",flag:"🇪🇹"},
-            {code:"fi",name:"Finland",flag:"🇫🇮"},{code:"fo",name:"Faroe Is.",flag:"🇫🇴"},{code:"fr",name:"France",flag:"🇫🇷"},
-            {code:"ge",name:"Georgia",flag:"🇬🇪"},{code:"gf",name:"French Guiana",flag:"🇬🇫"},{code:"gh",name:"Ghana",flag:"🇬🇭"},
-            {code:"gl",name:"Greenland",flag:"🇬🇱"},{code:"gm",name:"Gambia",flag:"🇬🇲"},{code:"gn",name:"Guinea",flag:"🇬🇳"},
-            {code:"gp",name:"Guadeloupe",flag:"🇬🇵"},{code:"gq",name:"Eq. Guinea",flag:"🇬🇶"},{code:"gr",name:"Greece",flag:"🇬🇷"},
-            {code:"gt",name:"Guatemala",flag:"🇬🇹"},{code:"gu",name:"Guam",flag:"🇬🇺"},{code:"gy",name:"Guyana",flag:"🇬🇾"},
-            {code:"hk",name:"Hong Kong",flag:"🇭🇰"},{code:"hn",name:"Honduras",flag:"🇭🇳"},{code:"hr",name:"Croatia",flag:"🇭🇷"},
-            {code:"ht",name:"Haiti",flag:"🇭🇹"},{code:"hu",name:"Hungary",flag:"🇭🇺"},{code:"id",name:"Indonesia",flag:"🇮🇩"},
-            {code:"ie",name:"Ireland",flag:"🇮🇪"},{code:"il",name:"Israel",flag:"🇮🇱"},{code:"in",name:"India",flag:"🇮🇳"},
-            {code:"iq",name:"Iraq",flag:"🇮🇶"},{code:"ir",name:"Iran",flag:"🇮🇷"},{code:"is",name:"Iceland",flag:"🇮🇸"},
-            {code:"it",name:"Italy",flag:"🇮🇹"},{code:"jm",name:"Jamaica",flag:"🇯🇲"},{code:"jo",name:"Jordan",flag:"🇯🇴"},
-            {code:"jp",name:"Japan",flag:"🇯🇵"},{code:"ke",name:"Kenya",flag:"🇰🇪"},{code:"kh",name:"Cambodia",flag:"🇰🇭"},
-            {code:"kn",name:"St. Kitts",flag:"🇰🇳"},{code:"kr",name:"South Korea",flag:"🇰🇷"},{code:"kw",name:"Kuwait",flag:"🇰🇼"},
-            {code:"kz",name:"Kazakhstan",flag:"🇰🇿"},{code:"la",name:"Laos",flag:"🇱🇦"},{code:"lb",name:"Lebanon",flag:"🇱🇧"},
-            {code:"lk",name:"Sri Lanka",flag:"🇱🇰"},{code:"lt",name:"Lithuania",flag:"🇱🇹"},{code:"lu",name:"Luxembourg",flag:"🇱🇺"},
-            {code:"lv",name:"Latvia",flag:"🇱🇻"},{code:"ly",name:"Libya",flag:"🇱🇾"},{code:"ma",name:"Morocco",flag:"🇲🇦"},
-            {code:"mc",name:"Monaco",flag:"🇲🇨"},{code:"md",name:"Moldova",flag:"🇲🇩"},{code:"me",name:"Montenegro",flag:"🇲🇪"},
-            {code:"mk",name:"North Macedonia",flag:"🇲🇰"},{code:"ml",name:"Mali",flag:"🇲🇱"},{code:"mm",name:"Myanmar",flag:"🇲🇲"},
-            {code:"mn",name:"Mongolia",flag:"🇲🇳"},{code:"mq",name:"Martinique",flag:"🇲🇶"},{code:"mt",name:"Malta",flag:"🇲🇹"},
-            {code:"mv",name:"Maldives",flag:"🇲🇻"},{code:"mx",name:"Mexico",flag:"🇲🇽"},{code:"my",name:"Malaysia",flag:"🇲🇾"},
-            {code:"mz",name:"Mozambique",flag:"🇲🇿"},{code:"na",name:"Namibia",flag:"🇳🇦"},{code:"ne",name:"Niger",flag:"🇳🇪"},
-            {code:"ng",name:"Nigeria",flag:"🇳🇬"},{code:"ni",name:"Nicaragua",flag:"🇳🇮"},{code:"nl",name:"Netherlands",flag:"🇳🇱"},
-            {code:"no",name:"Norway",flag:"🇳🇴"},{code:"np",name:"Nepal",flag:"🇳🇵"},{code:"nz",name:"New Zealand",flag:"🇳🇿"},
-            {code:"om",name:"Oman",flag:"🇴🇲"},{code:"pa",name:"Panama",flag:"🇵🇦"},{code:"pe",name:"Peru",flag:"🇵🇪"},
-            {code:"ph",name:"Philippines",flag:"🇵🇭"},{code:"pk",name:"Pakistan",flag:"🇵🇰"},{code:"pl",name:"Poland",flag:"🇵🇱"},
-            {code:"pr",name:"Puerto Rico",flag:"🇵🇷"},{code:"ps",name:"Palestine",flag:"🇵🇸"},{code:"pt",name:"Portugal",flag:"🇵🇹"},
-            {code:"py",name:"Paraguay",flag:"🇵🇾"},{code:"qa",name:"Qatar",flag:"🇶🇦"},{code:"ro",name:"Romania",flag:"🇷🇴"},
-            {code:"rs",name:"Serbia",flag:"🇷🇸"},{code:"ru",name:"Russia",flag:"🇷🇺"},{code:"rw",name:"Rwanda",flag:"🇷🇼"},
-            {code:"sa",name:"Saudi Arabia",flag:"🇸🇦"},{code:"sd",name:"Sudan",flag:"🇸🇩"},{code:"se",name:"Sweden",flag:"🇸🇪"},
-            {code:"sg",name:"Singapore",flag:"🇸🇬"},{code:"si",name:"Slovenia",flag:"🇸🇮"},{code:"sk",name:"Slovakia",flag:"🇸🇰"},
-            {code:"sn",name:"Senegal",flag:"🇸🇳"},{code:"sr",name:"Suriname",flag:"🇸🇷"},{code:"sv",name:"El Salvador",flag:"🇸🇻"},
-            {code:"sx",name:"Sint Maarten",flag:"🇸🇽"},{code:"sy",name:"Syria",flag:"🇸🇾"},{code:"td",name:"Chad",flag:"🇹🇩"},
-            {code:"tg",name:"Togo",flag:"🇹🇬"},{code:"th",name:"Thailand",flag:"🇹🇭"},{code:"tj",name:"Tajikistan",flag:"🇹🇯"},
-            {code:"tn",name:"Tunisia",flag:"🇹🇳"},{code:"tr",name:"Turkey",flag:"🇹🇷"},{code:"tt",name:"Trinidad",flag:"🇹🇹"},
-            {code:"tw",name:"Taiwan",flag:"🇹🇼"},{code:"tz",name:"Tanzania",flag:"🇹🇿"},{code:"ua",name:"Ukraine",flag:"🇺🇦"},
-            {code:"ug",name:"Uganda",flag:"🇺🇬"},{code:"uk",name:"UK",flag:"🇬🇧"},{code:"us",name:"USA",flag:"🇺🇸"},
-            {code:"uy",name:"Uruguay",flag:"🇺🇾"},{code:"uz",name:"Uzbekistan",flag:"🇺🇿"},{code:"ve",name:"Venezuela",flag:"🇻🇪"},
-            {code:"vg",name:"Brit. Virgin Is.",flag:"🇻🇬"},{code:"vn",name:"Vietnam",flag:"🇻🇳"},{code:"xk",name:"Kosovo",flag:"🇽🇰"},
-            {code:"ye",name:"Yemen",flag:"🇾🇪"},{code:"za",name:"South Africa",flag:"🇿🇦"},{code:"zw",name:"Zimbabwe",flag:"🇿🇼"}
+            {code:"af",name:"Afghanistan",flag:"🇦🇫"},{code:"al",name:"Albania",flag:"🇦🇱"},{code:"dz",name:"Algeria",flag:"🇩🇿"},
+            {code:"ad",name:"Andorra",flag:"🇦🇩"},{code:"ao",name:"Angola",flag:"🇦🇴"},{code:"ar",name:"Argentina",flag:"🇦🇷"},
+            {code:"am",name:"Armenia",flag:"🇦🇲"},{code:"au",name:"Australia",flag:"🇦🇺"},{code:"at",name:"Austria",flag:"🇦🇹"},
+            {code:"az",name:"Azerbaijan",flag:"🇦🇿"},{code:"bs",name:"Bahamas",flag:"🇧🇸"},{code:"bh",name:"Bahrain",flag:"🇧🇭"},
+            {code:"bd",name:"Bangladesh",flag:"🇧🇩"},{code:"bb",name:"Barbados",flag:"🇧🇧"},{code:"by",name:"Belarus",flag:"🇧🇾"},
+            {code:"be",name:"Belgium",flag:"🇧🇪"},{code:"bz",name:"Belize",flag:"🇧🇿"},{code:"bj",name:"Benin",flag:"🇧🇯"},
+            {code:"bt",name:"Bhutan",flag:"🇧🇹"},{code:"bo",name:"Bolivia",flag:"🇧🇴"},{code:"ba",name:"Bosnia",flag:"🇧🇦"},
+            {code:"bw",name:"Botswana",flag:"🇧🇼"},{code:"br",name:"Brazil",flag:"🇧🇷"},{code:"bn",name:"Brunei",flag:"🇧🇳"},
+            {code:"bg",name:"Bulgaria",flag:"🇧🇬"},{code:"bf",name:"Burkina Faso",flag:"🇧🇫"},{code:"kh",name:"Cambodia",flag:"🇰🇭"},
+            {code:"cm",name:"Cameroon",flag:"🇨🇲"},{code:"ca",name:"Canada",flag:"🇨🇦"},{code:"cv",name:"Cape Verde",flag:"🇨🇻"},
+            {code:"cl",name:"Chile",flag:"🇨🇱"},{code:"cn",name:"China",flag:"🇨🇳"},{code:"co",name:"Colombia",flag:"🇨🇴"},
+            {code:"km",name:"Comoros",flag:"🇰🇲"},{code:"cg",name:"Congo",flag:"🇨🇬"},{code:"cr",name:"Costa Rica",flag:"🇨🇷"},
+            {code:"hr",name:"Croatia",flag:"🇭🇷"},{code:"cu",name:"Cuba",flag:"🇨🇺"},{code:"cy",name:"Cyprus",flag:"🇨🇾"},
+            {code:"cz",name:"Czechia",flag:"🇨🇿"},{code:"dk",name:"Denmark",flag:"🇩🇰"},{code:"dj",name:"Djibouti",flag:"🇩🇯"},
+            {code:"dm",name:"Dominica",flag:"🇩🇲"},{code:"do",name:"Dominican Rep.",flag:"🇩🇴"},{code:"ec",name:"Ecuador",flag:"🇪🇨"},
+            {code:"eg",name:"Egypt",flag:"🇪🇬"},{code:"sv",name:"El Salvador",flag:"🇸🇻"},{code:"ee",name:"Estonia",flag:"🇪🇪"},
+            {code:"et",name:"Ethiopia",flag:"🇪🇹"},{code:"fj",name:"Fiji",flag:"🇫🇯"},{code:"fi",name:"Finland",flag:"🇫🇮"},
+            {code:"fr",name:"France",flag:"🇫🇷"},{code:"ga",name:"Gabon",flag:"🇬🇦"},{code:"gm",name:"Gambia",flag:"🇬🇲"},
+            {code:"ge",name:"Georgia",flag:"🇬🇪"},{code:"de",name:"Germany",flag:"🇩🇪"},{code:"gh",name:"Ghana",flag:"🇬🇭"},
+            {code:"gr",name:"Greece",flag:"🇬🇷"},{code:"gd",name:"Grenada",flag:"🇬🇩"},{code:"gt",name:"Guatemala",flag:"🇬🇹"},
+            {code:"gn",name:"Guinea",flag:"🇬🇳"},{code:"gy",name:"Guyana",flag:"🇬🇾"},{code:"ht",name:"Haiti",flag:"🇭🇹"},
+            {code:"hn",name:"Honduras",flag:"🇭🇳"},{code:"hk",name:"Hong Kong",flag:"🇭🇰"},{code:"hu",name:"Hungary",flag:"🇭🇺"},
+            {code:"is",name:"Iceland",flag:"🇮🇸"},{code:"in",name:"India",flag:"🇮🇳"},{code:"id",name:"Indonesia",flag:"🇮🇩"},
+            {code:"ir",name:"Iran",flag:"🇮🇷"},{code:"iq",name:"Iraq",flag:"🇮🇶"},{code:"ie",name:"Ireland",flag:"🇮🇪"},
+            {code:"il",name:"Israel",flag:"🇮🇱"},{code:"it",name:"Italy",flag:"🇮🇹"},{code:"jm",name:"Jamaica",flag:"🇯🇲"},
+            {code:"jp",name:"Japan",flag:"🇯🇵"},{code:"jo",name:"Jordan",flag:"🇯🇴"},{code:"kz",name:"Kazakhstan",flag:"🇰🇿"},
+            {code:"ke",name:"Kenya",flag:"🇰🇪"},{code:"kp",name:"Korea (North)",flag:"🇰🇵"},{code:"kr",name:"Korea (South)",flag:"🇰🇷"},
+            {code:"kw",name:"Kuwait",flag:"🇰🇼"},{code:"kg",name:"Kyrgyzstan",flag:"🇰🇬"},{code:"la",name:"Laos",flag:"🇱🇦"},
+            {code:"lv",name:"Latvia",flag:"🇱🇻"},{code:"lb",name:"Lebanon",flag:"🇱🇧"},{code:"ls",name:"Lesotho",flag:"🇱🇸"},
+            {code:"lr",name:"Liberia",flag:"🇱🇷"},{code:"ly",name:"Libya",flag:"🇱🇾"},{code:"li",name:"Liechtenstein",flag:"🇱🇮"},
+            {code:"lt",name:"Lithuania",flag:"🇱🇹"},{code:"lu",name:"Luxembourg",flag:"🇱🇺"},{code:"mo",name:"Macao",flag:"🇲🇴"},
+            {code:"mk",name:"North Macedonia",flag:"🇲🇰"},{code:"mg",name:"Madagascar",flag:"🇲🇬"},{code:"my",name:"Malaysia",flag:"🇲🇾"},
+            {code:"mv",name:"Maldives",flag:"🇲🇻"},{code:"ml",name:"Mali",flag:"🇲🇱"},{code:"mt",name:"Malta",flag:"🇲🇹"},
+            {code:"mr",name:"Mauritania",flag:"🇲🇷"},{code:"mu",name:"Mauritius",flag:"🇲🇺"},{code:"mx",name:"Mexico",flag:"🇲🇽"},
+            {code:"fm",name:"Micronesia",flag:"🇫🇲"},{code:"md",name:"Moldova",flag:"🇲🇩"},{code:"mc",name:"Monaco",flag:"🇲🇨"},
+            {code:"mn",name:"Mongolia",flag:"🇲🇳"},{code:"me",name:"Montenegro",flag:"🇲🇪"},{code:"ma",name:"Morocco",flag:"🇲🇦"},
+            {code:"mz",name:"Mozambique",flag:"🇲🇿"},{code:"mm",name:"Myanmar",flag:"🇲🇲"},{code:"na",name:"Namibia",flag:"🇳🇦"},
+            {code:"np",name:"Nepal",flag:"🇳🇵"},{code:"nl",name:"Netherlands",flag:"🇳🇱"},{code:"nz",name:"New Zealand",flag:"🇳🇿"},
+            {code:"ni",name:"Nicaragua",flag:"🇳🇮"},{code:"ne",name:"Niger",flag:"🇳🇪"},{code:"ng",name:"Nigeria",flag:"🇳🇬"},
+            {code:"no",name:"Norway",flag:"🇳🇴"},{code:"om",name:"Oman",flag:"🇴🇲"},{code:"pk",name:"Pakistan",flag:"🇵🇰"},
+            {code:"ps",name:"Palestine",flag:"🇵🇸"},{code:"pa",name:"Panama",flag:"🇵🇦"},{code:"pg",name:"Papua New Guinea",flag:"🇵🇬"},
+            {code:"py",name:"Paraguay",flag:"🇵🇾"},{code:"pe",name:"Peru",flag:"🇵🇪"},{code:"ph",name:"Philippines",flag:"🇵🇭"},
+            {code:"pl",name:"Poland",flag:"🇵🇱"},{code:"pt",name:"Portugal",flag:"🇵🇹"},{code:"pr",name:"Puerto Rico",flag:"🇵🇷"},
+            {code:"qa",name:"Qatar",flag:"🇶🇦"},{code:"ro",name:"Romania",flag:"🇷🇴"},{code:"ru",name:"Russia",flag:"🇷🇺"},
+            {code:"rw",name:"Rwanda",flag:"🇷🇼"},{code:"kn",name:"Saint Kitts",flag:"🇰🇳"},{code:"lc",name:"Saint Lucia",flag:"🇱🇨"},
+            {code:"ws",name:"Samoa",flag:"🇼🇸"},{code:"sm",name:"San Marino",flag:"🇸🇲"},{code:"sa",name:"Saudi Arabia",flag:"🇸🇦"},
+            {code:"sn",name:"Senegal",flag:"🇸🇳"},{code:"rs",name:"Serbia",flag:"🇷🇸"},{code:"sc",name:"Seychelles",flag:"🇸🇨"},
+            {code:"sl",name:"Sierra Leone",flag:"🇸🇱"},{code:"sg",name:"Singapore",flag:"🇸🇬"},{code:"sk",name:"Slovakia",flag:"🇸🇰"},
+            {code:"si",name:"Slovenia",flag:"🇸🇮"},{code:"so",name:"Somalia",flag:"🇸🇴"},{code:"za",name:"South Africa",flag:"🇿🇦"},
+            {code:"es",name:"Spain",flag:"🇪🇸"},{code:"lk",name:"Sri Lanka",flag:"🇱🇰"},{code:"sd",name:"Sudan",flag:"🇸🇩"},
+            {code:"sr",name:"Suriname",flag:"🇸🇷"},{code:"se",name:"Sweden",flag:"🇸🇪"},{code:"ch",name:"Switzerland",flag:"🇨🇭"},
+            {code:"sy",name:"Syria",flag:"🇸🇾"},{code:"tw",name:"Taiwan",flag:"🇹🇼"},{code:"tj",name:"Tajikistan",flag:"🇹🇯"},
+            {code:"tz",name:"Tanzania",flag:"🇹🇿"},{code:"th",name:"Thailand",flag:"🇹🇭"},{code:"tl",name:"Timor-Leste",flag:"🇹🇱"},
+            {code:"tg",name:"Togo",flag:"🇹🇬"},{code:"to",name:"Tonga",flag:"🇹🇴"},{code:"tt",name:"Trinidad & Tobago",flag:"🇹🇹"},
+            {code:"tn",name:"Tunisia",flag:"🇹🇳"},{code:"tr",name:"Turkey",flag:"🇹🇷"},{code:"tm",name:"Turkmenistan",flag:"🇹🇲"},
+            {code:"ug",name:"Uganda",flag:"🇺🇬"},{code:"ua",name:"Ukraine",flag:"🇺🇦"},{code:"ae",name:"UAE",flag:"🇦🇪"},
+            {code:"uk",name:"United Kingdom",flag:"🇬🇧"},{code:"us",name:"USA",flag:"🇺🇸"},{code:"uy",name:"Uruguay",flag:"🇺🇾"},
+            {code:"uz",name:"Uzbekistan",flag:"🇺🇿"},{code:"vu",name:"Vanuatu",flag:"🇻🇺"},{code:"ve",name:"Venezuela",flag:"🇻🇪"},
+            {code:"vn",name:"Vietnam",flag:"🇻🇳"},{code:"ye",name:"Yemen",flag:"🇾🇪"},{code:"zm",name:"Zambia",flag:"🇿🇲"},
+            {code:"zw",name:"Zimbabwe",flag:"🇿🇼"}
         ];
-
-        // --- LOAD SETTINGS ---
-        let currentFontSize = localStorage.getItem('tvPlayerZoom') ? parseInt(localStorage.getItem('tvPlayerZoom')) : 16;
-        document.documentElement.style.fontSize = currentFontSize + 'px';
+        
+        countryList.sort((a,b) => a.name.localeCompare(b.name));
 
         const savedCountry = localStorage.getItem('tvPlayerCountry') || 'tr';
-        
-        // Favorites
-        try {
-            favoriteChannels = JSON.parse(localStorage.getItem('tvPlayerFavorites')) || [];
-        } catch(e) { favoriteChannels = []; }
+        try { favoriteChannels = JSON.parse(localStorage.getItem('tvPlayerFavorites')) || []; } catch(e) { favoriteChannels = []; }
 
         updateCountryDisplay(savedCountry);
 
         function updateCountryDisplay(code) {
             const country = countryList.find(c => c.code === code) || { name: code.toUpperCase(), flag: '🏳️' };
-            document.getElementById('selectedCountryDisplay').innerHTML = `${country.flag} ${country.name}`;
+            // Mobil için sadece Bayrak, Masaüstü için Bayrak + İsim
+            const displayEl = document.getElementById('selectedCountryDisplay');
+            if(displayEl) displayEl.innerHTML = `${country.flag} ${country.name}`;
+            
+            // Mobilde sadece bayrak gösterimi için CSS class'ları html içinde ayarlandı
         }
         
-        function changeZoom(amount) {
-            currentFontSize += amount;
-            if (currentFontSize < 6) currentFontSize = 6;
-            if (currentFontSize > 30) currentFontSize = 30;
-            document.documentElement.style.fontSize = currentFontSize + 'px';
-            localStorage.setItem('tvPlayerZoom', currentFontSize);
-        }
-
         const BASE_URL = "https://raw.githubusercontent.com/famelack/famelack-channels/main/channels/raw/countries/";
 
         function toggleFullScreen() {
@@ -283,7 +336,19 @@
             }
         }
         
-        // --- COUNTRY MENU FUNCTIONS ---
+        function changeZoom(amount) {
+            let currentFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+            currentFontSize += amount;
+            if (currentFontSize < 10) currentFontSize = 10;
+            if (currentFontSize > 24) currentFontSize = 24;
+            document.documentElement.style.fontSize = currentFontSize + 'px';
+            localStorage.setItem('tvPlayerZoom', currentFontSize);
+        }
+
+        // Zoom ayarını yükle
+        const storedZoom = localStorage.getItem('tvPlayerZoom');
+        if(storedZoom) document.documentElement.style.fontSize = storedZoom + 'px';
+
         function toggleCountryMenu() {
             if (countryOverlay.classList.contains('hidden')) {
                 renderCountryGrid();
@@ -297,11 +362,11 @@
             countryGrid.innerHTML = '';
             countryList.forEach(c => {
                 const div = document.createElement('div');
-                div.className = 'country-card';
+                div.className = 'country-card p-3 rounded-lg flex flex-col items-center justify-center cursor-pointer bg-gray-900';
                 div.onclick = () => selectCountry(c.code);
                 div.innerHTML = `
-                    <div class="country-flag">${c.flag}</div>
-                    <div class="country-name">${c.name}</div>
+                    <div class="text-3xl mb-2">${c.flag}</div>
+                    <div class="text-xs font-bold text-gray-300 text-center truncate w-full">${c.name}</div>
                 `;
                 countryGrid.appendChild(div);
             });
@@ -312,19 +377,23 @@
             updateCountryDisplay(code);
             fetchChannels(code);
             countryOverlay.classList.add('hidden');
+            
+            if (hlsPlayer) { hlsPlayer.destroy(); hlsPlayer = null; }
+            const existingVideo = document.getElementById('hls-video');
+            const existingIframe = document.querySelector('#playerWrapper iframe');
+            if(existingVideo) existingVideo.remove();
+            if(existingIframe) existingIframe.remove();
+            
+            placeholderContent.style.display = 'flex';
+            currentChannelTitle.classList.add('hidden');
+            statusMessage.classList.add('hidden');
         }
 
-        // --- FAVORITE SYSTEM ---
         function toggleFavorite(channel, event) {
             event.stopPropagation();
-            
             const index = favoriteChannels.findIndex(fav => fav.name === channel.name);
-            if (index > -1) {
-                favoriteChannels.splice(index, 1);
-            } else {
-                favoriteChannels.push(channel);
-            }
-            
+            if (index > -1) favoriteChannels.splice(index, 1);
+            else favoriteChannels.push(channel);
             localStorage.setItem('tvPlayerFavorites', JSON.stringify(favoriteChannels));
             renderChannels(playableChannels); 
         }
@@ -334,10 +403,12 @@
         }
 
         async function fetchChannels(countryCode) {
+            if (!navigator.onLine) return; 
+
             channelListEl.innerHTML = `
-                <div class="flex items-center justify-center h-full text-gray-500 w-full">
-                    <i class="fas fa-circle-notch fa-spin text-2xl text-red-600 mb-3 mr-2"></i>
-                    <span class="text-xs">Updating List...</span>
+                <div class="flex flex-col items-center justify-center h-40 text-gray-500 w-full">
+                    <i class="fas fa-circle-notch fa-spin text-2xl text-red-600 mb-3"></i>
+                    <span class="text-xs">Updating Channel List...</span>
                 </div>`;
             try {
                 const response = await fetch(`${BASE_URL}${countryCode}.json`);
@@ -345,7 +416,8 @@
                 allChannels = await response.json();
                 renderChannels(allChannels);
             } catch (error) {
-                channelListEl.innerHTML = '<div class="p-4 text-center text-red-400 text-xs w-full">Failed to load list.</div>';
+                channelListEl.innerHTML = '<div class="p-4 text-center text-red-400 text-xs mt-10">No channels found for this country.<br>Please try another.</div>';
+                channelCountEl.innerText = "0";
             }
         }
 
@@ -360,24 +432,28 @@
             channelCountEl.innerText = playableChannels.length;
 
             if (playableChannels.length === 0) {
-                channelListEl.innerHTML = '<div class="p-4 text-center text-gray-500 text-xs w-full">No channels found.</div>';
+                channelListEl.innerHTML = '<div class="p-4 text-center text-gray-500 text-xs mt-10">No active channels found.</div>';
                 return;
             }
 
-            // Separate Favorites
             const favs = playableChannels.filter(ch => isFavorite(ch));
             const others = playableChannels.filter(ch => !isFavorite(ch));
 
-            // Favori Ayracı
             if (favs.length > 0) {
+                const favTitle = document.createElement('div');
+                favTitle.className = "text-[10px] uppercase font-bold text-red-500 px-2 mt-2 mb-1 opacity-70";
+                favTitle.innerText = "Favorites";
+                channelListEl.appendChild(favTitle);
                 favs.forEach((channel, index) => createChannelCard(channel, index, true));
-                
-                // Dikey çizgi (Ayraç)
-                const separator = document.createElement('div');
-                separator.className = "h-12 w-px bg-gray-700 mx-2";
-                channelListEl.appendChild(separator);
+                const divider = document.createElement('div');
+                divider.className = "h-px bg-gray-800 my-2 mx-2";
+                channelListEl.appendChild(divider);
             }
 
+            const allTitle = document.createElement('div');
+            allTitle.className = "text-[10px] uppercase font-bold text-gray-500 px-2 mt-2 mb-1 opacity-70";
+            allTitle.innerText = "All Channels";
+            channelListEl.appendChild(allTitle);
             others.forEach((channel, index) => createChannelCard(channel, index, false));
         }
 
@@ -386,41 +462,35 @@
             const div = document.createElement('div');
             const uniqueId = isFavList ? `fav-${index}` : `ch-${index}`;
             
-            // YATAY KART TASARIMI
-            div.className = `channel-item bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl cursor-pointer p-3 flex items-center shadow-lg group select-none`;
+            div.className = `channel-item w-full p-3 rounded-lg cursor-pointer flex items-center group relative overflow-hidden bg-gray-800/40 border border-gray-800/50 mb-1`;
             div.id = uniqueId;
             div.onclick = () => playChannel(channel, div);
             
-            const icon = isIptv 
-                ? '<div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center mr-3 flex-shrink-0 border border-gray-600"><i class="fas fa-tv text-green-500 text-sm"></i></div>' 
-                : '<div class="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center mr-3 flex-shrink-0 border border-gray-600"><i class="fab fa-youtube text-red-500 text-sm"></i></div>';
-            
-            const heartClass = isFavorite(channel) ? "fas fa-heart is-favorite" : "far fa-heart text-gray-600";
+            const iconClass = isIptv ? "fas fa-satellite-dish text-green-500" : "fab fa-youtube text-red-500";
+            const heartClass = isFavorite(channel) ? "fas fa-heart is-favorite" : "far fa-heart text-gray-600 hover:text-white";
             
             div.innerHTML = `
-                ${icon}
-                <span class="font-bold truncate flex-1 text-sm text-gray-200 tracking-wide">${channel.name}</span>
-                <i onclick="toggleFavorite(this.parentElement.channelData, event)" class="fav-btn ${heartClass} text-base ml-2 hover:text-red-400"></i>
+                <div class="w-8 h-8 rounded bg-gray-900 flex items-center justify-center mr-3 flex-shrink-0 border border-gray-700 shadow-sm">
+                    <i class="${iconClass} text-xs"></i>
+                </div>
+                <span class="channel-name font-medium truncate flex-1 text-sm text-gray-300 tracking-wide">${channel.name}</span>
+                <button onclick="toggleFavorite(this.parentElement.channelData, event)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-700 transition z-10">
+                    <i class="${heartClass} text-xs"></i>
+                </button>
             `;
-            
             div.channelData = channel;
             channelListEl.appendChild(div);
         }
 
         function playChannel(channel, element) {
-            document.querySelectorAll('.channel-item').forEach(el => {
-                el.classList.remove('active-channel');
-                el.classList.replace('bg-red-600', 'bg-gray-800');
-            });
-            
-            if(element) {
-                element.classList.add('active-channel');
-                // Yatay kaydırma hizalaması
-                element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
+            countryOverlay.classList.add('hidden');
+            document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active-channel'));
+            if(element) element.classList.add('active-channel');
 
-            currentChannelTitle.innerHTML = `<span class="text-red-500 mr-2">LIVE:</span> ${channel.name}`;
-            statusMessage.classList.add('hidden');
+            currentChannelTitle.innerHTML = `<span class="text-red-500 mr-2">NOW PLAYING:</span> ${channel.name}`;
+            currentChannelTitle.classList.remove('hidden');
+            statusMessage.classList.remove('hidden');
+            
             if(placeholderContent) placeholderContent.style.display = 'none';
 
             const existingVideo = document.getElementById('hls-video');
@@ -440,15 +510,10 @@
         function playHls(url) {
             const video = document.createElement('video');
             video.id = "hls-video";
-            video.className = "w-full h-full";
             video.controls = true;
             video.autoplay = true;
             video.playsInline = true;
-            // Full width/height styling
-            video.style.cssText = "object-fit: contain; width: 100%; height: 100%; background-color: black;";
-            video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
-
+            video.style.cssText = "width: 100%; height: 100%; background-color: black;";
             playerWrapper.appendChild(video);
 
             if (Hls.isSupported()) {
@@ -468,14 +533,13 @@
             let embedUrl = url;
             if (!url.includes('embed')) {
                 const videoId = url.split('v=')[1] || url.split('/').pop();
-                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&playsinline=1`;
-            } else { embedUrl += "?autoplay=1&playsinline=1"; }
+                embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&showinfo=0&playsinline=1&modestbranding=1`;
+            } else { embedUrl += "?autoplay=1&playsinline=1&modestbranding=1"; }
             
             const iframe = document.createElement('iframe');
             iframe.src = embedUrl;
             iframe.allow = "autoplay; encrypted-media; gyroscope; picture-in-picture";
             iframe.allowFullscreen = true;
-            iframe.className = "w-full h-full border-none";
             playerWrapper.appendChild(iframe);
         }
 
